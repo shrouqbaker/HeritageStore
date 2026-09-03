@@ -1,0 +1,99 @@
+﻿/* ===== About Hero ===== */
+.about-hero {
+    background-color: var(--maroon);
+    color: #fff;
+    padding: 5rem 0 4rem;
+    text-align: center;
+}
+
+    .about-hero h1 {
+        color: #fff;
+        font-size: 2.6rem;
+        margin-bottom: 1rem;
+    }
+
+    .about-hero p {
+        max-width: 650px;
+        margin: 0 auto;
+        font-size: 1.1rem;
+        color: #E4DACD;
+        line-height: 1.9;
+    }
+
+/* ===== Story Block ===== */
+.about-block {
+    padding: 4rem 0;
+}
+
+    .about-block:nth-child(even) {
+        background-color: #F0EAE0;
+    }
+
+    .about-block h2 {
+        margin-bottom: 1.2rem;
+    }
+
+    .about-block p {
+        line-height: 1.9;
+        color: #4a4038;
+        font-size: 1.02rem;
+    }
+
+/* ===== Value Cards (أهمية التوثيق) ===== */
+.value-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2rem 1.5rem;
+    height: 100%;
+    text-align: center;
+}
+
+    .value-card .icon {
+        font-size: 2.2rem;
+        color: var(--maroon);
+        margin-bottom: 1rem;
+    }
+
+    .value-card h5 {
+        margin-bottom: 0.7rem;
+    }
+
+    .value-card p {
+        color: #4a4038;
+        font-size: 0.95rem;
+        line-height: 1.8;
+        margin-bottom: 0;
+    }
+
+/* ===== Contribution Steps ===== */
+.contribute-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+    .contribute-step .step-num {
+        background: var(--green);
+        color: #fff;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-heading);
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .contribute-step h5 {
+        margin-bottom: 0.4rem;
+    }
+
+    .contribute-step p {
+        color: #4a4038;
+        margin-bottom: 0;
+        font-size: 0.95rem;
+    }

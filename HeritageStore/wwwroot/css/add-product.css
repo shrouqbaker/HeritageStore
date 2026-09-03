@@ -1,0 +1,782 @@
+﻿.add-product-form {
+    max-width: 750px;
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   Stepper
+   ========================================================= */
+
+.stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    direction: rtl;
+    max-width: 680px;
+    margin: 0 auto 3rem;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.step-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #b0a496;
+    transition: all 0.25s ease;
+}
+
+.step-item.active .step-circle {
+    background: var(--maroon);
+    border-color: var(--maroon);
+    color: #fff;
+}
+
+.step-item.completed .step-circle {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+}
+
+.step-label {
+    font-size: 0.8rem;
+    color: #8a7d6d;
+}
+
+.step-item.active .step-label {
+    color: var(--maroon);
+    font-weight: 600;
+}
+
+.step-line {
+    flex: 1;
+    height: 2px;
+    background: repeating-linear-gradient( 90deg, var(--border) 0 4px, transparent 4px 8px );
+    margin: 0 0.3rem;
+    margin-bottom: 1.6rem;
+}
+
+
+/* =========================================================
+   Form Steps
+   ========================================================= */
+
+.form-step {
+    display: none;
+}
+
+    .form-step.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* =========================================================
+   Form Section
+   ========================================================= */
+
+.form-section {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+    .form-section h3 {
+        font-size: 1.1rem;
+        margin-bottom: 1.2rem;
+        color: var(--maroon);
+    }
+
+.form-hint {
+    font-size: 0.82rem;
+    color: #8a7d6d;
+    margin-bottom: 0.8rem;
+    font-weight: 400;
+}
+
+.form-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+}
+
+.form-control,
+.form-select {
+    border-color: var(--border);
+    padding: 0.6rem 0.9rem;
+}
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--maroon);
+        box-shadow: 0 0 0 0.2rem rgba(122, 31, 43, 0.08);
+    }
+
+
+/* =========================================================
+   Step Actions
+   ========================================================= */
+
+.step-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    gap: 1rem;
+}
+
+.btn-step-next,
+.btn-step-back {
+    background: var(--maroon);
+    color: #fff;
+    border: none;
+    padding: 0.65rem 1.8rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+    .btn-step-next:hover {
+        background: var(--maroon-dark);
+    }
+
+.btn-step-back {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--ink);
+}
+
+    .btn-step-back:hover {
+        border-color: var(--maroon);
+        color: var(--maroon);
+    }
+
+
+/* =========================================================
+   Dropzone
+   ========================================================= */
+
+.dropzone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 3rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    background: var(--bg);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+    .dropzone.dragover {
+        border-color: var(--maroon);
+        background-color: #FBF3F0;
+    }
+
+.dropzone-icon {
+    font-size: 2.2rem;
+    color: var(--maroon);
+    margin-bottom: 0.5rem;
+}
+
+.dropzone-title {
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+
+.dropzone-sub {
+    font-size: 0.82rem;
+    color: #8a7d6d;
+    margin-bottom: 1.2rem;
+}
+
+
+/* =========================================================
+   Image Preview Grid
+   ========================================================= */
+
+.image-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.image-preview-item {
+    position: relative;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+    .image-preview-item.is-main {
+        border-color: var(--green);
+    }
+
+    .image-preview-item img {
+        width: 100%;
+        flex: 1;
+        object-fit: cover;
+    }
+
+    .image-preview-item.empty {
+        align-items: center;
+        justify-content: center;
+        background: var(--bg);
+        color: #c9bfb0;
+        font-size: 1.6rem;
+    }
+
+    .image-preview-item .set-main-btn {
+        width: 100%;
+        border: none;
+        background: #fff;
+        font-size: 0.68rem;
+        padding: 0.3rem;
+        cursor: pointer;
+    }
+
+    .image-preview-item.is-main .set-main-btn {
+        background: var(--green);
+        color: #fff;
+    }
+
+
+/* =========================================================
+   Remove Image Button
+   ========================================================= */
+
+.remove-image-btn {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--maroon);
+    border: none;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(43, 36, 32, 0.25);
+    transition: all 0.2s ease;
+}
+
+    .remove-image-btn:hover {
+        background: var(--maroon);
+        color: #fff;
+        transform: scale(1.1);
+    }
+
+
+/* =========================================================
+   Embroidery Blocks
+   ========================================================= */
+
+.embroidery-block {
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+    .embroidery-block.has-error {
+        border-color: #C0392B;
+        border-style: solid;
+        background-color: #FBEAEA;
+    }
+
+.embroidery-block-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 500;
+    color: var(--green);
+    margin-bottom: 1rem;
+}
+
+.embroidery-number {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* =========================================================
+   Mini Upload Box
+   ========================================================= */
+
+.mini-upload-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+    .mini-upload-box:hover {
+        border-color: var(--maroon);
+        background-color: #FBF3F0;
+    }
+
+    .mini-upload-box.dragover {
+        border-color: var(--maroon);
+        background-color: #FBF3F0;
+    }
+
+.mini-upload-placeholder {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    color: #b0a496;
+}
+
+.mini-upload-icon {
+    font-size: 1.3rem;
+    color: var(--maroon);
+}
+
+.mini-upload-text {
+    font-size: 0.72rem;
+    text-align: center;
+    padding: 0 0.4rem;
+}
+
+.mini-upload-preview {
+    position: relative;
+    height: 100%;
+}
+
+    .mini-upload-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.mini-remove-btn {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--maroon);
+    border: none;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(43, 36, 32, 0.25);
+    transition: all 0.2s ease;
+}
+
+    .mini-remove-btn:hover {
+        background: var(--maroon);
+        color: #fff;
+    }
+
+
+/* =========================================================
+   Listing Type
+   ========================================================= */
+
+.listing-type-options {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.listing-option {
+    flex: 1;
+    min-width: 220px;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .listing-option:has(input:checked) {
+        border-color: var(--maroon);
+        background-color: #FBF3F0;
+    }
+
+    .listing-option p {
+        font-size: 0.82rem;
+        color: #8a7d6d;
+        margin-bottom: 0;
+    }
+
+
+/* =========================================================
+   Commission Note
+   ========================================================= */
+
+.commission-note {
+    margin-top: 1rem;
+    padding: 0.8rem 1rem;
+    background: #F7F3ED;
+    border-radius: 7px;
+    color: #6b5d4f;
+    font-size: 0.84rem;
+    max-width: 500px;
+}
+
+    .commission-note i {
+        color: var(--gold);
+        margin-left: 0.3rem;
+    }
+
+
+/* =========================================================
+   Errors
+   ========================================================= */
+
+.step-error-msg {
+    background: #FBEAEA;
+    border: 1px solid #E8B4B4;
+    color: #8B2E2E;
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dropzone.has-error {
+    border-color: #C0392B;
+    background-color: #FBEAEA;
+    animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-6px);
+    }
+
+    75% {
+        transform: translateX(6px);
+    }
+}
+
+
+/* =========================================================
+   Confirmation
+   ========================================================= */
+
+.confirm-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.confirm-group {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.confirm-group-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg);
+    padding: 0.7rem 1.2rem;
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--maroon);
+    border-bottom: 1px solid var(--border);
+}
+
+.confirm-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 1.2rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+    gap: 1rem;
+}
+
+    .confirm-row:last-child {
+        border-bottom: none;
+    }
+
+.confirm-label {
+    color: #8a7d6d;
+}
+
+.confirm-value {
+    font-weight: 600;
+    color: var(--ink);
+    text-align: left;
+}
+
+.confirm-commission {
+    color: var(--maroon);
+}
+
+.confirm-thumbs {
+    display: flex;
+    gap: 0.6rem;
+    padding: 0.9rem 1.2rem;
+    flex-wrap: wrap;
+}
+
+    .confirm-thumbs img {
+        width: 56px;
+        height: 56px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+    }
+
+.confirm-highlight {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #F0F5F1;
+    padding: 0.9rem 1.2rem;
+    font-weight: 700;
+    color: var(--green);
+    font-size: 0.98rem;
+}
+
+.confirm-note {
+    background: #F0EAE0;
+    border-radius: 8px;
+    padding: 0.9rem 1.1rem;
+    font-size: 0.85rem;
+    color: #6b5d4f;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+    .confirm-note i {
+        color: var(--gold);
+    }
+
+
+/* =========================================================
+   Agreement
+   ========================================================= */
+
+.confirm-agree {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 1rem 1.1rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-top: 0.5rem;
+}
+
+    .confirm-agree .form-check-input {
+        margin-top: 0.2rem;
+        flex-shrink: 0;
+        cursor: pointer;
+    }
+
+        .confirm-agree .form-check-input:checked {
+            background-color: var(--maroon);
+            border-color: var(--maroon);
+        }
+
+    .confirm-agree label {
+        font-size: 0.88rem;
+        color: #4a4038;
+        cursor: pointer;
+        line-height: 1.7;
+    }
+
+
+/* =========================================================
+   Final Submit Button
+   ========================================================= */
+
+#finalSubmitBtn {
+    min-width: 220px;
+    transition: all 0.2s ease;
+}
+
+    #finalSubmitBtn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    #finalSubmitBtn:not(:disabled) {
+        opacity: 1;
+        cursor: pointer;
+    }
+
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .add-product-form {
+        width: 100%;
+    }
+
+    .form-section {
+        padding: 1.2rem;
+    }
+
+    .stepper {
+        max-width: 100%;
+        margin-bottom: 2rem;
+    }
+
+    .step-circle {
+        width: 36px;
+        height: 36px;
+        font-size: 0.85rem;
+    }
+
+    .step-label {
+        font-size: 0.7rem;
+    }
+
+    .image-preview-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .listing-option {
+        min-width: 100%;
+    }
+
+    .confirm-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .confirm-value {
+        text-align: right;
+    }
+
+    .step-actions {
+        gap: 0.7rem;
+    }
+
+    .btn-step-next,
+    .btn-step-back {
+        padding: 0.6rem 1.1rem;
+    }
+
+    #finalSubmitBtn {
+        min-width: 0;
+        flex: 1;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .stepper {
+        padding: 0 0.2rem;
+    }
+
+    .step-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.75rem;
+    }
+
+    .step-label {
+        font-size: 0.62rem;
+    }
+
+    .step-line {
+        margin-bottom: 1.5rem;
+    }
+
+    .dropzone {
+        padding: 2rem 1rem;
+    }
+
+    .image-preview-grid {
+        gap: 0.6rem;
+    }
+
+    .form-section h3 {
+        font-size: 1rem;
+    }
+
+    .confirm-agree {
+        padding: 0.8rem;
+    }
+
+        .confirm-agree label {
+            font-size: 0.82rem;
+        }
+}
+
+.required-star {
+    color: var(--maroon);
+    font-weight: 700;
+    margin-right: 3px;
+}

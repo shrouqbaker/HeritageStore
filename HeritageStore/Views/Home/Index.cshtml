@@ -1,0 +1,236 @@
+﻿@model HeritageStore.Models.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "الرئيسية";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+}
+<!-- ===== Hero ===== -->
+<section class="hero-section">
+    <div class="hero-overlay"></div>
+
+    <img src="~/images/herosection4.png" class="hero-img" alt="ثوب فلسطيني مطرز" />
+    <div class="hero-content">
+        <h1>من تراثنا... تبدأ الحِكاية</h1>
+        <p>
+            في كل غرزة تطريز حكاية تُروى، وفي كل ثوب هويةٌ تُحفظ.
+            اكتشف تراثنا الأردني والفلسطيني، وكن جزءًا من حكايته.
+        </p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a asp-controller="Explore" asp-action="Index" class="btn btn-heritage">استكشف التراث</a>
+            <a asp-controller="Product" asp-action="Add" class="btn btn-outline-heritage" style="border-color:#fff; color:#fff;">أضف قطعتك</a>
+        </div>
+    </div>
+</section>
+
+
+<!-- ===== أهمية التراث + فيديو ===== -->
+<section class="container section-block">
+    <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+            <h2 class="mb-3">لماذا نوثّق التراث؟</h2>
+            <p class="lead-text">
+                كل نقشة تطريز تحمل رمزًا ودلالة، وكل ثوب يعكس هوية منطقة بأكملها. مع مرور الوقت،
+                تندثر الكثير من هذه الحكايات إن لم تُحفظ وتُنقل للأجيال القادمة رقميًا.
+            </p>
+            <a asp-controller="Home" asp-action="About" class="btn btn-outline-heritage mt-2">اعرف المزيد</a>
+        </div>
+        <div class="col-lg-6">
+            <div class="ratio ratio-16x9">
+                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="التراث الفلسطيني والأردني" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+</section>
+
+@*
+<!-- ===== تعريف مختصر ===== -->
+<section class="container section-block text-center ">
+    <div class="col-lg-8 mx-auto">
+        <h2 class="mb-3">حِكاية تُروى... وتراث يُحفظ</h2>
+        <p class="lead-text">
+            حكاية منصة رقمية تهدف إلى توثيق التراث الأردني والفلسطيني والحفاظ
+            على تفاصيله الأصيلة، من خلال جمع الأثواب والتطريز والإكسسوارات
+            التقليدية في مساحة رقمية واحدة. نمنح أصحاب القطع والحرفيين مكانًا
+            لعرض إرثهم، ليبقى حاضرًا في ذاكرة الأجيال القادمة.
+        </p>
+    </div>
+</section> *@
+
+<!-- ===== أحدث الإضافات ===== -->
+@if (Model.LatestProducts.Any())
+{
+    <div class="back">
+        <section class="container section-block">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <h2>أحدث الإضافات</h2>
+                <a asp-controller="Explore" asp-action="Index">عرض الكل ←</a>
+            </div>
+            <div class="row g-4">
+                @foreach (var product in Model.LatestProducts)
+                {
+                    var mainImage = product.ProductImages.FirstOrDefault(i => i.IsMain) ?? product.ProductImages.FirstOrDefault();
+                    var isForSale = product.ListingType == "for_sale" && product.Price.HasValue;
+                    <div class="col-md-4">
+                        <div class="product-card">
+                            <div class="product-card-media">
+                                <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId">
+                                    <img src="@(mainImage != null ? mainImage.ImageUrl : "/images/placeholder.jpg")" alt="@product.Name" />
+                                </a>
+
+                                <form asp-controller="Favorites" asp-action="Toggle" asp-route-id="@product.ProductId" method="post" class="favorite-form">
+                                    @{
+                                        bool isFav = Model.FavoritedProductIds.Contains(product.ProductId);
+                                    }
+                                    <button type="submit"
+                                            class="favorite-btn @(isFav ? "is-active" : "")"
+                                            title="@(isFav ? "إزالة من المفضلة" : "أضف للمفضلة")"
+                                            aria-label="أضف للمفضلة">
+                                        <i class="bi @(isFav ? "bi-heart-fill" : "bi-heart")"></i>
+                                    </button>
+                                </form>
+
+                                @if (!isForSale)
+                                {
+                                    <span class="badge-archive badge-archive-overlay">للأرشفة</span>
+                                }
+                            </div>
+
+                            <div class="product-card-body">
+                                <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId" class="product-card-title">
+                                    <h5>@product.Name</h5>
+                                </a>
+                                @if (product.EmbroideryType != null)
+                                {
+                                    <p class="text-muted mb-2">تطريز @product.EmbroideryType.Name</p>
+                                }
+
+                                <div class="product-card-footer">
+                                    @if (isForSale)
+                                    {
+                                        <span class="price-tag">@product.Price!.Value.ToString("N0") د.أ</span>
+                                        <form asp-controller="Cart" asp-action="Add" asp-route-id="@product.ProductId" method="post" class="m-0">
+                                            <button type="submit" class="cart-btn" title="أضف للسلة" aria-label="أضف للسلة">
+                                                <i class="bi bi-cart-plus"></i>
+                                                <span>أضف للسلة</span>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">قطعة موثّقة للأرشفة فقط</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    </div>
+}
+
+<!-- ===== استكشف المجموعات ===== -->
+@if (Model.Categories.Any())
+{
+    <section class="container section-block">
+        <h2 class="text-start mb-4">استكشف المجموعات</h2>
+        <div class="row g-3">
+            @{
+                var firstCategory = Model.Categories.FirstOrDefault();
+                var restCategories = Model.Categories.Skip(1).ToList();
+            }
+            @if (firstCategory != null)
+            {
+                <div class="col-lg-6">
+                    <a asp-controller="Explore" asp-action="Index" asp-route-categoryId="@firstCategory.CategoryId"
+                       class="category-tile category-tile-large"
+                       style="background-image:url('@(firstCategory.ImageUrl ?? "/images/placeholder.jpg")')">
+                        <span>@firstCategory.Name</span>
+                    </a>
+                </div>
+            }
+            <div class="col-lg-6">
+                <div class="row g-3 h-100">
+                    @foreach (var category in restCategories)
+                    {
+                        <div class="col-6">
+                            <a asp-controller="Explore" asp-action="Index" asp-route-categoryId="@category.CategoryId"
+                               class="category-tile"
+                               style="background-image:url('@(category.ImageUrl ?? "/images/placeholder.jpg")')">
+                                <span>@category.Name</span>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+<!-- ===== دعوة أخيرة ===== -->
+<section class="cta-section text-center">
+    <div class="container">
+        <h2 class="mb-3">كل حكاية جزء من هويتنا</h2>
+        <div class="lead-text">
+            شارك قطعك التراثية مع مجتمع يهتم بالأصالة.
+        </div>
+        <div class="lead-text mb-4">
+            وثّق حكاية قطعتك، أضف تفاصيلها، وشاركها مع الآخرين أو اعرضها للبيع بسهولة.
+        </div>
+        <a asp-controller="Product" asp-action="Add" class="btn btn-heritage">أضف قطعتك الآن</a>
+    </div>
+</section>
+
+<!-- ===== الإحصائيات ===== -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-bar">
+
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="bi bi-bag-heart"></i>
+                </div>
+
+                <div class="stat-content">
+                    <strong>@(Model.ForSaleProducts)+</strong>
+                    <span>قطعة معروضة للبيع</span>
+                </div>
+            </div>
+
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="bi bi-archive"></i>
+                </div>
+
+                <div class="stat-content">
+                    <strong>@(Model.ArchivedProducts)+</strong>
+                    <span>قطعة موثقة للأرشفة</span>
+                </div>
+            </div>
+
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="bi bi-tags"></i>
+                </div>
+
+                <div class="stat-content">
+                    <strong>@(Model.TotalCategories)+</strong>
+                    <span>تصنيف تراثي</span>
+                </div>
+            </div>
+
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+
+                <div class="stat-content">
+                    <strong>@(Model.TotalUsers)+</strong>
+                    <span>مستخدم</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>

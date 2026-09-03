@@ -1,0 +1,2377 @@
+﻿@model HeritageStore.Models.ViewModels.ProductFormViewModel
+@{
+    ViewData["Title"] = "أضف قطعتك";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/add-product.css" asp-append-version="true" />
+}
+
+<section class="container section-block">
+
+    <div class="add-product-header text-center mb-4">
+        <h1>إضافة قطعة تراثية</h1>
+        <p class="lead-text">شارك إرثك مع العالم، ساهم في بناء المتحف الرقمي</p>
+    </div>
+
+    <!-- ===== Stepper ===== -->
+    <div class="stepper" id="stepper">
+
+        <div class="step-item active" data-step="1">
+            <div class="step-circle">1</div>
+            <span class="step-label">المعلومات</span>
+        </div>
+
+        <div class="step-line"></div>
+
+        <div class="step-item" data-step="2">
+            <div class="step-circle">2</div>
+            <span class="step-label">الصور</span>
+        </div>
+
+        <div class="step-line"></div>
+
+        <div class="step-item" data-step="3">
+            <div class="step-circle">3</div>
+            <span class="step-label">القصة</span>
+        </div>
+
+        <div class="step-line"></div>
+
+        <div class="step-item" data-step="4">
+            <div class="step-circle">4</div>
+            <span class="step-label">العرض</span>
+        </div>
+
+        <div class="step-line"></div>
+
+        <div class="step-item" data-step="5">
+            <div class="step-circle">5</div>
+            <span class="step-label">التأكيد</span>
+        </div>
+
+    </div>
+
+    <form asp-action="Add" method="post" enctype="multipart/form-data" id="productForm" class="add-product-form">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <!-- STEP 1 : المعلومات -->
+        <div class="form-step active" data-step="1">
+
+            <div class="form-section">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">اسم القطعة</label>
+
+                        <input asp-for="Name"
+                               class="form-control"
+                               placeholder="مثلاً: ثوب الخليل التراثي"
+                               required />
+
+                        <span asp-validation-for="Name"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">نوع القطعة</label>
+
+                        <select asp-for="CategoryId"
+                                class="form-select"
+                                required>
+
+                            <option value="">اختر النوع</option>
+
+                            @foreach (var cat in Model.CategoryList!)
+                            {
+                                <option value="@cat.CategoryId">
+                                    @cat.Name
+                                </option>
+                            }
+
+                        </select>
+
+                        <span asp-validation-for="CategoryId"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">الدولة</label>
+
+                        <select asp-for="Country"
+                                id="countrySelect"
+                                class="form-select"
+                                required>
+
+                            <option value="">اختر الدولة</option>
+                            <option value="فلسطين">فلسطين</option>
+                            <option value="الأردن">الأردن</option>
+
+                        </select>
+
+                        <span asp-validation-for="Country"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">نوع التطريز</label>
+
+                        <select asp-for="EmbroideryTypeId"
+                                id="embroideryTypeSelect"
+                                class="form-select">
+
+                            <option value="">
+                                بدون تطريز / غير محدد
+                            </option>
+
+                            @foreach (var et in Model.EmbroideryTypeList!)
+                            {
+                                <option value="@et.EmbroideryTypeId"
+                                        data-country="@et.Country">
+
+                                    @et.Name
+
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-12">
+
+                        <label class="form-label">وصف موجز</label>
+
+                        <textarea asp-for="Description"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="صف شكل القطعة، المواد المستخدمة، وحالتها العامة..."
+                                  required></textarea>
+
+                        <span asp-validation-for="Description"
+                              class="text-danger"></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="step-actions">
+
+                <button type="button"
+                        class="btn-step-next">
+
+                    التالي ←
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================================== -->
+        <!-- STEP 2 : الصور -->
+        <!-- ===================================================== -->
+
+        <div class="form-step" data-step="2">
+
+            <div class="form-section">
+
+                <h3>الصور الرئيسية</h3>
+
+                <p class="form-hint">
+                    يرجى رفع صور واضحة وعالية الجودة للقطعة من زوايا مختلفة،
+                    بخلفية بيضاء أو محايدة.
+                </p>
+
+
+                <div class="dropzone" id="dropzone">
+
+                    <input type="file"
+                           id="imagesInput"
+                           name="Images"
+                           multiple
+                           accept="image/*"
+                           hidden />
+
+
+                    <div class="dropzone-icon">
+                        ☁
+                    </div>
+
+                    <p class="dropzone-title">
+                        اسحب وأفلت الصور هنا
+                    </p>
+
+                    <p class="dropzone-sub">
+                        أو انقر لتصفح الملفات
+                        (الحد الأقصى 5 ميغابايت للصورة)
+                    </p>
+
+
+                    <button type="button"
+                            id="browseBtn"
+                            class="btn-outline-heritage">
+
+                        اختيار الصور
+
+                    </button>
+
+                </div>
+
+
+                <span asp-validation-for="Images"
+                      class="text-danger"></span>
+
+
+                <div id="imagePreviewGrid"
+                     class="image-preview-grid mt-3">
+                </div>
+
+
+                <input type="hidden"
+                       asp-for="MainImageIndex"
+                       id="mainImageIndexInput" />
+
+            </div>
+
+
+            <div class="step-actions">
+
+                <button type="button"
+                        class="btn-step-back">
+
+                    → رجوع
+
+                </button>
+
+
+                <button type="button"
+                        class="btn-step-next">
+
+                    التالي ←
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- STEP 3 : القصة -->
+        <!-- ===================================================== -->
+
+        <div class="form-step" data-step="3">
+
+            <div class="form-section">
+
+                <h3>حكاية القطعة</h3>
+
+                <div class="row g-3">
+
+                    <div class="col-12">
+
+                        <label class="form-label">
+                            قصة الثوب
+                            <span class="required-star">*</span>
+                        </label>
+
+                        <textarea asp-for="Story"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="احكِ لنا قصة هذه القطعة، كيف وصلت إليك، وكيف كانت تُستخدم..."
+                                  required></textarea>
+
+                        <span asp-validation-for="Story"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="col-12">
+
+                        <label class="form-label">
+                            الخلفية التاريخية
+                            <span class="required-star">*</span>
+                        </label>
+
+                        <textarea asp-for="HistoricalBackground"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="اذكر ما تعرفه عن أصل القطعة، المنطقة التي تنتمي إليها، أو أي معلومات تاريخية وثقافية مرتبطة بها..."
+                                  required></textarea>
+
+                        <span asp-validation-for="HistoricalBackground"
+                              class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="col-12">
+
+                        <label class="form-label">
+                            معلومات إضافية
+                        </label>
+
+                        <textarea asp-for="AdditionalInfo"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="أي معلومات أخرى ترغب بإضافتها عن القطعة...">
+                </textarea>
+
+                        <span asp-validation-for="AdditionalInfo"
+                              class="text-danger"></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- التطريز -->
+            <!-- ================================================= -->
+
+            <div class="form-section">
+
+                <h3>
+                    التطريز
+                    <span class="form-hint">
+                        (اختياري، حتى 3 تطريزات)
+                    </span>
+                </h3>
+
+
+                <div id="embroideryContainer">
+
+                    @for (int i = 0; i < 3; i++)
+                    {
+                        <div class="embroidery-block"
+                             data-index="@i">
+
+                            <div class="embroidery-block-header">
+
+                                <span class="embroidery-number">
+                                    @(i + 1)
+                                </span>
+
+                                <span>
+                                    تطريزة @(i + 1)
+                                </span>
+
+                            </div>
+
+
+                            <div class="row g-3 align-items-start">
+
+                                <div class="col-md-3">
+
+                                    <label class="form-label">
+                                        صورة التطريز
+                                    </label>
+
+                                    <div class="mini-upload-box">
+
+                                        <input type="file"
+                                               name="Embroideries[@i].Image"
+                                               class="mini-upload-input"
+                                               accept="image/*"
+                                               hidden />
+
+                                        <div class="mini-upload-placeholder">
+
+                                            <span class="mini-upload-icon">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </span>
+
+                                            <span class="mini-upload-text">
+                                                إضافة صورة
+                                            </span>
+
+                                        </div>
+
+
+                                        <div class="mini-upload-preview"
+                                             style="display:none;">
+
+                                            <img src=""
+                                                 alt="" />
+
+                                            <button type="button"
+                                                    class="mini-remove-btn">
+
+                                                <i class="bi bi-x-lg"></i>
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="col-md-4">
+
+                                    <label class="form-label">
+                                        الاسم
+                                    </label>
+
+                                    <input type="text"
+                                           name="Embroideries[@i].Name"
+                                           class="form-control"
+                                           placeholder="مثلاً: شجرة السرو" />
+
+                                </div>
+
+
+                                <div class="col-md-5">
+
+                                    <label class="form-label">
+                                        المعنى / الدلالة
+                                    </label>
+
+                                    <textarea name="Embroideries[@i].Description"
+                                              class="form-control"
+                                              rows="3"
+                                              placeholder="ما معنى هذا الرمز أو التطريز؟">
+                            </textarea>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <div class="step-actions">
+
+                <button type="button"
+                        class="btn-step-back">
+
+                    → رجوع
+
+                </button>
+
+
+                <button type="button"
+                        class="btn-step-next">
+
+                    التالي ←
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================================== -->
+        <!-- STEP 4 : العرض -->
+        <!-- ===================================================== -->
+
+        <div class="form-step" data-step="4">
+
+            <div class="form-section">
+
+                <h3>نوع الإدراج</h3>
+
+
+                <div class="listing-type-options">
+
+                    <label class="listing-option">
+
+                        <input type="radio"
+                               asp-for="ListingType"
+                               value="archive_only"
+                               id="radioArchive"
+                               checked />
+
+                        <div>
+
+                            <strong>
+                                للأرشفة فقط
+                            </strong>
+
+                            <p>
+                                القطعة تكون متاحة للمشاهدة والتوثيق فقط،
+                                غير متاحة للشراء
+                            </p>
+
+                        </div>
+
+                    </label>
+
+
+                    <label class="listing-option">
+
+                        <input type="radio"
+                               asp-for="ListingType"
+                               value="for_sale"
+                               id="radioForSale" />
+
+                        <div>
+
+                            <strong>
+                                للبيع
+                            </strong>
+
+                            <p>
+                                عرض القطعة للبيع مع تحديد السعر
+                            </p>
+
+                        </div>
+
+                    </label>
+
+                </div>
+
+
+                <div id="priceField"
+                     class="mt-3"
+                     style="display:none;">
+
+                    <label class="form-label">
+                        السعر (د.أ)
+                    </label>
+
+                    <input asp-for="Price"
+                           type="number"
+                           step="0.01"
+                           min="0.01"
+                           class="form-control"
+                           style="max-width:250px;"
+                           id="priceInput" />
+
+                    <span asp-validation-for="Price"
+                          class="text-danger">
+                    </span>
+
+
+                    <div class="commission-note">
+
+                        <i class="bi bi-info-circle"></i>
+
+                        تستقطع المنصة عمولة
+                        <strong>5%</strong>
+                        من سعر البيع عند إتمام عملية الشراء.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- عنوان الاستلام -->
+
+            <div class="form-section">
+
+                <h3>
+                    عنوان استلام القطعة
+                </h3>
+
+                <p class="form-hint">
+                    هذا العنوان سيُستخدم لاستلام القطعة منك
+                    في حال تم بيعها
+                </p>
+
+
+                <input asp-for="PickupAddress"
+                       class="form-control"
+                       style="max-width:500px;"
+                       placeholder="المدينة، الحي، أقرب معلم..."
+                       required
+                       id="pickupAddressInput" />
+
+
+                <span asp-validation-for="PickupAddress"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <div class="step-actions">
+
+                <button type="button"
+                        class="btn-step-back">
+
+                    → رجوع
+
+                </button>
+
+
+                <button type="button"
+                        class="btn-step-next"
+                        id="goToConfirmBtn">
+
+                    التالي ←
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================================== -->
+        <!-- STEP 5 : التأكيد -->
+        <!-- ===================================================== -->
+
+        <div class="form-step" data-step="5">
+
+            <div class="form-section confirm-section">
+
+                <h3>
+                    راجع معلومات قطعتك قبل الإرسال
+                </h3>
+
+
+                <div class="confirm-groups">
+
+
+                    <!-- معلومات القطعة -->
+
+                    <div class="confirm-group">
+
+                        <div class="confirm-group-title">
+
+                            <i class="bi bi-info-circle"></i>
+
+                            معلومات القطعة
+
+                        </div>
+
+
+                        <div class="confirm-row">
+
+                            <span class="confirm-label">
+                                اسم القطعة
+                            </span>
+
+                            <span class="confirm-value"
+                                  id="confirmName">
+                                —
+                            </span>
+
+                        </div>
+
+
+                        <div class="confirm-row">
+
+                            <span class="confirm-label">
+                                التصنيف
+                            </span>
+
+                            <span class="confirm-value"
+                                  id="confirmCategory">
+                                —
+                            </span>
+
+                        </div>
+
+
+                        <div class="confirm-row">
+
+                            <span class="confirm-label">
+                                الدولة
+                            </span>
+
+                            <span class="confirm-value"
+                                  id="confirmCountry">
+                                —
+                            </span>
+
+                        </div>
+
+
+                        <div class="confirm-row">
+
+                            <span class="confirm-label">
+                                نوع التطريز
+                            </span>
+
+                            <span class="confirm-value"
+                                  id="confirmEmbroidery">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- الصور -->
+
+                    <div class="confirm-group">
+
+                        <div class="confirm-group-title">
+
+                            <i class="bi bi-images"></i>
+
+                            الصور
+
+                        </div>
+
+
+                        <div class="confirm-row">
+
+                            <span class="confirm-label">
+                                عدد الصور المرفوعة
+                            </span>
+
+                            <span class="confirm-value"
+                                  id="confirmImagesCount">
+                                —
+                            </span>
+
+                        </div>
+
+
+                        <div class="confirm-thumbs"
+                             id="confirmImagesStrip">
+                        </div>
+
+                    </div>
+
+
+                    <!-- التسعير -->
+
+                    <div class="confirm-group"
+                         id="confirmPricingGroup">
+
+                        <div class="confirm-group-title">
+
+                            <i class="bi bi-tag"></i>
+
+                            التسعير والعرض
+
+                        </div>
+
+
+                        <div class="confirm-row">
+
+                            <span class="confirm-label">
+                                نوع الإدراج
+                            </span>
+
+                            <span class="confirm-value"
+                                  id="confirmListingType">
+                                —
+                            </span>
+
+                        </div>
+
+
+                        <div class="confirm-row"
+                             id="confirmPriceRow"
+                             style="display:none;">
+
+                            <span class="confirm-label">
+                                السعر
+                            </span>
+
+                            <span class="confirm-value"
+                                  id="confirmPrice">
+                                —
+                            </span>
+
+                        </div>
+
+
+                        <div class="confirm-row"
+                             id="confirmCommissionRow"
+                             style="display:none;">
+
+                            <span class="confirm-label">
+                                عمولة المنصة (5%)
+                            </span>
+
+                            <span class="confirm-value confirm-commission"
+                                  id="confirmCommission">
+                                —
+                            </span>
+
+                        </div>
+
+
+                        <div class="confirm-highlight"
+                             id="confirmNetRow"
+                             style="display:none;">
+
+                            <span>
+
+                                <i class="bi bi-cash-coin"></i>
+
+                                صافي ما تستلمه
+
+                            </span>
+
+                            <span id="confirmNet">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- الاستلام -->
+
+                    <div class="confirm-group">
+
+                        <div class="confirm-group-title">
+
+                            <i class="bi bi-geo-alt"></i>
+
+                            الاستلام
+
+                        </div>
+
+
+                        <div class="confirm-row">
+
+                            <span class="confirm-label">
+                                عنوان الاستلام
+                            </span>
+
+                            <span class="confirm-value"
+                                  id="confirmAddress">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ملاحظة المراجعة -->
+
+                <div class="confirm-note">
+
+                    <i class="bi bi-clock-history"></i>
+
+                    بعد الإرسال، ستخضع القطعة لمراجعة فريق
+                    "حِكاية" قبل ظهورها على المنصة.
+
+                </div>
+
+
+                <!-- الموافقة النهائية -->
+
+                <div class="form-check confirm-agree">
+
+                    <input class="form-check-input  ms-1"
+                           type="checkbox"
+                           id="agreeCheckbox"
+                           required />
+
+                    <label class="form-check-label"
+                           for="agreeCheckbox">
+
+                        أؤكد صحة المعلومات المدخلة،
+                        وأوافق على شروط المنصة وسياسة العمولة عند البيع.
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- أزرار الخطوة الأخيرة -->
+
+            <div class="step-actions">
+
+                <button type="button"
+                        class="btn-step-back">
+
+                    → رجوع
+
+                </button>
+
+
+                <button type="submit"
+                        class="btn btn-heritage px-5"
+                        id="finalSubmitBtn"
+                        disabled>
+
+                    إرسال القطعة للمراجعة
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</section>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+
+    <script>
+
+        // =========================================================
+        // Stepper Navigation
+        // =========================================================
+
+        const steps = document.querySelectorAll('.form-step');
+        const stepItems = document.querySelectorAll('.step-item');
+
+        let currentStep = 1;
+
+        const totalSteps = 5;
+
+
+        function goToStep(stepNum) {
+
+            steps.forEach(step => {
+
+                step.classList.toggle(
+                    'active',
+                    step.dataset.step == stepNum
+                );
+
+            });
+
+
+            stepItems.forEach(item => {
+
+                const number =
+                    parseInt(item.dataset.step);
+
+                item.classList.toggle(
+                    'active',
+                    number === stepNum
+                );
+
+                item.classList.toggle(
+                    'completed',
+                    number < stepNum
+                );
+
+            });
+
+
+            currentStep = stepNum;
+
+
+            if (stepNum === totalSteps) {
+
+                fillConfirmationSummary();
+
+            }
+
+
+            window.scrollTo({
+
+                top:
+                    document.getElementById('stepper').offsetTop - 30,
+
+                behavior: 'smooth'
+
+            });
+
+        }
+
+
+
+        // =========================================================
+        // Next Buttons
+        // =========================================================
+
+        document
+            .querySelectorAll('.btn-step-next')
+            .forEach(button => {
+
+                button.addEventListener('click', () => {
+
+                    const currentFields =
+                        document.querySelector(
+                            `.form-step[data-step="${currentStep}"]`
+                        );
+
+
+                    const requiredInputs =
+                        currentFields.querySelectorAll('[required]');
+
+
+                    let valid = true;
+
+
+                    // التحقق من الحقول المطلوبة
+
+                    requiredInputs.forEach(input => {
+
+                        if (!input.checkValidity()) {
+
+                            input.reportValidity();
+
+                            valid = false;
+
+                        }
+
+                    });
+
+
+                    // =================================================
+                    // Step 2 - الصور
+                    // =================================================
+
+                    if (valid && currentStep === 2) {
+
+                        if (selectedFiles.length === 0) {
+
+                            dropzone.classList.add('has-error');
+
+                            showStepError(
+                                currentFields,
+                                '⚠ يجب رفع صورة واحدة على الأقل للقطعة قبل المتابعة'
+                            );
+
+                            valid = false;
+
+                        }
+                        else {
+
+                            dropzone.classList.remove('has-error');
+
+                            clearStepError(currentFields);
+
+                        }
+
+                    }
+
+
+                    // =================================================
+                    // Step 3 - التطريز
+                    // =================================================
+
+                    if (valid && currentStep === 3) {
+
+                        const embroideryError =
+                            validateEmbroideryBlocks();
+
+
+                        if (embroideryError) {
+
+                            showStepError(
+                                currentFields,
+                                '⚠ ' + embroideryError
+                            );
+
+                            valid = false;
+
+                        }
+                        else {
+
+                            clearStepError(currentFields);
+
+                        }
+
+                    }
+
+
+                    // =================================================
+                    // Step 4 - البيع والسعر
+                    // =================================================
+
+                    if (valid && currentStep === 4) {
+
+                        const isForSale =
+                            document.getElementById('radioForSale').checked;
+
+
+                        if (isForSale) {
+
+                            const price =
+                                parseFloat(priceInput.value);
+
+
+                            if (
+                                isNaN(price) ||
+                                price <= 0
+                            ) {
+
+                                priceInput.setCustomValidity(
+                                    'يرجى إدخال سعر صحيح أكبر من صفر'
+                                );
+
+                                priceInput.reportValidity();
+
+                                priceInput.setCustomValidity('');
+
+                                valid = false;
+
+                            }
+
+                        }
+
+                    }
+
+
+                    if (valid) {
+
+                        clearStepError(currentFields);
+
+                        goToStep(currentStep + 1);
+
+                    }
+
+                });
+
+            });
+
+
+
+        // =========================================================
+        // Back Buttons
+        // =========================================================
+
+        document
+            .querySelectorAll('.btn-step-back')
+            .forEach(button => {
+
+                button.addEventListener('click', () => {
+
+                    if (currentStep > 1) {
+
+                        goToStep(currentStep - 1);
+
+                    }
+
+                });
+
+            });
+
+
+
+        // =========================================================
+        // Step Errors
+        // =========================================================
+
+        function showStepError(container, message) {
+
+            clearStepError(container);
+
+
+            const errorDiv =
+                document.createElement('div');
+
+
+            errorDiv.className =
+                'step-error-msg';
+
+
+            errorDiv.textContent =
+                message;
+
+
+            const lastSection =
+                container.querySelector(
+                    '.form-section:last-of-type'
+                );
+
+
+            lastSection.appendChild(errorDiv);
+
+
+            errorDiv.scrollIntoView({
+
+                behavior: 'smooth',
+
+                block: 'center'
+
+            });
+
+        }
+
+
+        function clearStepError(container) {
+
+            const existing =
+                container.querySelector(
+                    '.step-error-msg'
+                );
+
+
+            if (existing) {
+
+                existing.remove();
+
+            }
+
+        }
+
+
+
+        // =========================================================
+        // Validate Embroidery
+        // =========================================================
+
+        function validateEmbroideryBlocks() {
+
+            const blocks =
+                document.querySelectorAll(
+                    '.embroidery-block'
+                );
+
+
+            let firstErrorIndex = -1;
+
+
+            blocks.forEach((block, index) => {
+
+                const nameInput =
+                    block.querySelector(
+                        'input[type="text"]'
+                    );
+
+
+                const descInput =
+                    block.querySelector(
+                        'textarea'
+                    );
+
+
+                const imageInput =
+                    block.querySelector(
+                        'input[type="file"]'
+                    );
+
+
+                const hasName =
+                    nameInput.value.trim() !== '';
+
+
+                const hasDescription =
+                    descInput.value.trim() !== '';
+
+
+                const hasImage =
+                    imageInput.files.length > 0;
+
+
+                const filledCount =
+                    [
+                        hasName,
+                        hasDescription,
+                        hasImage
+                    ].filter(Boolean).length;
+
+
+                const isIncomplete =
+                    filledCount > 0 &&
+                    filledCount < 3;
+
+
+                block.classList.toggle(
+                    'has-error',
+                    isIncomplete
+                );
+
+
+                if (
+                    isIncomplete &&
+                    firstErrorIndex === -1
+                ) {
+
+                    firstErrorIndex = index;
+
+                }
+
+            });
+
+
+            if (firstErrorIndex !== -1) {
+
+                return `تطريزة ${firstErrorIndex + 1}: يجب تعبئة الصورة والاسم والمعنى معًا، أو تركها فارغة بالكامل`;
+
+            }
+
+
+            return null;
+
+        }
+
+
+
+        // =========================================================
+        // فلترة التطريز حسب الدولة
+        // =========================================================
+
+        const countrySelect =
+            document.getElementById(
+                'countrySelect'
+            );
+
+
+        const embroiderySelect =
+            document.getElementById(
+                'embroideryTypeSelect'
+            );
+
+
+        const allEmbOptions =
+            Array.from(
+                embroiderySelect.options
+            );
+
+
+        function filterEmbroideryOptions() {
+
+            const selectedCountry =
+                countrySelect.value;
+
+
+            embroiderySelect.innerHTML = '';
+
+
+            embroiderySelect.appendChild(
+                new Option(
+                    'بدون تطريز / غير محدد',
+                    ''
+                )
+            );
+
+
+            allEmbOptions.forEach(option => {
+
+                if (
+                    option.dataset.country ===
+                    selectedCountry
+                ) {
+
+                    embroiderySelect.appendChild(
+                        option.cloneNode(true)
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        countrySelect.addEventListener(
+            'change',
+            filterEmbroideryOptions
+        );
+
+
+
+        // =========================================================
+        // رفع الصور الرئيسية
+        // =========================================================
+
+        const dropzone =
+            document.getElementById(
+                'dropzone'
+            );
+
+
+        const imagesInput =
+            document.getElementById(
+                'imagesInput'
+            );
+
+
+        const browseBtn =
+            document.getElementById(
+                'browseBtn'
+            );
+
+
+        const previewGrid =
+            document.getElementById(
+                'imagePreviewGrid'
+            );
+
+
+        const mainImageIndexInput =
+            document.getElementById(
+                'mainImageIndexInput'
+            );
+
+
+        let selectedFiles = [];
+
+
+        // فتح اختيار الملفات
+
+        browseBtn.addEventListener(
+            'click',
+            event => {
+
+                event.stopPropagation();
+
+                imagesInput.click();
+
+            }
+        );
+
+
+        dropzone.addEventListener(
+            'click',
+            event => {
+
+                if (
+                    event.target === browseBtn ||
+                    event.target.closest('#browseBtn')
+                ) {
+
+                    return;
+
+                }
+
+
+                imagesInput.click();
+
+            }
+        );
+
+
+        // Drag & Drop
+
+        ['dragover', 'dragenter']
+            .forEach(eventName => {
+
+                dropzone.addEventListener(
+                    eventName,
+                    event => {
+
+                        event.preventDefault();
+
+                        dropzone.classList.add(
+                            'dragover'
+                        );
+
+                    }
+                );
+
+            });
+
+
+        ['dragleave', 'drop']
+            .forEach(eventName => {
+
+                dropzone.addEventListener(
+                    eventName,
+                    event => {
+
+                        event.preventDefault();
+
+                        dropzone.classList.remove(
+                            'dragover'
+                        );
+
+                    }
+                );
+
+            });
+
+
+        dropzone.addEventListener(
+            'drop',
+            event => {
+
+                handleFiles(
+                    event.dataTransfer.files
+                );
+
+            }
+        );
+
+
+        imagesInput.addEventListener(
+            'change',
+            () => {
+
+                handleFiles(
+                    imagesInput.files
+                );
+
+            }
+        );
+
+
+
+        function handleFiles(fileList) {
+
+            const files =
+                Array.from(fileList);
+
+
+            // الحد الأقصى 5 ميغابايت للصورة
+
+            const validFiles =
+                files.filter(file => {
+
+                    if (
+                        !file.type.startsWith('image/')
+                    ) {
+
+                        return false;
+
+                    }
+
+
+                    if (
+                        file.size >
+                        5 * 1024 * 1024
+                    ) {
+
+                        alert(
+                            `الصورة "${file.name}" تتجاوز الحد الأقصى وهو 5 ميغابايت.`
+                        );
+
+                        return false;
+
+                    }
+
+
+                    return true;
+
+                });
+
+
+            selectedFiles =
+                selectedFiles.concat(
+                    validFiles
+                );
+
+
+            syncFilesToInput();
+
+            renderPreviews();
+
+
+            if (
+                selectedFiles.length > 0
+            ) {
+
+                dropzone.classList.remove(
+                    'has-error'
+                );
+
+
+                clearStepError(
+                    document.querySelector(
+                        '.form-step[data-step="2"]'
+                    )
+                );
+
+            }
+
+        }
+
+
+
+        function syncFilesToInput() {
+
+            const dataTransfer =
+                new DataTransfer();
+
+
+            selectedFiles.forEach(file => {
+
+                dataTransfer.items.add(file);
+
+            });
+
+
+            imagesInput.files =
+                dataTransfer.files;
+
+        }
+
+
+
+        function removeImage(index) {
+
+            selectedFiles.splice(
+                index,
+                1
+            );
+
+
+            syncFilesToInput();
+
+
+            if (
+                parseInt(
+                    mainImageIndexInput.value
+                ) >= selectedFiles.length
+            ) {
+
+                mainImageIndexInput.value =
+                    selectedFiles.length > 0
+                        ? 0
+                        : '';
+
+            }
+
+
+            renderPreviews();
+
+        }
+
+
+
+        function renderPreviews() {
+
+            previewGrid.innerHTML = '';
+
+
+            selectedFiles.forEach(
+                (file, index) => {
+
+                    const reader =
+                        new FileReader();
+
+
+                    reader.onload = event => {
+
+                        const isMain =
+                            index ==
+                            mainImageIndexInput.value;
+
+
+                        const box =
+                            document.createElement(
+                                'div'
+                            );
+
+
+                        box.className =
+                            'image-preview-item' +
+                            (
+                                isMain
+                                    ? ' is-main'
+                                    : ''
+                            );
+
+
+                        box.innerHTML = `
+
+                                    <button
+                                        type="button"
+                                        class="remove-image-btn"
+                                        title="إزالة الصورة">
+                                        ×
+                                    </button>
+
+                                    <img
+                                        src="${event.target.result}"
+                                        alt="صورة القطعة" />
+
+                                    <button
+                                        type="button"
+                                        class="set-main-btn">
+
+                                        ${isMain
+                                ? 'الرئيسية ✓'
+                                : 'اجعلها رئيسية'
+                            }
+
+                                    </button>
+
+                                `;
+
+
+                        box
+                            .querySelector(
+                                '.set-main-btn'
+                            )
+                            .addEventListener(
+                                'click',
+                                () => {
+
+                                    mainImageIndexInput.value =
+                                        index;
+
+                                    renderPreviews();
+
+                                }
+                            );
+
+
+                        box
+                            .querySelector(
+                                '.remove-image-btn'
+                            )
+                            .addEventListener(
+                                'click',
+                                () => {
+
+                                    removeImage(
+                                        index
+                                    );
+
+                                }
+                            );
+
+
+                        previewGrid.appendChild(
+                            box
+                        );
+
+                    };
+
+
+                    reader.readAsDataURL(
+                        file
+                    );
+
+                }
+            );
+
+
+            // مربعات فارغة
+
+            const emptyCount =
+                Math.max(
+                    0,
+                    4 - selectedFiles.length
+                );
+
+
+            for (
+                let i = 0;
+                i < emptyCount;
+                i++
+            ) {
+
+                const emptyBox =
+                    document.createElement(
+                        'div'
+                    );
+
+
+                emptyBox.className =
+                    'image-preview-item empty';
+
+
+                emptyBox.innerHTML =
+                    `<span class="empty-icon">🖼</span>`;
+
+
+                previewGrid.appendChild(
+                    emptyBox
+                );
+
+            }
+
+        }
+
+
+        renderPreviews();
+
+
+
+        // =========================================================
+        // إزالة خطأ التطريز أثناء التصحيح
+        // =========================================================
+
+        document
+            .querySelectorAll(
+                '.embroidery-block input, .embroidery-block textarea'
+            )
+            .forEach(element => {
+
+                element.addEventListener(
+                    'input',
+                    () => {
+
+                        document
+                            .querySelectorAll(
+                                '.embroidery-block'
+                            )
+                            .forEach(block => {
+
+                                block.classList.remove(
+                                    'has-error'
+                                );
+
+                            });
+
+
+                        clearStepError(
+                            document.querySelector(
+                                '.form-step[data-step="3"]'
+                            )
+                        );
+
+                    }
+                );
+
+            });
+
+
+
+        // =========================================================
+        // نوع الإدراج والسعر
+        // =========================================================
+
+        const listingRadios =
+            document.querySelectorAll(
+                'input[name="ListingType"]'
+            );
+
+
+        const priceField =
+            document.getElementById(
+                'priceField'
+            );
+
+
+        const priceInput =
+            document.getElementById(
+                'priceInput'
+            );
+
+
+        function togglePriceField() {
+
+            const selected =
+                document.querySelector(
+                    'input[name="ListingType"]:checked'
+                );
+
+
+            const isForSale =
+                selected &&
+                selected.value === 'for_sale';
+
+
+            priceField.style.display =
+                isForSale
+                    ? 'block'
+                    : 'none';
+
+
+            if (!isForSale) {
+
+                priceInput.value = '';
+
+            }
+
+        }
+
+
+        listingRadios.forEach(radio => {
+
+            radio.addEventListener(
+                'change',
+                togglePriceField
+            );
+
+        });
+
+
+        togglePriceField();
+
+
+
+        // =========================================================
+        // التأكيد النهائي
+        // =========================================================
+
+        const agreeCheckbox =
+            document.getElementById(
+                'agreeCheckbox'
+            );
+
+
+        const finalSubmitBtn =
+            document.getElementById(
+                'finalSubmitBtn'
+            );
+
+
+        function updateSubmitButton() {
+
+            finalSubmitBtn.disabled =
+                !agreeCheckbox.checked;
+
+        }
+
+
+        agreeCheckbox.addEventListener(
+            'change',
+            updateSubmitButton
+        );
+
+
+        // الحالة الافتراضية
+
+        updateSubmitButton();
+
+
+
+        // =========================================================
+        // ملخص التأكيد
+        // =========================================================
+
+        function fillConfirmationSummary() {
+
+            // اسم القطعة
+
+            document.getElementById(
+                'confirmName'
+            ).textContent =
+                document.querySelector(
+                    '[name="Name"]'
+                ).value ||
+                '—';
+
+
+
+            // التصنيف
+
+            const categorySelect =
+                document.querySelector(
+                    '[name="CategoryId"]'
+                );
+
+
+            document.getElementById(
+                'confirmCategory'
+            ).textContent =
+                categorySelect
+                    .options[
+                    categorySelect.selectedIndex
+                ]?.text ||
+                '—';
+
+
+
+            // الدولة
+
+            document.getElementById(
+                'confirmCountry'
+            ).textContent =
+                countrySelect.value ||
+                '—';
+
+
+
+            // التطريز
+
+            const embSelect =
+                document.getElementById(
+                    'embroideryTypeSelect'
+                );
+
+
+            document.getElementById(
+                'confirmEmbroidery'
+            ).textContent =
+                embSelect.value
+                    ? embSelect.options[
+                        embSelect.selectedIndex
+                    ].text
+                    : 'بدون تطريز';
+
+
+
+            // عدد الصور
+
+            document.getElementById(
+                'confirmImagesCount'
+            ).textContent =
+                selectedFiles.length +
+                ' صورة';
+
+
+
+            // صور مصغرة
+
+            const stripContainer =
+                document.getElementById(
+                    'confirmImagesStrip'
+                );
+
+
+            stripContainer.innerHTML = '';
+
+
+            const uploadedImgs =
+                previewGrid.querySelectorAll(
+                    '.image-preview-item:not(.empty) img'
+                );
+
+
+            uploadedImgs.forEach(img => {
+
+                const thumb =
+                    document.createElement(
+                        'img'
+                    );
+
+
+                thumb.src =
+                    img.src;
+
+
+                thumb.alt =
+                    'صورة القطعة';
+
+
+                stripContainer.appendChild(
+                    thumb
+                );
+
+            });
+
+
+
+            // نوع الإدراج
+
+            const isForSale =
+                document.getElementById(
+                    'radioForSale'
+                ).checked;
+
+
+            document.getElementById(
+                'confirmListingType'
+            ).textContent =
+                isForSale
+                    ? 'للبيع'
+                    : 'للأرشفة فقط';
+
+
+
+            // إظهار وإخفاء معلومات السعر
+
+            document.getElementById(
+                'confirmPriceRow'
+            ).style.display =
+                isForSale
+                    ? 'flex'
+                    : 'none';
+
+
+            document.getElementById(
+                'confirmCommissionRow'
+            ).style.display =
+                isForSale
+                    ? 'flex'
+                    : 'none';
+
+
+            document.getElementById(
+                'confirmNetRow'
+            ).style.display =
+                isForSale
+                    ? 'flex'
+                    : 'none';
+
+
+
+            // حساب السعر والعمولة
+
+            if (isForSale) {
+
+                const price =
+                    parseFloat(
+                        priceInput.value
+                    ) || 0;
+
+
+                const commission =
+                    price * 0.05;
+
+
+                const net =
+                    price - commission;
+
+
+                document.getElementById(
+                    'confirmPrice'
+                ).textContent =
+                    price.toFixed(2) +
+                    ' د.أ';
+
+
+                document.getElementById(
+                    'confirmCommission'
+                ).textContent =
+                    '- ' +
+                    commission.toFixed(2) +
+                    ' د.أ';
+
+
+                document.getElementById(
+                    'confirmNet'
+                ).textContent =
+                    net.toFixed(2) +
+                    ' د.أ';
+
+            }
+
+
+
+            // عنوان الاستلام
+
+            document.getElementById(
+                'confirmAddress'
+            ).textContent =
+                document.getElementById(
+                    'pickupAddressInput'
+                ).value ||
+                '—';
+
+        }
+
+
+
+        // =========================================================
+        // رفع صور التطريز
+        // =========================================================
+
+        document
+            .querySelectorAll(
+                '.mini-upload-box'
+            )
+            .forEach(box => {
+
+                const input =
+                    box.querySelector(
+                        '.mini-upload-input'
+                    );
+
+
+                const placeholder =
+                    box.querySelector(
+                        '.mini-upload-placeholder'
+                    );
+
+
+                const preview =
+                    box.querySelector(
+                        '.mini-upload-preview'
+                    );
+
+
+                const previewImg =
+                    preview.querySelector(
+                        'img'
+                    );
+
+
+                const removeBtn =
+                    box.querySelector(
+                        '.mini-remove-btn'
+                    );
+
+
+
+                box.addEventListener(
+                    'click',
+                    event => {
+
+                        if (
+                            event.target.closest(
+                                '.mini-remove-btn'
+                            )
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        input.click();
+
+                    }
+                );
+
+
+
+                ['dragover', 'dragenter']
+                    .forEach(eventName => {
+
+                        box.addEventListener(
+                            eventName,
+                            event => {
+
+                                event.preventDefault();
+
+                                box.classList.add(
+                                    'dragover'
+                                );
+
+                            }
+                        );
+
+                    });
+
+
+
+                ['dragleave', 'drop']
+                    .forEach(eventName => {
+
+                        box.addEventListener(
+                            eventName,
+                            event => {
+
+                                event.preventDefault();
+
+                                box.classList.remove(
+                                    'dragover'
+                                );
+
+                            }
+                        );
+
+                    });
+
+
+
+                box.addEventListener(
+                    'drop',
+                    event => {
+
+                        if (
+                            event.dataTransfer.files.length > 0
+                        ) {
+
+                            input.files =
+                                event.dataTransfer.files;
+
+
+                            showMiniPreview(
+                                input.files[0]
+                            );
+
+                        }
+
+                    }
+                );
+
+
+
+                input.addEventListener(
+                    'change',
+                    () => {
+
+                        if (
+                            input.files.length > 0
+                        ) {
+
+                            showMiniPreview(
+                                input.files[0]
+                            );
+
+                        }
+
+                    }
+                );
+
+
+
+                removeBtn.addEventListener(
+                    'click',
+                    event => {
+
+                        event.stopPropagation();
+
+
+                        input.value = '';
+
+
+                        placeholder.style.display =
+                            'flex';
+
+
+                        preview.style.display =
+                            'none';
+
+
+                        previewImg.src =
+                            '';
+
+                    }
+                );
+
+
+
+                function showMiniPreview(file) {
+
+                    if (
+                        file.size >
+                        5 * 1024 * 1024
+                    ) {
+
+                        alert(
+                            'حجم صورة التطريز يجب ألا يتجاوز 5 ميغابايت.'
+                        );
+
+                        input.value = '';
+
+                        return;
+
+                    }
+
+
+                    const reader =
+                        new FileReader();
+
+
+                    reader.onload = event => {
+
+                        previewImg.src =
+                            event.target.result;
+
+
+                        placeholder.style.display =
+                            'none';
+
+
+                        preview.style.display =
+                            'block';
+
+                    };
+
+
+                    reader.readAsDataURL(
+                        file
+                    );
+
+                }
+
+            });
+
+
+    </script>
+}

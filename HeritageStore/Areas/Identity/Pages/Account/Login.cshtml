@@ -1,0 +1,59 @@
+@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "تسجيل الدخول";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+}
+
+<div class="auth-page">
+    <div class="auth-card">
+
+        <h2>تسجيل الدخول</h2>
+        <hr class="auth-divider-top" />
+        <p class="auth-subtitle">مرحبًا بك مجددًا! يرجى تسجيل الدخول لمتابعة رحلتك</p>
+
+        <form id="account" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="البريد الإلكتروني" />
+            </div>
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="كلمة المرور" />
+            </div>
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+
+            <div class="auth-options">
+                <div class="form-check">
+                    <input class="form-check-input" asp-for="Input.RememberMe" />
+                    <label asp-for="Input.RememberMe" class="form-check-label">تذكرني</label>
+                </div>
+                <a id="forgot-password" asp-page="./ForgotPassword">نسيت كلمة المرور؟</a>
+            </div>
+
+            <button id="login-submit" type="submit" class="btn-auth-primary">تسجيل الدخول</button>
+
+            <div class="auth-or-divider"><span>أو</span></div>
+
+            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="btn-auth-outline">
+                <i class="bi bi-person-plus"></i> إنشاء حساب جديد
+            </a>
+        </form>
+
+        <p class="auth-footer-note">
+            بمتابعة دخولك، أنت توافق على <a href="#">الشروط والأحكام</a> و<a href="#">سياسة الخصوصية</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

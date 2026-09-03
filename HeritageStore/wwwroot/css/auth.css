@@ -1,0 +1,176 @@
+﻿.site-footer {
+    margin: 0 !important;
+}
+.auth-page {
+    min-height: 95vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    position: relative;
+    background-image: linear-gradient(rgba(43,36,32,0.55), rgba(43,36,32,0.55)),url('/images/bg2.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.auth-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 2.5rem 2.5rem 2rem;
+    max-width: 430px;
+    width: 100%;
+    box-shadow: 0 8px 30px rgba(43,36,32,0.06);
+}
+
+/* ===== Logo & Tagline ===== */
+.auth-logo {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    color: var(--maroon);
+    margin-bottom: 0.3rem;
+}
+
+    .auth-logo .ornament {
+        font-size: 1.1rem;
+        color: var(--gold);
+        margin: 0 0.5rem;
+        vertical-align: middle;
+    }
+
+.auth-tagline {
+    text-align: center;
+    color: #8a7d6d;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.auth-divider-top {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+}
+
+/* ===== Headings ===== */
+.auth-card h2 {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 0.4rem;
+}
+
+.auth-card .auth-subtitle {
+    text-align: center;
+    color: #8a7d6d;
+    font-size: 0.9rem;
+    margin-bottom: 1.6rem;
+    line-height: 1.7;
+}
+
+/* ===== Inputs with icons ===== */
+.auth-card .input-group {
+    margin-bottom: 1rem;
+}
+
+.auth-card .input-group-text {
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--maroon);
+}
+
+.auth-card .form-control {
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    padding: 0.7rem 1rem;
+}
+
+    .auth-card .form-control:focus {
+        border-color: var(--maroon);
+        box-shadow: none;
+        background-color: #fff;
+    }
+
+/* ===== Row: تذكرني + نسيت كلمة المرور ===== */
+.auth-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.4rem;
+    font-size: 0.88rem;
+}
+
+    .auth-options a {
+        color: var(--maroon);
+    }
+
+/* ===== Buttons ===== */
+.btn-auth-primary {
+    background-color: var(--green);
+    color: #fff;
+    border: none;
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+    .btn-auth-primary:hover {
+        background-color: #22362b;
+        color: #fff;
+    }
+
+.btn-auth-outline {
+    background: transparent;
+    border: 1.5px solid var(--maroon);
+    color: var(--maroon);
+    width: 100%;
+    padding: 0.7rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+    .btn-auth-outline:hover {
+        background-color: var(--maroon);
+        color: #fff;
+    }
+
+/* ===== Divider "أو" ===== */
+.auth-or-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #b0a496;
+    font-size: 0.85rem;
+    margin: 1.3rem 0;
+}
+
+    .auth-or-divider::before,
+    .auth-or-divider::after {
+        content: "";
+        flex: 1;
+        border-top: 1px solid var(--border);
+    }
+
+    .auth-or-divider span {
+        padding: 0 1rem;
+    }
+
+/* ===== Footer note ===== */
+.auth-footer-note {
+    text-align: center;
+    font-size: 0.78rem;
+    color: #a89b8b;
+    margin-top: 1.5rem;
+    line-height: 1.6;
+}
+
+    .auth-footer-note a {
+        color: #8a7d6d;
+        text-decoration: underline;
+    }

@@ -1,0 +1,300 @@
+@import url('https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap');
+
+:root {
+    --bg: #FAF6EF;
+    --maroon: #7A1F2B;
+    --maroon-dark: #5E1620;
+    --green: #2F4A3C;
+    --ink: #2B2420;
+    --gold: #B8863B;
+    --border: #E4DACD;
+    --font-heading: 'Aref Ruqaa', serif;
+    --font-body: 'Tajawal', sans-serif;
+}
+
+/* ===== Base ===== */
+html {
+    -webkit-text-size-adjust: 100%;
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-weight: 400;
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+h1, h2, h3, h4, .brand-font {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--ink);
+}
+
+/* أحجام خط متجاوبة للعناوين */
+h1 {
+    font-size: clamp(1.7rem, 4vw, 2.75rem);
+}
+
+h2 {
+    font-size: clamp(1.4rem, 3vw, 2.1rem);
+}
+
+h3 {
+    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+}
+
+a {
+    color: var(--maroon);
+    text-decoration: none;
+}
+
+.container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* ===== Navbar ===== */
+.site-navbar {
+    background-color: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: .85rem 0;
+}
+
+    /* لا نلمس display/flex-wrap الأساسية لـ .navbar > .container، بوتستراب نفسه
+       يتكفل بها (space-between + flex-wrap المناسب لكل حجم شاشة). أي override هون
+       كان يكسر آلية الطي (collapse) على الموبايل. */
+    .site-navbar .container {
+        position: relative;
+    }
+
+    .site-navbar .navbar-brand {
+        font-family: var(--font-heading);
+        font-size: 1.6rem;
+        color: var(--maroon);
+    }
+
+    .site-navbar .nav-link {
+        font-family: var(--font-body);
+        color: var(--ink);
+        margin: 0 0.6rem;
+    }
+
+        .site-navbar .nav-link:hover {
+            color: var(--maroon);
+        }
+
+/* أيقونة السلة/المفضلة الظاهرة بجانب زر القائمة على الموبايل */
+.nav-icons-mobile {
+    margin-inline-end: .75rem;
+    gap: 1rem !important;
+}
+
+/* ===== الشاشات الكبيرة (≥992px): نافبار أفقي عادي ===== */
+@media (min-width: 992px) {
+    /* الـ collapse ياخد كل المساحة المتبقية، والأيقونات تروح لآخرها (الشمال).
+       ملاحظة: bootstrap نفسه بيحط display:flex!important لـ navbar-collapse
+       ضمن media query خاص فيه navbar-expand-lg، فما في داعي نكررها هون ولا
+       نطبّقها بدون شرط الحجم (هذا كان سبب انكسار القائمة على الموبايل). */
+    .site-navbar .navbar-collapse {
+        align-items: center;
+        justify-content: flex-end;
+        flex: 1;
+    }
+
+    /* روابط النافبار توضع بمنتصف الصفحة بالكامل (بالنسبة لعرض الـ container) */
+    .site-navbar .navbar-nav.mx-auto {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0 !important;
+    }
+}
+
+/* ===== الشاشات الأصغر من lg: القائمة مطوية افتراضياً وتنسدل عمودياً عند الفتح ===== */
+@media (max-width: 991.98px) {
+    .site-navbar .navbar-collapse.show,
+    .site-navbar .navbar-collapse.collapsing {
+        margin-top: .75rem;
+        padding-top: .75rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .site-navbar .navbar-nav .nav-link {
+        padding: .65rem 0;
+    }
+
+    /* خط فاصل بين روابط الصفحات (الرئيسية / استكشف التراث / عن المشروع)
+       والأشياء الخاصة بالمستخدم (المفضلة / السلة / الحساب) */
+    .site-navbar .nav-icons:not(.nav-icons-mobile) {
+        margin-top: .75rem;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 1.25rem !important;
+    }
+
+    /* خط فاصل بين روابط الصفحات وخيارات المستخدم (تسجيل الدخول/الحساب...) */
+    .user-links-mobile {
+        margin-top: .75rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+    }
+
+        .user-links-mobile .nav-link,
+        .user-links-mobile .btn-link {
+            padding: .5rem 0;
+            font-size: 1rem;
+        }
+
+        .user-links-mobile .btn-link {
+            color: var(--maroon);
+            text-decoration: none;
+            font-family: var(--font-body);
+        }
+
+            .user-links-mobile .btn-link:hover {
+                color: var(--maroon-dark);
+            }
+
+        /* زر "أضف قطعتك" داخل قائمة الموبايل: نلغي التمدد الكامل للعرض
+           (اللي مطبق عموماً على الأزرار بالشاشات الصغيرة) عشان يبقى متناسق
+           مع باقي الروابط جنبه بدل ما يمتد حافة لحافة. !important هون
+           لضمان الأسبقية مهما كان ترتيب القواعد التانية. */
+        .user-links-mobile .btn-heritage {
+            width: auto !important;
+            display: inline-block !important;
+            text-align: center !important;
+        }
+}
+
+@media (max-width: 575.98px) {
+    .site-navbar .navbar-brand {
+        font-size: 1.35rem;
+    }
+
+    .nav-icons .nav-icon,
+    .nav-icons-mobile .nav-icon {
+        font-size: 1.15rem;
+    }
+}
+
+.nav-icons .nav-icon {
+    font-size: 1.3rem;
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+}
+
+    .nav-icons .nav-icon:hover {
+        color: var(--maroon);
+    }
+
+.dropdown-toggle-no-arrow::after {
+    display: none;
+}
+
+.dropdown-menu {
+    font-family: var(--font-body);
+    border: 1px solid var(--border);
+    max-width: calc(100vw - 2rem);
+}
+
+.dropdown-item:hover {
+    background-color: var(--bg);
+    color: var(--maroon);
+}
+
+/* على الموبايل، الموقع المطلق (اللي بيحسبه Popper) بينكسر أحياناً بالـ RTL
+   ويخلي القائمة تطلع برا حدود الشاشة وتعمل سكرول أفقي. الحل: نخليها عنصر
+   عادي داخل تدفق الصفحة، تنسدل تحت الأيقونة مباشرة وبعرض كامل. */
+@media (max-width: 991.98px) {
+    .site-navbar .dropdown-menu {
+        position: static !important;
+        inset: auto !important;
+        transform: none !important;
+        float: none;
+        width: 100%;
+        max-width: 100%;
+        margin-top: .5rem;
+        box-shadow: none;
+    }
+}
+
+/* ===== Buttons ===== */
+.btn-heritage {
+    background-color: var(--maroon);
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.6rem;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+    .btn-heritage:hover {
+        background-color: var(--maroon-dark);
+        color: #fff;
+    }
+
+.btn-outline-heritage {
+    background: transparent;
+    border: 1.5px solid var(--maroon);
+    color: var(--maroon);
+    padding: 0.55rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+    .btn-outline-heritage:hover {
+        background-color: var(--maroon);
+        color: #fff;
+    }
+
+/* الأزرار تمتد بعرض كامل داخل القوائم المنسدلة على الموبايل لسهولة اللمس */
+@media (max-width: 575.98px) {
+    .btn-heritage, .btn-outline-heritage {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ===== Footer ===== */
+.site-footer {
+    background-color: var(--ink);
+    color: #E4DACD;
+    padding: 3rem 0 1.5rem;
+    margin-top: 2rem;
+}
+
+    .site-footer a {
+        color: #E4DACD;
+    }
+
+    .site-footer h5 {
+        color: #fff;
+        font-family: var(--font-heading);
+    }
+
+@media (max-width: 767.98px) {
+    .site-footer {
+        padding: 2.25rem 0 1.25rem;
+        margin-top: 2.5rem;
+        text-align: center;
+    }
+}
+
+/* شاشات صغيرة جداً: تقليل الحشوات العامة لتوفير مساحة */
+@media (max-width: 400px) {
+    .container {
+        padding-left: .75rem;
+        padding-right: .75rem;
+    }
+}
