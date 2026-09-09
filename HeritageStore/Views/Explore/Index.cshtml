@@ -1,0 +1,189 @@
+﻿@model HeritageStore.Models.ViewModels.ExploreViewModel
+@{
+    ViewData["Title"] = "استكشف التراث";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/explore.css" asp-append-version="true" />
+}
+
+<section class="container section-block">
+    <div class="explore-header text-center mb-4">
+        <h1>استكشف التراث</h1>
+        <p class="lead-text">تصفح مجموعة الأثواب والتطريزات والقطع التراثية الأردنية والفلسطينية</p>
+    </div>
+
+    <!-- ===== شريط البحث ===== -->
+    <form asp-action="Index" method="get" id="exploreForm">
+        <div class="search-bar mb-4">
+            <i class="bi bi-search"></i>
+            <input type="text" name="search" value="@Model.SearchTerm" class="form-control" placeholder="ابحث باسم القطعة أو وصفها..." />
+        </div>
+
+        <div class="row g-4">
+            <!-- ===== الفلاتر (Sidebar) ===== -->
+            <div class="col-lg-3">
+                <div class="filter-sidebar">
+
+                    <div class="filter-group">
+                        <h6>التصنيف</h6>
+                        <select name="categoryId" class="form-select form-select-sm" onchange="document.getElementById('exploreForm').submit()">
+                            <option value="">كل التصنيفات</option>
+                            @foreach (var cat in Model.Categories)
+                            {
+                                <option value="@cat.CategoryId" selected="@(Model.CategoryId == cat.CategoryId)">@cat.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <h6>الدولة</h6>
+                        <div class="filter-radio">
+                            <label>
+                                <input type="radio" name="country" value="" onchange="document.getElementById('exploreForm').submit()" checked="@(string.IsNullOrEmpty(Model.Country))" />
+                                الكل
+                            </label>
+                            <label>
+                                <input type="radio" name="country" value="فلسطين" onchange="document.getElementById('exploreForm').submit()" checked="@(Model.Country == "فلسطين")" />
+                                فلسطين
+                            </label>
+                            <label>
+                                <input type="radio" name="country" value="الأردن" onchange="document.getElementById('exploreForm').submit()" checked="@(Model.Country == "الأردن")" />
+                                الأردن
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <h6>نوع التطريز</h6>
+                        <div class="filter-checkbox-list">
+                            @foreach (var et in Model.EmbroideryTypes)
+                            {
+                                <label class="@(Model.Country == et.Country || string.IsNullOrEmpty(Model.Country) ? "" : "d-none")">
+                                    <input type="checkbox" name="embroideryTypeIds" value="@et.EmbroideryTypeId"
+                                           onchange="document.getElementById('exploreForm').submit()"
+                                           checked="@(Model.EmbroideryTypeIds.Contains(et.EmbroideryTypeId))" />
+                                    @et.Name
+                                </label>
+                            }
+                        </div>
+                    </div>
+  
+
+                    <div class="filter-group">
+                        <h6>الحالة</h6>
+
+                        <div class="filter-radio">
+
+                            <label>
+                                <input type="radio"
+                                       name="listingType"
+                                       value=""
+                                       onchange="document.getElementById('exploreForm').submit()"
+                                       checked="@(string.IsNullOrEmpty(Model.ListingType))" />
+                                الكل
+                            </label>
+
+                            <label>
+                                <input type="radio"
+                                       name="listingType"
+                                       value="for_sale"
+                                       onchange="document.getElementById('exploreForm').submit()"
+                                       checked="@(Model.ListingType == "for_sale")" />
+                                متاح للبيع
+                            </label>
+
+                            <label>
+                                <input type="radio"
+                                       name="listingType"
+                                       value="archive_only"
+                                       onchange="document.getElementById('exploreForm').submit()"
+                                       checked="@(Model.ListingType == "archive_only")" />
+                                للعرض فقط
+                            </label>
+
+                        </div>
+                    </div>
+                    
+                    <a asp-action="Index" class="clear-filters-link">مسح كل الفلاتر</a>
+                </div>
+            </div>
+
+            <!-- ===== نتائج البحث ===== -->
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="results-count">@Model.TotalCount نتيجة</span>
+                </div>
+
+                @if (Model.Products.Any())
+                {
+                    <section class="container section-block">
+                        <div class="row g-4">
+                            @foreach (var product in Model.Products)
+                            {
+                                var mainImage = product.ProductImages.FirstOrDefault(i => i.IsMain) ?? product.ProductImages.FirstOrDefault();
+                                <div class="col-md-4 col-6">
+                                    <div class="product-card">
+                                        <div class="product-card-media">
+                                            <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId">
+                                                <img src="@(mainImage != null ? mainImage.ImageUrl : "/images/placeholder.jpg")" alt="@product.Name" loading="lazy" />
+                                            </a>
+                                            <button type="button"
+                                                    class="favorite-btn @(ViewBag.FavoriteIds.Contains(product.ProductId) ? "is-favorited" : "")"
+                                                    data-product-id="@product.ProductId"
+                                                    title="أضف إلى المفضلة">
+                                                <i class="bi bi-heart"></i>
+                                            </button>
+                                        </div>
+                                        <div class="product-card-body">
+                                            @if (product.EmbroideryType != null)
+                                            {
+                                                <span class="embroidery-type-label">تطريز @product.EmbroideryType.Name</span>
+                                            }
+                                            <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId" class="product-title-link">
+                                                <h5 class="product-title">@product.Name</h5>
+                                            </a>
+                                            <div class="product-card-footer">
+                                                @if (product.ListingType == "for_sale" && product.Price.HasValue)
+                                                {
+                                                    <div class="price-tag">
+                                                        @product.Price.Value.ToString("N0") <small class="currency">د.أ</small>
+                                                    </div>
+                                                    @if (product.Status == "approved")
+                                                    {
+                                                        <button type="button" class="cart-btn" data-product-id="@product.ProductId" title="أضف إلى السلة">
+                                                            <i class="bi bi-bag-plus"></i>
+                                                            <span>إضافة اى السلة</span>
+                                                        </button>
+                                                    }
+                                                    else if (product.Status == "sold")
+                                                    {
+                                                        <button type="button" class="cart-btn sold" disabled>
+                                                            تم بيع القطعة
+                                                        </button>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge-archive">قطعة للعرض</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </section>
+                }
+                else
+                {
+                    <div class="no-results">
+                        <i class="bi bi-search"></i>
+                        <p>لا يوجد نتائج تطابق بحثك</p>
+                        <a asp-action="Index" class="btn btn-outline-heritage btn-sm">مسح الفلاتر</a>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </form>
+</section>

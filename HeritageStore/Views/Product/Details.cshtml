@@ -1,0 +1,610 @@
+﻿@model HeritageStore.Models.Product
+
+@{
+    ViewData["Title"] = Model.Name;
+
+    bool isFavorited = ViewBag.IsFavorited != null && (bool)ViewBag.IsFavorited;
+
+    var images = Model.ProductImages?
+        .OrderByDescending(i => i.IsMain)
+        .ToList()
+        ?? new List<HeritageStore.Models.ProductImage>();
+
+    var mainImage = images.FirstOrDefault();
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/product-details.css" asp-append-version="true" />
+}
+
+<div class="product-page" dir="rtl">
+
+    <div class="container product-container">
+
+        <!-- Breadcrumb -->
+        <nav class="product-breadcrumb" aria-label="breadcrumb">
+            <a asp-controller="Home" asp-action="Index">
+                <i class="bi bi-house"></i>
+                الرئيسية
+            </a>
+
+            <span>/</span>
+
+            <a asp-controller="Explore" asp-action="Index">
+                استكشف التراث
+            </a>
+
+            <span>/</span>
+
+            <strong>@Model.Name</strong>
+        </nav>
+
+
+        <!-- ================= PRODUCT ================= -->
+
+        <section class="product-main">
+
+            <!-- Gallery -->
+            <div class="gallery-column">
+
+                <div class="main-image-wrapper">
+
+                    <img id="mainProductImage"
+                         src="@(mainImage != null ? mainImage.ImageUrl : "/images/placeholder.jpg")"
+                         alt="@Model.Name" />
+
+                    @if (Model.EmbroideryType != null)
+                    {
+                        <div class="embroidery-badge">
+                            <i class="bi bi-patch-check-fill"></i>
+                            تطريز @Model.EmbroideryType.Name
+                        </div>
+                    }
+
+                    <div class="image-count">
+                        <i class="bi bi-images"></i>
+                        @(images.Count > 0 ? images.Count : 1)
+                    </div>
+
+                </div>
+
+
+                @if (images.Count > 1)
+                {
+                    <div class="gallery-thumbnails">
+
+                        @foreach (var img in images)
+                        {
+                            <button type="button"
+                                    class="gallery-thumb @(img == mainImage ? "active" : "")"
+                                    data-src="@img.ImageUrl"
+                                    aria-label="عرض صورة إضافية لـ @Model.Name"
+                                    aria-pressed="@(img == mainImage ? "true" : "false")">
+
+                                <img src="@img.ImageUrl"
+                                     alt=""
+                                     loading="lazy" />
+
+                            </button>
+                        }
+
+                    </div>
+                }
+
+            </div>
+
+
+            <!-- Product Information -->
+            <div class="info-column">
+
+                <div class="product-info">
+
+
+                    <!-- Title -->
+                    <div class="product-title">
+
+                        <span class="title-label">
+                            قطعة من التراث
+                        </span>
+
+                        <h1>
+                            @Model.Name
+                        </h1>
+
+                    </div>
+
+
+                    <!-- Price -->
+                    @if (Model.Price.HasValue)
+                    {
+                        <div class="price-area">
+
+                            <span class="price">
+                                @Model.Price.Value.ToString("N0")
+                            </span>
+
+                            <div class="currency-area">
+                                <strong>دينار أردني</strong>
+                                <small>السعر</small>
+                            </div>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="exhibition-area">
+
+                            <i class="bi bi-award"></i>
+
+                            <div>
+                                <strong>قطعة للعرض التراثي</strong>
+                                <span>متاحة للتعرف على قصتها وتفاصيلها</span>
+                            </div>
+
+                        </div>
+                    }
+
+
+                    <!-- Description -->
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <div class="description-area">
+
+                            <span class="label">
+                                عن القطعة
+                            </span>
+
+                            <p>
+                                @Model.Description
+                            </p>
+
+                        </div>
+                    }
+
+
+                    <!-- Details -->
+                    <div class="details-grid">
+
+                        @if (Model.EmbroideryType != null)
+                        {
+                            <div class="detail">
+
+                                <i class="bi bi-flower1"></i>
+
+                                <div>
+                                    <small>نوع التطريز</small>
+                                    <strong>@Model.EmbroideryType.Name</strong>
+                                </div>
+
+                            </div>
+                        }
+
+
+                        @if (!string.IsNullOrWhiteSpace(Model.Country))
+                        {
+                            <div class="detail">
+
+                                <i class="bi bi-geo-alt"></i>
+
+                                <div>
+                                    <small>منطقة الأصالة</small>
+                                    <strong>@Model.Country</strong>
+                                </div>
+
+                            </div>
+                        }
+
+
+                        @if (Model.User != null)
+                        {
+                            <div class="detail">
+
+                                <i class="bi bi-person"></i>
+
+                                <div>
+                                    <small>المالك / الحرفي</small>
+                                    <strong>@Model.User.UserName</strong>
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+
+                    <!-- Actions -->
+                    <div class="product-actions">
+
+                        @if (Model.ListingType == "for_sale" &&
+                             Model.Status == "approved")
+                        {
+                            <button type="button"
+                                    class="add-cart add-to-cart-btn"
+                                    data-product-id="@Model.ProductId">
+
+                                <i class="bi bi-bag-plus"></i>
+
+                                إضافة إلى السلة
+
+                            </button>
+                        }
+                        else if (Model.ListingType == "for_sale" &&
+                                 Model.Status == "sold")
+                        {
+                            <button type="button"
+                                    class="disabled-action"
+                                    disabled>
+
+                                <i class="bi bi-x-circle"></i>
+
+                                تم بيع هذه القطعة
+
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button"
+                                    class="disabled-action"
+                                    disabled>
+
+                                <i class="bi bi-eye"></i>
+
+                                قطعة للعرض المعرفي فقط
+
+                            </button>
+                        }
+
+
+                        <button type="button"
+                                class="wishlist @(isFavorited ? "active" : "")"
+                                data-product-id="@Model.ProductId"
+                                aria-label="إضافة إلى المفضلة"
+                                aria-pressed="@(isFavorited ? "true" : "false")"
+                                title="إضافة إلى المفضلة">
+
+                            <i class="bi @(isFavorited ? "bi-heart-fill" : "bi-heart")"></i>
+
+                        </button>
+
+                    </div>
+
+
+                    
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= STORY ================= -->
+@if (!string.IsNullOrWhiteSpace(Model.Story) ||
+     !string.IsNullOrWhiteSpace(Model.HistoricalBackground) ||
+     !string.IsNullOrWhiteSpace(Model.AdditionalInfo))
+{
+    <section class="story-section">
+
+        <div class="section-heading">
+            <div>
+                <span>حكاية القطعة</span>
+
+                <h2>
+                    حكاية من التراث
+                </h2>
+           
+            </div>
+
+            <div class="heading-line">
+                <b></b>
+                <b></b>
+                <b></b>
+            </div>
+        </div>
+
+
+        <div class="story-card">
+
+            <!-- Tabs -->
+            <div class="story-tabs" role="tablist">
+
+                @if (!string.IsNullOrWhiteSpace(Model.Story))
+                {
+                    <button class="story-tab active"
+                            data-target="story-content"
+                            role="tab"
+                            aria-selected="true">
+                        <i class="bi bi-journal-text"></i>
+                        <span>قصة القطعة</span>
+                    </button>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.HistoricalBackground))
+                {
+                    <button class="story-tab @(string.IsNullOrWhiteSpace(Model.Story) ? "active" : "")"
+                            data-target="history-content"
+                            role="tab"
+                            aria-selected="@(string.IsNullOrWhiteSpace(Model.Story) ? "true" : "false")">
+                        <i class="bi bi-hourglass-split"></i>
+                        <span>الخلفية التاريخية</span>
+                    </button>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.AdditionalInfo))
+                {
+                    <button class="story-tab @(string.IsNullOrWhiteSpace(Model.Story) &&
+                                                string.IsNullOrWhiteSpace(Model.HistoricalBackground)
+                                                ? "active"
+                                                : "")"
+                            data-target="additional-content"
+                            role="tab"
+                            aria-selected="@(string.IsNullOrWhiteSpace(Model.Story) &&
+                                              string.IsNullOrWhiteSpace(Model.HistoricalBackground)
+                                              ? "true"
+                                              : "false")">
+                        <i class="bi bi-info-circle"></i>
+                        <span>معلومات إضافية</span>
+                    </button>
+                }
+
+            </div>
+
+
+            <div class="story-content">
+
+                @if (!string.IsNullOrWhiteSpace(Model.Story))
+                {
+                    <div id="story-content"
+                         class="story-pane active"
+                         role="tabpanel">
+
+                        <span class="quote" aria-hidden="true">“</span>
+
+                        <p>
+                            @Model.Story
+                        </p>
+
+                    </div>
+                }
+
+
+                @if (!string.IsNullOrWhiteSpace(Model.HistoricalBackground))
+                {
+                    <div id="history-content"
+                         class="story-pane @(string.IsNullOrWhiteSpace(Model.Story) ? "active" : "")"
+                         role="tabpanel">
+
+                        <span class="quote" aria-hidden="true">“</span>
+
+                        <p>
+                            @Model.HistoricalBackground
+                        </p>
+
+                    </div>
+                }
+
+
+                @if (!string.IsNullOrWhiteSpace(Model.AdditionalInfo))
+                {
+                    <div id="additional-content"
+                         class="story-pane @(string.IsNullOrWhiteSpace(Model.Story) &&
+                                             string.IsNullOrWhiteSpace(Model.HistoricalBackground)
+                                             ? "active"
+                                             : "")"
+                         role="tabpanel">
+
+                        <span class="quote" aria-hidden="true">“</span>
+
+                        <p>
+                            @Model.AdditionalInfo
+                        </p>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </section>
+}
+
+        <!-- ================= EMBROIDERY ================= -->
+
+        @if (Model.Embroideries != null &&
+             Model.Embroideries.Any())
+        {
+            <section class="embroidery-section">
+
+                <div class="section-heading">
+
+                    <div>
+                        <span>لغة التطريز</span>
+
+                        <h2>
+                            رمزية ومعاني التطريز
+                        </h2>
+                    </div>
+
+                    <div class="heading-line">
+                        <b></b>
+                        <b></b>
+                        <b></b>
+                    </div>
+
+                </div>
+
+
+                <div class="embroidery-grid">
+
+                    @foreach (var emb in Model.Embroideries)
+                    {
+                        <article class="embroidery-card">
+
+                            <div class="embroidery-image">
+
+                                <img src="@(!string.IsNullOrWhiteSpace(emb.ImageUrl)
+                                               ? emb.ImageUrl
+                                               : "/images/placeholder.jpg")"
+                                     alt="@emb.Name"
+                                     loading="lazy" />
+
+                            </div>
+
+                            <div class="embroidery-info">
+
+                                <span>
+                                    رمز من رموز التطريز
+                                </span>
+
+                                <h3>
+                                    @emb.Name
+                                </h3>
+
+                                @if (!string.IsNullOrWhiteSpace(emb.Description))
+                                {
+                                    <p>
+                                        @emb.Description
+                                    </p>
+                                }
+
+                            </div>
+
+                        </article>
+                    }
+
+                </div>
+
+            </section>
+        }
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* ================= GALLERY ================= */
+
+    const mainImage =
+        document.getElementById("mainProductImage");
+
+    const thumbs =
+        document.querySelectorAll(".gallery-thumb");
+
+
+    thumbs.forEach(function (thumb) {
+
+        thumb.addEventListener("click", function () {
+
+            if (!mainImage) return;
+
+            const source = this.dataset.src;
+
+            mainImage.classList.add("changing");
+
+            setTimeout(function () {
+
+                mainImage.src = source;
+
+                mainImage.onload = function () {
+                    mainImage.classList.remove("changing");
+                };
+
+            }, 150);
+
+
+            thumbs.forEach(function (item) {
+                item.classList.remove("active");
+                item.setAttribute("aria-pressed", "false");
+            });
+
+            this.classList.add("active");
+            this.setAttribute("aria-pressed", "true");
+
+        });
+
+    });
+
+
+    /* ================= WISHLIST ================= */
+
+    const wishlist =
+        document.querySelector(".wishlist");
+
+
+    if (wishlist) {
+
+        wishlist.addEventListener("click", function () {
+
+            const nowActive = !this.classList.contains("active");
+
+            this.classList.toggle("active");
+            this.setAttribute("aria-pressed", nowActive ? "true" : "false");
+
+            const icon =
+                this.querySelector("i");
+
+            if (icon) {
+
+                icon.classList.toggle("bi-heart");
+                icon.classList.toggle("bi-heart-fill");
+
+            }
+
+        });
+
+    }
+
+
+    /* ================= STORY TABS ================= */
+
+    const storyTabs =
+        document.querySelectorAll(".story-tab");
+
+    const storyPanes =
+        document.querySelectorAll(".story-pane");
+
+
+    storyTabs.forEach(function (tab) {
+
+        tab.addEventListener("click", function () {
+
+            const target =
+                this.dataset.target;
+
+
+            storyTabs.forEach(function (item) {
+                item.classList.remove("active");
+                item.setAttribute("aria-selected", "false");
+            });
+
+            storyPanes.forEach(function (pane) {
+                pane.classList.remove("active");
+            });
+
+
+            this.classList.add("active");
+            this.setAttribute("aria-selected", "true");
+
+            const selected =
+                document.getElementById(target);
+
+            if (selected) {
+                selected.classList.add("active");
+            }
+
+        });
+
+    });
+
+});
+
+</script>
+
+}

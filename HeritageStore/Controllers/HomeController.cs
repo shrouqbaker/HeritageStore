@@ -23,15 +23,19 @@ namespace HeritageStore.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var favoritedIds = new HashSet<int>();
-            if (User.Identity != null && User.Identity.IsAuthenticated)
+            var userId = _userManager.GetUserId(User);
+            var favoriteIds = new HashSet<int>();
+
+            if (userId != null)
             {
-                var userId = _userManager.GetUserId(User); // أو الطريقة يلي عندك لجلب الـ UserId
-                favoritedIds = _context.Favorites
+                favoriteIds = (await _context.Favorites
                     .Where(f => f.UserId == userId)
                     .Select(f => f.ProductId)
-                    .ToHashSet();
+                    .ToListAsync()).ToHashSet();
             }
+
+            ViewBag.FavoriteIds = favoriteIds;
+
             var viewModel = new HomeViewModel
             {
                 Categories = await _context.Categories
@@ -42,21 +46,20 @@ namespace HeritageStore.Controllers
                 LatestProducts = await _context.Products
                  .Include(p => p.ProductImages)
                  .Include(p => p.EmbroideryType)
-                 .Where(p => p.Status == "available" ||
+                 .Where(p => p.Status == "sold" ||
                              p.Status == "approved" ||
                              p.Status == "archived")
                  .OrderByDescending(p => p.CreatedAt)
-                 .Take(3)
+                 .Take(4)
                  .ToListAsync(),
 
                 ForSaleProducts = await _context.Products
                     .CountAsync(p => p.ListingType == "for_sale" &&
                                      p.Price.HasValue &&
-                                     (p.Status == "available" ||
-                                      p.Status == "approved")),
+                                     p.Status == "approved"),
 
                 ArchivedProducts = await _context.Products
-                     .CountAsync(p => p.ListingType == "archive_only"),
+                     .CountAsync(p => p.ListingType == "archive_only" || (p.ListingType == "for_sale" && p.Status == "sold")),
 
                 TotalCategories = await _context.Categories
                    .CountAsync(),

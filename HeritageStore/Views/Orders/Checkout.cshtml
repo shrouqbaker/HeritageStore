@@ -1,0 +1,171 @@
+﻿@model HeritageStore.Controllers.CheckoutViewModel
+
+@{
+    ViewData["Title"] = "إتمام الطلب";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Checkout.css" asp-append-version="true" />
+}
+<div class="container checkout-page py-4 py-lg-5">
+
+    <h1 class="mb-4">إتمام الطلب</h1>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="checkout-alert">@TempData["Error"]</div>
+    }
+
+    <form asp-controller="Orders" asp-action="Checkout" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="row g-4 g-lg-5">
+
+            @* ===================== Shipping + Items ===================== *@
+            <div class="col-lg-8">
+
+                <div class="checkout-section mb-4">
+                    <h2 class="section-heading">عنوان التوصيل</h2>
+                    <div class="mb-3">
+                        <label for="ShippingAddress" class="form-label">العنوان بالتفصيل</label>
+                        <textarea asp-for="ShippingAddress" id="ShippingAddress" class="form-control checkout-textarea"
+                                  rows="3" placeholder="المدينة، الحي، اسم الشارع، أقرب معلم..."></textarea>
+                        <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="checkout-section mb-4">
+                    <h2 class="section-heading">طريقة الدفع</h2>
+                    <div class="payment-method-options">
+                        <label class="payment-method-option">
+                            <input type="radio" name="PaymentMethod" value="cash" id="pmCash"
+                                   checked="@(Model.PaymentMethod == "cash")">
+                            <span class="payment-method-card">
+                                <i class="bi bi-cash-coin"></i>
+                                <span>الدفع عند الاستلام (كاش)</span>
+                            </span>
+                        </label>
+                        <label class="payment-method-option">
+                            <input type="radio" name="PaymentMethod" value="visa" id="pmVisa"
+                                   checked="@(Model.PaymentMethod == "visa")">
+                            <span class="payment-method-card">
+                                <i class="bi bi-credit-card-2-front"></i>
+                                <span>بطاقة فيزا/ماستركارد</span>
+                            </span>
+                        </label>
+                    </div>
+                    <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+
+                    @* ===================== Visa Card Fields (تظهر بس لو اختارت فيزا) ===================== *@
+                    <div id="visaCardFields" class="visa-card-fields @(Model.PaymentMethod == "visa" ? "" : "d-none")">
+                        <div class="row g-3 mt-1">
+                            <div class="col-12">
+                                <label for="CardHolderName" class="form-label">الاسم على البطاقة</label>
+                                <input asp-for="CardHolderName" id="CardHolderName" class="form-control checkout-textarea"
+                                       placeholder="كما هو مكتوب على البطاقة" autocomplete="cc-name">
+                                <span asp-validation-for="CardHolderName" class="text-danger"></span>
+                            </div>
+                            <div class="col-12">
+                                <label for="CardNumber" class="form-label">رقم البطاقة</label>
+                                <input asp-for="CardNumber" id="CardNumber" class="form-control checkout-textarea"
+                                       placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="cc-number" inputmode="numeric">
+                                <span asp-validation-for="CardNumber" class="text-danger"></span>
+                            </div>
+                            <div class="col-6">
+                                <label for="CardExpiry" class="form-label">تاريخ الانتهاء</label>
+                                <input asp-for="CardExpiry" id="CardExpiry" class="form-control checkout-textarea"
+                                       placeholder="MM/YY" maxlength="5" autocomplete="cc-exp">
+                                <span asp-validation-for="CardExpiry" class="text-danger"></span>
+                            </div>
+                            <div class="col-6">
+                                <label for="CardCvv" class="form-label">CVV</label>
+                                <input asp-for="CardCvv" id="CardCvv" class="form-control checkout-textarea"
+                                       placeholder="***" maxlength="4" autocomplete="cc-csc" inputmode="numeric">
+                                <span asp-validation-for="CardCvv" class="text-danger"></span>
+                            </div>
+                        </div>
+                       
+                    </div>
+                </div>
+
+                <div class="checkout-section">
+                    <h2 class="section-heading">القطع بالطلب (@Model.Items.Count)</h2>
+                    <div class="checkout-items-list">
+                        @foreach (var item in Model.Items)
+                        {
+                            var product = item.Product;
+                            var image = product?.ProductImages != null && product.ProductImages.Any()
+                                ? product.ProductImages.First().ImageUrl
+                                : "/images/placeholder.jpg";
+
+                            <div class="checkout-item-row">
+                                <img src="@image" alt="@product?.Name">
+                                <div class="checkout-item-info">
+                                    <span class="checkout-item-title">@product?.Name</span>
+                                </div>
+                                <span class="checkout-item-price">@((product?.Price ?? 0).ToString("N0")) دينار</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @* ===================== Summary ===================== *@
+            <div class="col-lg-4">
+                <div class="cart-summary-panel">
+                    <h2 class="cart-summary-title">ملخص الطلب</h2>
+
+                    <div class="cart-summary-row">
+                        <span>المجموع الفرعي</span>
+                        <span>@Model.Subtotal.ToString("N0") دينار</span>
+                    </div>
+                    <div class="cart-summary-row">
+                        <span>التوصيل</span>
+                        <span>@Model.DeliveryCost.ToString("N0") دينار</span>
+                    </div>
+                    <div class="cart-summary-row cart-summary-total">
+                        <span>الإجمالي</span>
+                        <span>@Model.Total.ToString("N0") دينار</span>
+                    </div>
+
+                    <button type="submit" class="btn-heritage w-100 mt-3">تأكيد الطلب</button>
+                    <a asp-controller="Cart" asp-action="Index" class="btn-outline-heritage w-100 d-block text-center mt-2">
+                        رجوع للسلة
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        const cashRadio = document.getElementById('pmCash');
+        const visaRadio = document.getElementById('pmVisa');
+        const visaFields = document.getElementById('visaCardFields');
+
+        function toggleVisaFields() {
+            visaFields.classList.toggle('d-none', !visaRadio.checked);
+        }
+        cashRadio.addEventListener('change', toggleVisaFields);
+        visaRadio.addEventListener('change', toggleVisaFields);
+
+        // تنسيق تلقائي لرقم البطاقة: 0000 0000 0000 0000
+        const cardNumberInput = document.getElementById('CardNumber');
+        cardNumberInput?.addEventListener('input', function() {
+            let digits = this.value.replace(/\D/g, '').slice(0, 16);
+            this.value = digits.replace(/(.{4})/g, '$1 ').trim();
+        });
+
+        // تنسيق تلقائي لتاريخ الانتهاء: MM/YY
+        const expiryInput = document.getElementById('CardExpiry');
+        expiryInput?.addEventListener('input', function() {
+            let digits = this.value.replace(/\D/g, '').slice(0, 4);
+            this.value = digits.length > 2 ? digits.slice(0, 2) + '/' + digits.slice(2) : digits;
+        });
+
+        const cvvInput = document.getElementById('CardCvv');
+        cvvInput?.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 4);
+        });
+    </script>
+}

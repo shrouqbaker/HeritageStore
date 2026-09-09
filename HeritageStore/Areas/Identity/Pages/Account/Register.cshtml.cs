@@ -98,6 +98,15 @@ public class RegisterModel : PageModel
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string? ConfirmPassword { get; set; }
+
+        [Required(ErrorMessage = "اسم المستخدم مطلوب")]
+        [Display(Name = "اسم المستخدم")]
+        public string Username { get; set; }
+
+        [Required(ErrorMessage = "رقم الهاتف مطلوب")]
+        [Phone(ErrorMessage = "صيغة رقم الهاتف غير صحيحة")]
+        [Display(Name = "رقم الهاتف")]
+        public string PhoneNumber { get; set; }
     }
 
 

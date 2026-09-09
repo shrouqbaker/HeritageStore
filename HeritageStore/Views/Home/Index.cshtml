@@ -25,7 +25,7 @@
 
 
 <!-- ===== أهمية التراث + فيديو ===== -->
-<section class="container section-block">
+<section class="container mt-5">
     <div class="row align-items-center g-5">
         <div class="col-lg-6">
             <h2 class="mb-3">لماذا نوثّق التراث؟</h2>
@@ -37,7 +37,7 @@
         </div>
         <div class="col-lg-6">
             <div class="ratio ratio-16x9">
-                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="التراث الفلسطيني والأردني" allowfullscreen></iframe>
+                <iframe src="https://www.youtube.com/embed/dQw4w9WgXc" title="التراث الفلسطيني والأردني" allowfullscreen></iframe>
             </div>
         </div>
     </div>
@@ -56,85 +56,11 @@
         </p>
     </div>
 </section> *@
-
-<!-- ===== أحدث الإضافات ===== -->
-@if (Model.LatestProducts.Any())
-{
-    <div class="back">
-        <section class="container section-block">
-            <div class="d-flex justify-content-between align-items-end mb-4">
-                <h2>أحدث الإضافات</h2>
-                <a asp-controller="Explore" asp-action="Index">عرض الكل ←</a>
-            </div>
-            <div class="row g-4">
-                @foreach (var product in Model.LatestProducts)
-                {
-                    var mainImage = product.ProductImages.FirstOrDefault(i => i.IsMain) ?? product.ProductImages.FirstOrDefault();
-                    var isForSale = product.ListingType == "for_sale" && product.Price.HasValue;
-                    <div class="col-md-4">
-                        <div class="product-card">
-                            <div class="product-card-media">
-                                <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId">
-                                    <img src="@(mainImage != null ? mainImage.ImageUrl : "/images/placeholder.jpg")" alt="@product.Name" />
-                                </a>
-
-                                <form asp-controller="Favorites" asp-action="Toggle" asp-route-id="@product.ProductId" method="post" class="favorite-form">
-                                    @{
-                                        bool isFav = Model.FavoritedProductIds.Contains(product.ProductId);
-                                    }
-                                    <button type="submit"
-                                            class="favorite-btn @(isFav ? "is-active" : "")"
-                                            title="@(isFav ? "إزالة من المفضلة" : "أضف للمفضلة")"
-                                            aria-label="أضف للمفضلة">
-                                        <i class="bi @(isFav ? "bi-heart-fill" : "bi-heart")"></i>
-                                    </button>
-                                </form>
-
-                                @if (!isForSale)
-                                {
-                                    <span class="badge-archive badge-archive-overlay">للأرشفة</span>
-                                }
-                            </div>
-
-                            <div class="product-card-body">
-                                <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId" class="product-card-title">
-                                    <h5>@product.Name</h5>
-                                </a>
-                                @if (product.EmbroideryType != null)
-                                {
-                                    <p class="text-muted mb-2">تطريز @product.EmbroideryType.Name</p>
-                                }
-
-                                <div class="product-card-footer">
-                                    @if (isForSale)
-                                    {
-                                        <span class="price-tag">@product.Price!.Value.ToString("N0") د.أ</span>
-                                        <form asp-controller="Cart" asp-action="Add" asp-route-id="@product.ProductId" method="post" class="m-0">
-                                            <button type="submit" class="cart-btn" title="أضف للسلة" aria-label="أضف للسلة">
-                                                <i class="bi bi-cart-plus"></i>
-                                                <span>أضف للسلة</span>
-                                            </button>
-                                        </form>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted small">قطعة موثّقة للأرشفة فقط</span>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        </section>
-    </div>
-}
-
 <!-- ===== استكشف المجموعات ===== -->
 @if (Model.Categories.Any())
 {
     <section class="container section-block">
-        <h2 class="text-start mb-4">استكشف المجموعات</h2>
+        <h2 class="text-center my-4">استكشف المجموعات</h2>
         <div class="row g-3">
             @{
                 var firstCategory = Model.Categories.FirstOrDefault();
@@ -167,6 +93,74 @@
         </div>
     </section>
 }
+
+
+<!-- ===== أحدث الإضافات ===== -->
+@if (Model.LatestProducts.Any())
+{
+    <section class="container section-block">
+        <div class="text-center my-4">
+            <h2>أحدث الإضافات</h2>
+        </div>
+        <div class="row g-4">
+            @foreach (var product in Model.LatestProducts)
+            {
+                var mainImage = product.ProductImages.FirstOrDefault(i => i.IsMain) ?? product.ProductImages.FirstOrDefault();
+                <div class="col-md-3 col-6">
+                    <div class="product-card">
+                        <div class="product-card-media">
+                            <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId">
+                                <img src="@(mainImage != null ? mainImage.ImageUrl : "/images/placeholder.jpg")" alt="@product.Name" loading="lazy" />
+                            </a>
+                            <button type="button" class="favorite-btn" data-product-id="@product.ProductId" title="أضف إلى المفضلة">
+                                <i class="bi bi-heart"></i>
+                            </button>
+                        </div>
+                        <div class="product-card-body">
+                            @if (product.EmbroideryType != null)
+                            {
+                                <span class="embroidery-type-label">تطريز @product.EmbroideryType.Name</span>
+                            }
+                            <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId" class="product-title-link">
+                                <h5 class="product-title">@product.Name</h5>
+                            </a>
+                            <div class="product-card-footer">
+                                @if (product.ListingType == "for_sale" && product.Price.HasValue)
+                                {
+                                    <div class="price-tag">
+                                        @product.Price.Value.ToString("N0") <small class="currency">د.أ</small>
+                                    </div>
+                                    @if (product.Status == "approved")
+                                    {
+                                        <button type="button" class="cart-btn" data-product-id="@product.ProductId" title="أضف إلى السلة">
+                                            <i class="bi bi-bag-plus"></i>
+                                            <span>إضافة اى السلة</span>
+                                        </button>
+                                    }
+                                    else if (product.Status == "sold")
+                                    {
+                                        <button type="button" class="cart-btn sold" disabled>
+                                            تم بيع القطعة
+                                        </button>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="badge-archive">قطعة للعرض</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="text-end my-4">
+            <a asp-controller="Explore" asp-action="Index" class="btn-see-all">عرض الكل ←</a>
+        </div>
+    </section>
+}
+
+
 
 <!-- ===== دعوة أخيرة ===== -->
 <section class="cta-section text-center">
@@ -205,7 +199,7 @@
 
                 <div class="stat-content">
                     <strong>@(Model.ArchivedProducts)+</strong>
-                    <span>قطعة موثقة للأرشفة</span>
+                    <span>قطعة موثقة للعرض</span>
                 </div>
             </div>
 

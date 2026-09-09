@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "سلة المشتريات";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/cart.css" asp-append-version="true" />
+}
+
+<div class="container cart-page py-4 py-lg-5">
+
+    <h1 class="mb-4">سلة المشتريات</h1>
+
+    <div id="cartEmptyState" class="cart-empty-state text-center d-none">
+        <i class="bi bi-bag-heart"></i>
+        <h2>السلة فاضية</h2>
+        <p>أضيفي أي قطعة تراثية للسلة.</p>
+        <a asp-controller="Explore" asp-action="Index" class="btn-heritage">استكشفي التراث</a>
+    </div>
+
+    <div id="cartGrid"></div>
+
+</div>
+
+@section Scripts {
+    <script src="~/js/cart-page.js" asp-append-version="true"></script>
+}

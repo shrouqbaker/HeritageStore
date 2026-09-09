@@ -1,0 +1,202 @@
+﻿/* =========================================================
+   CHECKOUT PAGE
+========================================================= */
+
+.checkout-alert {
+    background: rgba(176, 71, 63, 0.1);
+    color: #8a3a33;
+    padding: 0.85rem 1.1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.92rem;
+}
+
+.checkout-section {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+}
+
+.checkout-textarea {
+    font-family: var(--font-body);
+    border-color: var(--border);
+    resize: vertical;
+}
+
+    .checkout-textarea:focus {
+        border-color: var(--maroon);
+        box-shadow: 0 0 0 0.2rem rgba(122, 31, 43, 0.12);
+    }
+
+.checkout-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    margin-top: 1rem;
+}
+
+.checkout-item-row {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+}
+
+    .checkout-item-row img {
+        width: 56px;
+        height: 56px;
+        border-radius: 8px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+.checkout-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.checkout-item-title {
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.checkout-item-price {
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   PAYMENT METHOD
+========================================================= */
+
+.payment-method-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.payment-method-option {
+    cursor: pointer;
+    margin: 0;
+}
+
+    .payment-method-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+.payment-method-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+    .payment-method-card i {
+        font-size: 1.3rem;
+        color: var(--maroon);
+    }
+
+.payment-method-option input[type="radio"]:checked + .payment-method-card {
+    border-color: var(--maroon);
+    background: rgba(122, 31, 43, 0.05);
+}
+
+
+/* ===== Visa card fields ===== */
+.visa-card-fields {
+    border-top: 1px dashed var(--border);
+    margin-top: 1.1rem;
+    padding-top: 1.1rem;
+}
+
+.visa-security-note {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--green);
+    font-size: 0.8rem;
+    margin: 0.85rem 0 0;
+}
+
+
+/* =========================================================
+   CONFIRMATION PAGE
+========================================================= */
+
+.confirmation-box {
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+    .confirmation-box > i {
+        font-size: 3.5rem;
+        color: var(--green);
+        margin-bottom: 1rem;
+        display: inline-block;
+    }
+
+    .confirmation-box p {
+        color: #6b5f52;
+        margin-bottom: 2rem;
+    }
+
+.confirmation-summary {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    text-align: start;
+}
+
+.confirmation-item-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+}
+
+    .confirmation-item-row:not(:last-child) {
+        border-bottom: 1px dashed var(--border);
+    }
+
+    .confirmation-item-row img {
+        width: 44px;
+        height: 44px;
+        border-radius: 6px;
+        object-fit: cover;
+    }
+
+    .confirmation-item-row span:nth-child(2) {
+        flex: 1;
+        font-size: 0.9rem;
+    }
+
+.confirmation-item-price {
+    color: var(--gold);
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.confirmation-total-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    color: var(--maroon);
+    padding-top: 0.85rem;
+    margin-top: 0.4rem;
+    border-top: 1px solid var(--border);
+}

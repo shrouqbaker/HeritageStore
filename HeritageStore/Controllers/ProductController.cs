@@ -170,9 +170,44 @@ namespace HeritageStore.Controllers
             return View();
         }
 
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            return View();
+            var product = await _context.Products
+                .Include(p => p.ProductImages)
+                .Include(p => p.Embroideries)
+                .Include(p => p.EmbroideryType)
+                .Include(p => p.Category)
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.ProductId == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            // منتجات مشابهة (نفس التصنيف أو نفس الدولة، عدا المنتج الحالي)
+            var similarProducts = await _context.Products
+                .Include(p => p.ProductImages).Include(p => p.Embroideries)
+                .Include(p => p.EmbroideryType)
+                .Where(p => p.ProductId != id &&
+                            (p.CategoryId == product.CategoryId || p.Country == product.Country) &&
+                            (p.Status == "sold" || p.Status == "approved" || p.Status == "archived"))
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(4)
+                .ToListAsync();
+
+            // هل المنتج مفضّل عند المستخدم الحالي؟
+            bool isFavorited = false;
+            var userId = _userManager.GetUserId(User);
+            if (userId != null)
+            {
+                isFavorited = await _context.Favorites.AnyAsync(f => f.UserId == userId && f.ProductId == id);
+            }
+
+            ViewBag.SimilarProducts = similarProducts;
+            ViewBag.IsFavorited = isFavorited;
+
+            return View(product);
         }
     }
 }

@@ -237,6 +237,10 @@
                 <span asp-validation-for="Images"
                       class="text-danger"></span>
 
+                <p class="form-hint mt-2">
+                    انقر "اجعلها رئيسية" تحت أي صورة لاختيارها كصورة الغلاف الرئيسية للقطعة.
+                </p>
+
 
                 <div id="imagePreviewGrid"
                      class="image-preview-grid mt-3">
@@ -510,7 +514,7 @@
                         <div>
 
                             <strong>
-                                للأرشفة فقط
+                                للعرض فقط
                             </strong>
 
                             <p>
@@ -566,6 +570,7 @@
                     <span asp-validation-for="Price"
                           class="text-danger">
                     </span>
+
 
 
                     <div class="commission-note">
@@ -1524,6 +1529,7 @@
 
 
 
+        // ✅ معدّلة: تحديد أول صورة كرئيسية تلقائيًا عند أول رفع
         function handleFiles(fileList) {
 
             const files =
@@ -1567,6 +1573,17 @@
                 selectedFiles.concat(
                     validFiles
                 );
+
+
+            // لو ما في صورة رئيسية محددة صراحة لسا، خلي أول صورة هي الرئيسية
+            if (
+                mainImageIndexInput.value === '' &&
+                selectedFiles.length > 0
+            ) {
+
+                mainImageIndexInput.value = 0;
+
+            }
 
 
             syncFilesToInput();
@@ -1615,7 +1632,12 @@
 
 
 
+        // ✅ معدّلة: تصحيح فهرس الصورة الرئيسية بعد الحذف
         function removeImage(index) {
+
+            const mainIndex =
+                parseInt(mainImageIndexInput.value);
+
 
             selectedFiles.splice(
                 index,
@@ -1626,16 +1648,25 @@
             syncFilesToInput();
 
 
-            if (
-                parseInt(
-                    mainImageIndexInput.value
-                ) >= selectedFiles.length
+            if (selectedFiles.length === 0) {
+
+                // ما في صور متبقية
+                mainImageIndexInput.value = '';
+
+            }
+            else if (index === mainIndex) {
+
+                // الصورة الرئيسية هي يلي انحذفت -> أول صورة متبقية بتصير رئيسية
+                mainImageIndexInput.value = 0;
+
+            }
+            else if (
+                !isNaN(mainIndex) &&
+                index < mainIndex
             ) {
 
-                mainImageIndexInput.value =
-                    selectedFiles.length > 0
-                        ? 0
-                        : '';
+                // انحذفت صورة قبل الرئيسية -> لازم ننزّل الفهرس واحد
+                mainImageIndexInput.value = mainIndex - 1;
 
             }
 
@@ -1646,13 +1677,69 @@
 
 
 
+        // ✅ معدّلة: بننشئ كل الصناديق أولاً (placeholders) مرتبة حسب index،
+        // وبعدين لما توصل نتيجة FileReader منحط الصورة جوا الصندوق الصحيح.
+        // هيك ترتيب العرض دايمًا مطابق لترتيب selectedFiles، وما في تعارض
+        // من قراءة الملفات بشكل غير متزامن (async).
         function renderPreviews() {
 
             previewGrid.innerHTML = '';
 
+            const mainIdx =
+                parseInt(mainImageIndexInput.value);
+
 
             selectedFiles.forEach(
                 (file, index) => {
+
+                    const isMain =
+                        index === mainIdx;
+
+
+                    const box =
+                        document.createElement('div');
+
+
+                    box.className =
+                        'image-preview-item' +
+                        (isMain ? ' is-main' : '');
+
+
+                    // ✅ نحفظ الفهرس على الصندوق نفسه بدل ما نعتمد
+                    // على الـ closure، هيك الـ delegation بالأسفل
+                    // بيقدر يعرف مين انضغط بشكل مضمون
+                    box.dataset.index = index;
+
+
+                    box.innerHTML = `
+
+                                        <button
+                                            type="button"
+                                            class="remove-image-btn"
+                                            title="إزالة الصورة">
+                                            ×
+                                        </button>
+
+                                        <img
+                                            src=""
+                                            alt="صورة القطعة" />
+
+                                        <button
+                                            type="button"
+                                            class="set-main-btn">
+
+                                            ${isMain
+                            ? 'الرئيسية ✓'
+                            : 'اجعلها رئيسية'
+                        }
+
+                                        </button>
+
+                                    `;
+
+
+                    previewGrid.appendChild(box);
+
 
                     const reader =
                         new FileReader();
@@ -1660,96 +1747,20 @@
 
                     reader.onload = event => {
 
-                        const isMain =
-                            index ==
-                            mainImageIndexInput.value;
+                        const img =
+                            box.querySelector('img');
 
+                        if (img) {
 
-                        const box =
-                            document.createElement(
-                                'div'
-                            );
+                            img.src =
+                                event.target.result;
 
-
-                        box.className =
-                            'image-preview-item' +
-                            (
-                                isMain
-                                    ? ' is-main'
-                                    : ''
-                            );
-
-
-                        box.innerHTML = `
-
-                                    <button
-                                        type="button"
-                                        class="remove-image-btn"
-                                        title="إزالة الصورة">
-                                        ×
-                                    </button>
-
-                                    <img
-                                        src="${event.target.result}"
-                                        alt="صورة القطعة" />
-
-                                    <button
-                                        type="button"
-                                        class="set-main-btn">
-
-                                        ${isMain
-                                ? 'الرئيسية ✓'
-                                : 'اجعلها رئيسية'
-                            }
-
-                                    </button>
-
-                                `;
-
-
-                        box
-                            .querySelector(
-                                '.set-main-btn'
-                            )
-                            .addEventListener(
-                                'click',
-                                () => {
-
-                                    mainImageIndexInput.value =
-                                        index;
-
-                                    renderPreviews();
-
-                                }
-                            );
-
-
-                        box
-                            .querySelector(
-                                '.remove-image-btn'
-                            )
-                            .addEventListener(
-                                'click',
-                                () => {
-
-                                    removeImage(
-                                        index
-                                    );
-
-                                }
-                            );
-
-
-                        previewGrid.appendChild(
-                            box
-                        );
+                        }
 
                     };
 
 
-                    reader.readAsDataURL(
-                        file
-                    );
+                    reader.readAsDataURL(file);
 
                 }
             );
@@ -1791,6 +1802,54 @@
             }
 
         }
+
+
+        // ✅ Event Delegation: listener واحد بس، منعمله مرة وحدة
+        // بره renderPreviews، فهيك بيضل شغال دايمًا مهما تغيّر
+        // محتوى previewGrid، وما بضيع أي listener بعد إعادة الرسم.
+        previewGrid.addEventListener('click', event => {
+
+            const setMainBtn =
+                event.target.closest('.set-main-btn');
+
+            const removeBtn =
+                event.target.closest('.remove-image-btn');
+
+
+            if (setMainBtn) {
+
+                const box =
+                    setMainBtn.closest('.image-preview-item');
+
+                const index =
+                    parseInt(box.dataset.index);
+
+
+                mainImageIndexInput.value = index;
+
+                renderPreviews();
+
+                return;
+
+            }
+
+
+            if (removeBtn) {
+
+                const box =
+                    removeBtn.closest('.image-preview-item');
+
+                const index =
+                    parseInt(box.dataset.index);
+
+
+                removeImage(index);
+
+                return;
+
+            }
+
+        });
 
 
         renderPreviews();
@@ -1941,6 +2000,7 @@
         // ملخص التأكيد
         // =========================================================
 
+        // ✅ معدّلة: تمييز الصورة الرئيسية بشارة "★ رئيسية" بشاشة التأكيد
         function fillConfirmationSummary() {
 
             // اسم القطعة
@@ -2013,7 +2073,7 @@
 
 
 
-            // صور مصغرة
+            // صور مصغّرة (مع تمييز الصورة الرئيسية)
 
             const stripContainer =
                 document.getElementById(
@@ -2030,7 +2090,22 @@
                 );
 
 
-            uploadedImgs.forEach(img => {
+            const mainIdx =
+                parseInt(mainImageIndexInput.value);
+
+
+            uploadedImgs.forEach((img, idx) => {
+
+                const isMain =
+                    idx === mainIdx;
+
+                const wrapper =
+                    document.createElement('div');
+
+                wrapper.className =
+                    'confirm-thumb-wrapper' +
+                    (isMain ? ' is-main' : '');
+
 
                 const thumb =
                     document.createElement(
@@ -2046,8 +2121,27 @@
                     'صورة القطعة';
 
 
+                wrapper.appendChild(thumb);
+
+
+                if (isMain) {
+
+                    const badge =
+                        document.createElement('span');
+
+                    badge.className =
+                        'confirm-thumb-badge';
+
+                    badge.textContent =
+                        '★ رئيسية';
+
+                    wrapper.appendChild(badge);
+
+                }
+
+
                 stripContainer.appendChild(
-                    thumb
+                    wrapper
                 );
 
             });

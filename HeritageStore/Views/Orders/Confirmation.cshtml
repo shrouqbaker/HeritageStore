@@ -1,0 +1,40 @@
+﻿@model HeritageStore.Models.Order
+
+@{
+    ViewData["Title"] = "تم تأكيد الطلب";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Checkout.css" asp-append-version="true" />
+}
+<div class="container confirmation-page py-5">
+    <div class="confirmation-box text-center">
+        <i class="bi bi-check-circle-fill"></i>
+        <h1>تم تأكيد طلبك!</h1>
+        <p> سنتواصل معك قريبًا لاستكمال إجراءات التوصيل</p>
+
+        <div class="confirmation-summary">
+            @foreach (var item in Model.OrderItems)
+            {
+                var product = item.Product;
+                var image = product?.ProductImages != null && product.ProductImages.Any()
+                    ? product.ProductImages.First().ImageUrl
+                    : "/images/placeholder.jpg";
+
+                <div class="confirmation-item-row">
+                    <img src="@image" alt="@product?.Name">
+                    <span>@product?.Name</span>
+                    <span class="confirmation-item-price">@((product?.Price ?? 0).ToString("N0")) دينار</span>
+                </div>
+            }
+
+            <div class="confirmation-total-row">
+                <span>الإجمالي</span>
+                <span>@Model.TotalPrice.ToString("N0") دينار</span>
+            </div>
+        </div>
+
+        <a asp-controller="Explore" asp-action="Index" class="btn-heritage mt-4 d-inline-block">
+            متابعة التصفح
+        </a>
+    </div>
+</div>

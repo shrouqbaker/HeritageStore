@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.CodeAnalysis;
 
 namespace HeritageStore.Models
 {

@@ -10,46 +10,148 @@
 }
 
 <div class="auth-page">
-    <div class="auth-card">
 
-        <h2>إنشاء حساب جديد</h2>
-        <hr class="auth-divider-top" />
-        <p class="auth-subtitle">انضم إلينا وابدأ رحلتك في توثيق التراث ومشاركته</p>
-
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="البريد الإلكتروني" />
-            </div>
-            <span asp-validation-for="Input.Email" class="text-danger"></span>
-
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="كلمة المرور" />
-            </div>
-            <span asp-validation-for="Input.Password" class="text-danger"></span>
-
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="تأكيد كلمة المرور" />
-            </div>
-            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-
-            <button id="registerSubmit" type="submit" class="btn-auth-primary mt-3">إنشاء حساب</button>
-
-            <div class="auth-or-divider"><span>أو</span></div>
-
-            <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="btn-auth-outline">
-                <i class="bi bi-box-arrow-in-left"></i> لدي حساب بالفعل
-            </a>
-        </form>
-
-        <p class="auth-footer-note">
-            بإنشائك حسابًا، أنت توافق على <a href="#">الشروط والأحكام</a> و<a href="#">سياسة الخصوصية</a>
-        </p>
+    <!-- نقاط التزيين الفاتحة -->
+    <div class="auth-dots-decor">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
     </div>
+
+    <!-- الحاوية المزدوجة الفاتحة -->
+    <div class="auth-container">
+
+        <!-- جانب اللوغو -->
+        <div class="auth-side-image">
+            <img src="~/images/logoHeritage.png" alt="لوغو حِكاية" class="auth-brand-logo" />
+        </div>
+
+        <!-- جانب النموذج الفاتح -->
+        <div class="auth-side-form">
+
+            <h2>إنشاء حساب جديد</h2>
+
+            <p class="auth-subtitle">
+                انضمي إلى حِكاية واكتشفي جمال التراث وشاركي قصصه
+            </p>
+
+            <form id="registerForm"
+                  asp-route-returnUrl="@Model.ReturnUrl"
+                  method="post">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"
+                     role="alert">
+                </div>
+
+                <!-- Username -->
+                <div class="form-group-wrapper">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-person"></i>
+                        </span>
+                        <input asp-for="Input.Username"
+                               class="form-control"
+                               autocomplete="username"
+                               aria-required="true"
+                               placeholder="اسم المستخدم" />
+                    </div>
+                    <span asp-validation-for="Input.Username" class="text-danger"></span>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group-wrapper">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-envelope"></i>
+                        </span>
+                        <input asp-for="Input.Email"
+                               class="form-control"
+                               autocomplete="email"
+                               aria-required="true"
+                               placeholder="البريد الإلكتروني" />
+                    </div>
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group-wrapper">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-telephone"></i>
+                        </span>
+                        <input asp-for="Input.PhoneNumber"
+                               class="form-control"
+                               autocomplete="tel"
+                               aria-required="true"
+                               placeholder="رقم الهاتف" />
+                    </div>
+                    <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group-wrapper">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-lock"></i>
+                        </span>
+                        <input asp-for="Input.Password"
+                               class="form-control"
+                               autocomplete="new-password"
+                               aria-required="true"
+                               placeholder="كلمة المرور" />
+                    </div>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group-wrapper">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-lock-fill"></i>
+                        </span>
+                        <input asp-for="Input.ConfirmPassword"
+                               class="form-control"
+                               autocomplete="new-password"
+                               aria-required="true"
+                               placeholder="تأكيد كلمة المرور" />
+                    </div>
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <!-- Register Button -->
+                <button id="registerSubmit"
+                        type="submit"
+                        class="btn-auth-primary">
+                    إنشاء الحساب
+                </button>
+
+                <!-- Divider -->
+                <div class="auth-or-divider">
+                    <span>أو</span>
+                </div>
+
+                <!-- Login Button -->
+                <a asp-page="./Login"
+                   asp-route-returnUrl="@Model.ReturnUrl"
+                   class="btn-auth-outline">
+                    <i class="bi bi-box-arrow-in-left"></i>
+                    لدي حساب بالفعل
+                </a>
+
+            </form>
+
+            <p class="auth-footer-note">
+                بإنشائك حسابًا، أنت توافق على
+                <a href="#">الشروط والأحكام</a>
+                و
+                <a href="#">سياسة الخصوصية</a>
+            </p>
+
+        </div>
+
+    </div>
+
 </div>
 
 @section Scripts {

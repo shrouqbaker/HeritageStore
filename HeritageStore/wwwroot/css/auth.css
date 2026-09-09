@@ -1,176 +1,311 @@
 ﻿.site-footer {
     margin: 0 !important;
 }
+
 .auth-page {
-    min-height: 95vh;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 3rem 1rem;
+    padding: 2rem 1rem;
     position: relative;
-    background-image: linear-gradient(rgba(43,36,32,0.55), rgba(43,36,32,0.55)),url('/images/bg2.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-.auth-card {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 2.5rem 2.5rem 2rem;
-    max-width: 430px;
-    width: 100%;
-    box-shadow: 0 8px 30px rgba(43,36,32,0.06);
+    /* خلفية الصفحة كاملة بلون عاجي فاتح جداً */
+    background-color: #faf8f5;
+    overflow: hidden;
 }
 
-/* ===== Logo & Tagline ===== */
-.auth-logo {
-    text-align: center;
-    font-family: var(--font-heading);
-    font-size: 2.2rem;
-    color: var(--maroon);
-    margin-bottom: 0.3rem;
-}
-
-    .auth-logo .ornament {
-        font-size: 1.1rem;
-        color: var(--gold);
-        margin: 0 0.5rem;
-        vertical-align: middle;
+    /* ===== خلفية الجزء الأيسر وتزيين النقاط ===== */
+    .auth-page::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        background-color: #f2ede4; /* درجة فاتحة أغمق قليلاً للتباين */
+        z-index: 1;
     }
 
-.auth-tagline {
-    text-align: center;
-    color: #8a7d6d;
-    font-size: 0.85rem;
-    margin-bottom: 1rem;
+.auth-dots-decor {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    z-index: 1;
 }
 
-.auth-divider-top {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin-bottom: 1.5rem;
-}
-
-/* ===== Headings ===== */
-.auth-card h2 {
-    text-align: center;
-    font-size: 1.5rem;
-    margin-bottom: 0.4rem;
-}
-
-.auth-card .auth-subtitle {
-    text-align: center;
-    color: #8a7d6d;
-    font-size: 0.9rem;
-    margin-bottom: 1.6rem;
-    line-height: 1.7;
-}
-
-/* ===== Inputs with icons ===== */
-.auth-card .input-group {
-    margin-bottom: 1rem;
-}
-
-.auth-card .input-group-text {
-    background-color: var(--bg);
-    border: 1px solid var(--border);
-    color: var(--maroon);
-}
-
-.auth-card .form-control {
-    background-color: var(--bg);
-    border: 1px solid var(--border);
-    padding: 0.7rem 1rem;
-}
-
-    .auth-card .form-control:focus {
-        border-color: var(--maroon);
-        box-shadow: none;
-        background-color: #fff;
+    .auth-dots-decor span {
+        width: 14px;
+        height: 14px;
+        background-color: var(--gold, #d4a359);
+        border-radius: 50%;
+        opacity: 0.8;
     }
 
-/* ===== Row: تذكرني + نسيت كلمة المرور ===== */
-.auth-options {
+/* ===== الحاوية الرئيسية (الكارت المزدوج الفاتح) ===== */
+.auth-container {
+    position: relative;
+    z-index: 2;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.4rem;
-    font-size: 0.88rem;
+    width: 100%;
+    max-width: 900px;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(107, 29, 47, 0.05);
+    overflow: hidden;
+    border: 1px solid var(--border, #e8e2d8);
 }
 
-    .auth-options a {
-        color: var(--maroon);
+/* ===== قسم الشعار / اللوغو ===== */
+.auth-side-image {
+    flex: 1;
+    background-color: #fcfbfa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    border-left: 1px solid var(--border, #e8e2d8);
+}
+
+.auth-brand-logo {
+    max-width: 210px;
+    height: auto;
+    object-fit: contain;
+}
+
+/* ===== قسم النموذج (فاتح وأنيق) ===== */
+.auth-side-form {
+    flex: 1.2;
+    background-color: #ffffff; /* خلفية بيضاء نقية للنموذج */
+    color: var(--maroon, #6B1D2F);
+    padding: 3rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+    /* ===== النصوص والعناوين ===== */
+    .auth-side-form h2 {
+        font-size: 1.8rem;
+        font-family: var(--font-heading);
+        color: var(--maroon, #6B1D2F); /* استبدال الأسود بالمارون */
+        margin-bottom: 0.3rem;
     }
 
-/* ===== Buttons ===== */
+    .auth-side-form .auth-subtitle {
+        color: #7a7067;
+        font-size: 0.9rem;
+        margin-bottom: 1.8rem;
+        line-height: 1.6;
+    }
+
+/* ===== الحقول والمدخلات الفاتحة ===== */
+.form-group-wrapper {
+    margin-bottom: 1rem;
+}
+
+.auth-side-form .input-group-text {
+    background-color: #f8f6f0;
+    border: 1px solid #e2ded7;
+    border-left: none;
+    color: var(--gold, #b8860b);
+}
+
+.auth-side-form .form-control {
+    background-color: #f8f6f0;
+    border: 1px solid #e2ded7;
+    color: var(--maroon, #6B1D2F); /* النص المدخل باللون المارون */
+    padding: 0.65rem 1rem;
+}
+
+    .auth-side-form .form-control::placeholder {
+        color: #a09589;
+    }
+
+    .auth-side-form .form-control:focus {
+        border-color: var(--gold, #d4a359);
+        box-shadow: none;
+        background-color: #ffffff;
+        color: var(--maroon, #6B1D2F);
+    }
+
+.auth-side-form .input-group:focus-within .input-group-text {
+    border-color: var(--gold, #d4a359);
+    background-color: #ffffff;
+}
+
+/* ===== الأزرار ===== */
 .btn-auth-primary {
-    background-color: var(--green);
-    color: #fff;
+    background-color: var(--green, #2d5a43);
+    color: #ffffff;
     border: none;
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.8rem;
     border-radius: 8px;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 1rem;
+    margin-top: 0.5rem;
+    transition: all 0.3s ease;
 }
 
     .btn-auth-primary:hover {
-        background-color: #22362b;
-        color: #fff;
+        background-color: #214332;
+        color: #ffffff;
     }
 
 .btn-auth-outline {
     background: transparent;
-    border: 1.5px solid var(--maroon);
-    color: var(--maroon);
+    border: 1.5px solid var(--maroon, #6B1D2F); /* حدود المارون بدلاً من الأسود */
+    color: var(--maroon, #6B1D2F);
     width: 100%;
-    padding: 0.7rem;
+    padding: 0.65rem;
     border-radius: 8px;
-    font-weight: 500;
-    font-size: 0.95rem;
+    font-weight: 600;
+    font-size: 0.9rem;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
     .btn-auth-outline:hover {
-        background-color: var(--maroon);
-        color: #fff;
+        background-color: var(--maroon, #6B1D2F);
+        color: #ffffff;
     }
 
-/* ===== Divider "أو" ===== */
+/* ===== الفواصل والملاحظات ===== */
 .auth-or-divider {
     display: flex;
     align-items: center;
     text-align: center;
-    color: #b0a496;
+    color: #a09589;
     font-size: 0.85rem;
-    margin: 1.3rem 0;
+    margin: 1.2rem 0;
 }
 
     .auth-or-divider::before,
     .auth-or-divider::after {
         content: "";
         flex: 1;
-        border-top: 1px solid var(--border);
+        border-top: 1px solid #e2ded7;
     }
 
     .auth-or-divider span {
-        padding: 0 1rem;
+        padding: 0 0.8rem;
     }
 
-/* ===== Footer note ===== */
 .auth-footer-note {
     text-align: center;
     font-size: 0.78rem;
-    color: #a89b8b;
-    margin-top: 1.5rem;
-    line-height: 1.6;
+    color: #8c8278;
+    margin-top: 1.2rem;
+    line-height: 1.5;
 }
 
     .auth-footer-note a {
-        color: #8a7d6d;
+        color: var(--gold, #b8860b);
         text-decoration: underline;
+    }
+
+/* ===== خيارات تذكرني ونسيت كلمة المرور ===== */
+.auth-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    font-size: 0.88rem;
+    color: var(--maroon, #6B1D2F);
+}
+
+    .auth-options a {
+        color: var(--gold, #b8860b);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .auth-options a:hover {
+            text-decoration: underline;
+        }
+
+    .auth-options .form-check-input:checked {
+        background-color: var(--green, #2d5a43);
+        border-color: var(--green, #2d5a43);
+    }
+
+/* ===== التجاوب مع مختلف الشاشات ===== */
+@media (max-width: 768px) {
+    .auth-container {
+        flex-direction: column;
+    }
+
+    .auth-side-image {
+        padding: 2rem 1rem;
+        border-left: none;
+        border-bottom: 1px solid var(--border, #e8e2d8);
+    }
+
+    .auth-brand-logo {
+        max-width: 140px;
+    }
+
+    .auth-dots-decor,
+    .auth-page::before {
+        display: none;
+    }
+}
+/* ===== ضبط الاتجاه والمحاذاة لجميع العناصر بالكامل إلى اليمين ===== */
+.auth-page,
+.auth-container,
+.auth-side-form {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+    /* ضبط محاذاة العناوين والنصوص الفرعية */
+    .auth-side-form h2,
+    .auth-side-form .auth-subtitle {
+        text-align: right !important;
+    }
+
+    /* ضبط الأيقونات والحقول لتكون الأيقونة على اليمين والنص على يمين الحقل */
+    .auth-side-form .input-group {
+        direction: rtl !important;
+    }
+
+    .auth-side-form .input-group-text {
+        border-left: none !important;
+        border-right: 1px solid #e2ded7 !important;
+        border-top-right-radius: 8px !important;
+        border-bottom-right-radius: 8px !important;
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+    }
+
+    .auth-side-form .form-control {
+        text-align: right !important;
+        border-top-left-radius: 8px !important;
+        border-bottom-left-radius: 8px !important;
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+    }
+
+/* ضبط خيار تذكرني ونسيت كلمة المرور */
+.auth-options {
+    direction: rtl !important;
+}
+
+    .auth-options .form-check {
+        padding-right: 1.5em !important;
+        padding-left: 0 !important;
+    }
+
+    .auth-options .form-check-input {
+        float: right !important;
+        margin-right: -1.5em !important;
+        margin-left: 0.5rem !important;
     }

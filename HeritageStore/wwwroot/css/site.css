@@ -16,7 +16,6 @@
 html {
     -webkit-text-size-adjust: 100%;
     overflow-x: hidden;
-    max-width: 100%;
 }
 
 body {
@@ -25,12 +24,19 @@ body {
     font-family: var(--font-body);
     font-weight: 400;
     overflow-x: hidden;
-    max-width: 100%;
+    padding-top: 75px;
 }
 
 img {
     max-width: 100%;
     height: auto;
+}
+
+/* Responsive Logo Fix */
+.navbar-logo {
+    max-height: 42px;
+    width: auto;
+    object-fit: contain;
 }
 
 h1, h2, h3, h4, .brand-font {
@@ -39,7 +45,6 @@ h1, h2, h3, h4, .brand-font {
     color: var(--ink);
 }
 
-/* أحجام خط متجاوبة للعناوين */
 h1 {
     font-size: clamp(1.7rem, 4vw, 2.75rem);
 }
@@ -57,137 +62,83 @@ a {
     text-decoration: none;
 }
 
-.container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-}
-
 /* ===== Navbar ===== */
 .site-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
     background-color: var(--bg);
     border-bottom: 1px solid var(--border);
-    padding: .85rem 0;
+    padding: 0.65rem 0;
 }
-
-    /* لا نلمس display/flex-wrap الأساسية لـ .navbar > .container، بوتستراب نفسه
-       يتكفل بها (space-between + flex-wrap المناسب لكل حجم شاشة). أي override هون
-       كان يكسر آلية الطي (collapse) على الموبايل. */
-    .site-navbar .container {
-        position: relative;
-    }
-
-    .site-navbar .navbar-brand {
-        font-family: var(--font-heading);
-        font-size: 1.6rem;
-        color: var(--maroon);
-    }
 
     .site-navbar .nav-link {
         font-family: var(--font-body);
         color: var(--ink);
-        margin: 0 0.6rem;
+        margin: 0 0.5rem;
+        white-space: nowrap;
     }
 
         .site-navbar .nav-link:hover {
             color: var(--maroon);
         }
 
-/* أيقونة السلة/المفضلة الظاهرة بجانب زر القائمة على الموبايل */
 .nav-icons-mobile {
-    margin-inline-end: .75rem;
-    gap: 1rem !important;
+    margin-inline-end: 0.5rem;
 }
 
-/* ===== الشاشات الكبيرة (≥992px): نافبار أفقي عادي ===== */
+/* ===== Desktop View (≥992px) ===== */
 @media (min-width: 992px) {
-    /* الـ collapse ياخد كل المساحة المتبقية، والأيقونات تروح لآخرها (الشمال).
-       ملاحظة: bootstrap نفسه بيحط display:flex!important لـ navbar-collapse
-       ضمن media query خاص فيه navbar-expand-lg، فما في داعي نكررها هون ولا
-       نطبّقها بدون شرط الحجم (هذا كان سبب انكسار القائمة على الموبايل). */
     .site-navbar .navbar-collapse {
+        display: flex !important;
+        justify-content: space-between;
         align-items: center;
-        justify-content: flex-end;
-        flex: 1;
     }
 
-    /* روابط النافبار توضع بمنتصف الصفحة بالكامل (بالنسبة لعرض الـ container) */
+    /* توسيط ناعم وآمن بدون absolute لمنع التداخل */
     .site-navbar .navbar-nav.mx-auto {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        margin: 0 !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
 }
 
-/* ===== الشاشات الأصغر من lg: القائمة مطوية افتراضياً وتنسدل عمودياً عند الفتح ===== */
+/* ===== Mobile View (<992px) ===== */
 @media (max-width: 991.98px) {
     .site-navbar .navbar-collapse.show,
     .site-navbar .navbar-collapse.collapsing {
-        margin-top: .75rem;
-        padding-top: .75rem;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
         border-top: 1px solid var(--border);
     }
 
     .site-navbar .navbar-nav .nav-link {
-        padding: .65rem 0;
+        padding: 0.5rem 0;
     }
 
-    /* خط فاصل بين روابط الصفحات (الرئيسية / استكشف التراث / عن المشروع)
-       والأشياء الخاصة بالمستخدم (المفضلة / السلة / الحساب) */
-    .site-navbar .nav-icons:not(.nav-icons-mobile) {
-        margin-top: .75rem;
-        width: 100%;
-        justify-content: flex-start;
-        gap: 1.25rem !important;
-    }
-
-    /* خط فاصل بين روابط الصفحات وخيارات المستخدم (تسجيل الدخول/الحساب...) */
     .user-links-mobile {
-        margin-top: .75rem;
-        padding-top: 1rem;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
         border-top: 1px solid var(--border);
     }
 
-        .user-links-mobile .nav-link,
-        .user-links-mobile .btn-link {
-            padding: .5rem 0;
-            font-size: 1rem;
-        }
-
-        .user-links-mobile .btn-link {
-            color: var(--maroon);
-            text-decoration: none;
-            font-family: var(--font-body);
-        }
-
-            .user-links-mobile .btn-link:hover {
-                color: var(--maroon-dark);
-            }
-
-        /* زر "أضف قطعتك" داخل قائمة الموبايل: نلغي التمدد الكامل للعرض
-           (اللي مطبق عموماً على الأزرار بالشاشات الصغيرة) عشان يبقى متناسق
-           مع باقي الروابط جنبه بدل ما يمتد حافة لحافة. !important هون
-           لضمان الأسبقية مهما كان ترتيب القواعد التانية. */
         .user-links-mobile .btn-heritage {
             width: auto !important;
             display: inline-block !important;
-            text-align: center !important;
         }
-}
 
-@media (max-width: 575.98px) {
-    .site-navbar .navbar-brand {
-        font-size: 1.35rem;
-    }
-
-    .nav-icons .nav-icon,
-    .nav-icons-mobile .nav-icon {
-        font-size: 1.15rem;
+    .site-navbar .dropdown-menu {
+        position: static !important;
+        transform: none !important;
+        width: 100%;
+        box-shadow: none;
     }
 }
 
+/* ===== Nav Icons & Badges ===== */
 .nav-icons .nav-icon {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     color: var(--ink);
     display: inline-flex;
     align-items: center;
@@ -201,30 +152,50 @@ a {
     display: none;
 }
 
-.dropdown-menu {
-    font-family: var(--font-body);
-    border: 1px solid var(--border);
-    max-width: calc(100vw - 2rem);
+.cart-icon-wrapper {
+    position: relative;
 }
 
-.dropdown-item:hover {
-    background-color: var(--bg);
+.cart-badge {
+    position: absolute;
+    top: -5px;
+    inset-inline-start: -8px;
+    background: var(--maroon);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+}
+
+.site-navbar .nav-link.active {
     color: var(--maroon);
+    font-weight: 700;
+    position: relative;
 }
 
-/* على الموبايل، الموقع المطلق (اللي بيحسبه Popper) بينكسر أحياناً بالـ RTL
-   ويخلي القائمة تطلع برا حدود الشاشة وتعمل سكرول أفقي. الحل: نخليها عنصر
-   عادي داخل تدفق الصفحة، تنسدل تحت الأيقونة مباشرة وبعرض كامل. */
+@media (min-width: 992px) {
+    .site-navbar .nav-link.active::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        left: 0;
+        bottom: -4px;
+        height: 2px;
+        background-color: var(--maroon);
+        border-radius: 2px;
+    }
+}
+
 @media (max-width: 991.98px) {
-    .site-navbar .dropdown-menu {
-        position: static !important;
-        inset: auto !important;
-        transform: none !important;
-        float: none;
-        width: 100%;
-        max-width: 100%;
-        margin-top: .5rem;
-        box-shadow: none;
+    .site-navbar .nav-link.active {
+        border-right: 3px solid var(--maroon);
+        padding-right: 0.6rem;
     }
 }
 
@@ -233,7 +204,7 @@ a {
     background-color: var(--maroon);
     color: #fff;
     border: none;
-    padding: 0.6rem 1.6rem;
+    padding: 0.55rem 1.4rem;
     border-radius: 4px;
     font-weight: 500;
     transition: background-color 0.2s ease;
@@ -243,35 +214,224 @@ a {
         background-color: var(--maroon-dark);
         color: #fff;
     }
+/* ===== Improved Product Card Style ===== */
+.product-card {
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
 
-.btn-outline-heritage {
-    background: transparent;
-    border: 1.5px solid var(--maroon);
+    .product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 24px rgba(43, 36, 32, 0.08);
+        border-color: rgba(184, 134, 59, 0.4);
+    }
+
+/* Media & Image Zoom Effect */
+.product-card-media {
+    position: relative;
+    width: 100%;
+    background: #fdfbf7;
+    overflow: hidden;
+}
+
+    .product-card-media img {
+        width: 100%;
+        aspect-ratio: 4 / 4; /* نسبة طولية مثالية لقطع الملابس والمطرزات */
+        object-fit: cover;
+        display: block;
+        transition: transform 0.5s ease;
+    }
+
+.product-card:hover .product-card-media img {
+    transform: scale(1.05);
+}
+
+/* Favorite Button (Glassmorphism) */
+.favorite-btn {
+    position: absolute;
+    top: 0.75rem;
+    inset-inline-end: 0.75rem;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(4px);
     color: var(--maroon);
-    padding: 0.55rem 1.5rem;
-    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(228, 218, 205, 0.6);
+    z-index: 3;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+    .favorite-btn:hover {
+        background: var(--maroon);
+        color: #ffffff;
+        transform: scale(1.1);
+    }
+
+/* ===== Favorite Button ===== */
+.favorite-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: white;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .favorite-btn:hover {
+        color: var(--maroon);
+        transform: scale(1.1);
+        background-color: white;
+    }
+
+    /* Active */
+    .favorite-btn.is-favorited {
+        color: var(--maroon);
+    }
+
+        .favorite-btn.is-favorited i {
+            filter: drop-shadow(1px 0 0 white) drop-shadow(-1px 0 0 white) drop-shadow(0 1px 0 white) drop-shadow(0 -1px 0 white);
+        }
+
+            .favorite-btn.is-favorited i::before {
+                content: "\f415";
+            }
+
+/* Body & Typography */
+.product-card-body {
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.embroidery-type-label {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: var(--green);
+    background-color: rgba(47, 74, 60, 0.08);
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    margin-bottom: 0.5rem;
+    align-self: flex-start;
     font-weight: 500;
 }
 
-    .btn-outline-heritage:hover {
-        background-color: var(--maroon);
-        color: #fff;
+.product-title-link {
+    text-decoration: none;
+}
+
+.product-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* قص النص الزائد عن سطرين لتوحيد الارتفاع */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.2s ease;
+}
+
+.product-card:hover .product-title {
+    color: var(--maroon);
+}
+
+/* Footer & Actions */
+.product-card-footer {
+    margin-top: auto;
+    padding-top: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    border-top: 1px dashed var(--border);
+}
+
+.price-tag {
+    color: var(--gold);
+    font-weight: 800;
+    font-size: 1.1rem;
+    white-space: nowrap;
+}
+
+    .price-tag .currency {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--ink);
+        opacity: 0.8;
     }
 
-/* الأزرار تمتد بعرض كامل داخل القوائم المنسدلة على الموبايل لسهولة اللمس */
-@media (max-width: 575.98px) {
-    .btn-heritage, .btn-outline-heritage {
-        width: 100%;
-        text-align: center;
-    }
+.cart-btn {
+    background-color: var(--maroon);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
+
+    .cart-btn:hover {
+        background-color: var(--maroon-dark);
+        box-shadow: 0 3px 8px rgba(122, 31, 43, 0.25);
+    }
+
+    .cart-btn.sold {
+        background-color: var(--bg);
+        color: var(--maroon-dark);
+        border: 1px solid var(--maroon-dark);
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+
+.badge-archive {
+    font-size: 0.75rem;
+    color: var(--bg);
+    background: var(--green);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.btn-see-all {
+    font-weight: 700;
+    color: var(--maroon);
+    transition: opacity 0.2s;
+}
+
+    .btn-see-all:hover {
+        opacity: 0.8;
+    }
 
 /* ===== Footer ===== */
 .site-footer {
     background-color: var(--ink);
     color: #E4DACD;
-    padding: 3rem 0 1.5rem;
-    margin-top: 2rem;
+    padding: 2.5rem 0 1.25rem;
+    margin-top: 3rem;
 }
 
     .site-footer a {
@@ -283,18 +443,22 @@ a {
         font-family: var(--font-heading);
     }
 
-@media (max-width: 767.98px) {
-    .site-footer {
-        padding: 2.25rem 0 1.25rem;
-        margin-top: 2.5rem;
-        text-align: center;
-    }
+.btn-outline-heritage {
+    background-color: transparent;
+    color: var(--maroon);
+    border: 1px solid var(--maroon);
+    border-radius: 6px;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    transition: all 0.3s ease; /* تم تقليل سرعة التحويل لتكون أسرع وأكثر سلاسة */
 }
 
-/* شاشات صغيرة جداً: تقليل الحشوات العامة لتوفير مساحة */
-@media (max-width: 400px) {
-    .container {
-        padding-left: .75rem;
-        padding-right: .75rem;
-    }
+.btn-outline-heritage:hover{
+    background-color: var(--maroon);
+    border:none;
 }
