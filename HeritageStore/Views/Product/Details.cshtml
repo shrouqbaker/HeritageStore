@@ -1,4 +1,4 @@
-﻿@model HeritageStore.Models.Product
+@model HeritageStore.Models.Product
 
 @{
     ViewData["Title"] = Model.Name;
@@ -531,35 +531,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
-
-    /* ================= WISHLIST ================= */
-
-    const wishlist =
-        document.querySelector(".wishlist");
-
-
-    if (wishlist) {
-
-        wishlist.addEventListener("click", function () {
-
-            const nowActive = !this.classList.contains("active");
-
-            this.classList.toggle("active");
-            this.setAttribute("aria-pressed", nowActive ? "true" : "false");
-
-            const icon =
-                this.querySelector("i");
-
-            if (icon) {
-
-                icon.classList.toggle("bi-heart");
-                icon.classList.toggle("bi-heart-fill");
-
-            }
-
-        });
-
-    }
 
 
     /* ================= STORY TABS ================= */
