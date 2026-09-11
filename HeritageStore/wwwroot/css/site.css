@@ -24,7 +24,7 @@ body {
     font-family: var(--font-body);
     font-weight: 400;
     overflow-x: hidden;
-    padding-top: 75px;
+    padding-top: 56px;
 }
 
 img {
@@ -149,7 +149,244 @@ a {
     }
 
 .dropdown-toggle-no-arrow::after {
-    display: none;
+    display: none !important;
+}
+
+/* ===== Modern User Pill & Dropdown in Navbar ===== */
+.nav-user-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 30px;
+    padding: 0.28rem 0.85rem 0.28rem 0.45rem;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--ink);
+    transition: all 0.22s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 2px 6px rgba(43, 36, 32, 0.03);
+}
+
+.nav-user-pill:hover,
+.nav-user-pill[aria-expanded="true"] {
+    background: #FFFFFF;
+    border-color: var(--gold);
+    color: var(--maroon);
+    box-shadow: 0 4px 14px rgba(122, 31, 43, 0.08);
+}
+
+.nav-user-avatar-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 1.5px solid var(--gold);
+    background: #FFFFFF;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-user-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.nav-user-avatar-default {
+    background: rgba(184, 134, 59, 0.12);
+    color: var(--maroon);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.nav-user-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--ink);
+    max-width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav-user-chevron {
+    font-size: 0.68rem;
+    color: #8A7D6D;
+    transition: transform 0.2s ease;
+    margin-inline-start: 0.15rem;
+}
+
+.nav-user-pill[aria-expanded="true"] .nav-user-chevron {
+    transform: rotate(180deg);
+    color: var(--maroon);
+}
+
+/* Modern Dropdown Card */
+.modern-user-dropdown {
+    min-width: 275px;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 0.65rem;
+    box-shadow: 0 16px 40px rgba(43, 36, 32, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
+    margin-top: 0.65rem !important;
+    border-top: 3px solid var(--gold);
+}
+
+.animate-dropdown {
+    animation: slideDownMenu 0.22s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+@keyframes slideDownMenu {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-user-header {
+    padding: 0.85rem;
+    background: var(--bg);
+    border-radius: 12px;
+    margin-bottom: 0.45rem;
+    border: 1px solid rgba(226, 220, 213, 0.7);
+}
+
+.dropdown-header-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--gold);
+    flex-shrink: 0;
+    background: #FFFFFF;
+}
+
+.dropdown-header-placeholder {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(184, 134, 59, 0.15);
+    color: var(--maroon);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    border: 2px solid var(--gold);
+    flex-shrink: 0;
+}
+
+.dropdown-header-name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--maroon);
+    font-size: 1rem;
+    line-height: 1.3;
+}
+
+.dropdown-header-email {
+    font-size: 0.78rem;
+    color: #7A6F68;
+}
+
+.dropdown-items-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.user-dropdown-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    color: var(--ink);
+}
+
+.user-dropdown-link:hover {
+    background: var(--bg);
+    color: var(--maroon);
+    transform: translateX(-3px);
+}
+
+.dropdown-link-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(43, 36, 32, 0.05);
+    color: var(--maroon);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.98rem;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.user-dropdown-link:hover .dropdown-link-icon {
+    background: var(--maroon);
+    color: #FFFFFF;
+}
+
+.dropdown-link-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+}
+
+.dropdown-link-text strong {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: inherit;
+}
+
+.dropdown-link-text small {
+    font-size: 0.73rem;
+    color: #8A7D6D;
+}
+
+.add-product-link {
+    background: rgba(184, 134, 59, 0.08);
+    border: 1px dashed rgba(184, 134, 59, 0.35);
+    margin-top: 0.25rem;
+}
+
+.add-product-link:hover {
+    background: rgba(184, 134, 59, 0.15);
+    border-color: var(--gold);
+}
+
+.add-product-link .dropdown-link-icon {
+    background: rgba(184, 134, 59, 0.2);
+    color: var(--maroon);
+}
+
+.logout-link:hover {
+    background: rgba(220, 53, 69, 0.08) !important;
+}
+
+.logout-link:hover .dropdown-link-icon {
+    background: var(--maroon) !important;
+    color: #FFFFFF !important;
+}
+
+.logout-link:hover .dropdown-link-text strong {
+    color: var(--maroon) !important;
 }
 
 .cart-icon-wrapper {
@@ -460,5 +697,50 @@ a {
 
 .btn-outline-heritage:hover{
     background-color: var(--maroon);
+    color:white;
     border:none;
 }
+
+/* =========================================================
+   RESPONSIVE ENHANCEMENTS FOR MOBILE (<576px & <380px)
+   ========================================================= */
+@media (max-width: 575.98px) {
+    .product-card-body {
+        padding: 0.65rem 0.65rem 0.75rem;
+    }
+
+    .product-card-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.4rem;
+    }
+
+    .product-card-footer .price-tag {
+        font-size: 0.98rem;
+        text-align: right;
+    }
+
+    .product-card-footer .cart-btn,
+    .product-card-footer .btn-outline-heritage,
+    .product-card-footer .badge-archive {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+        padding: 0.4rem 0.5rem;
+        font-size: 0.76rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .navbar-logo {
+        max-height: 38px;
+    }
+
+    .nav-icons-mobile {
+        gap: 0.65rem !important;
+    }
+
+    .product-title {
+        font-size: 0.88rem;
+    }
+}

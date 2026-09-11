@@ -352,7 +352,6 @@ namespace HeritageStore.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("HistoricalBackground")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -373,7 +372,6 @@ namespace HeritageStore.Data.Migrations
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("PickupAddress")
-                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
@@ -390,7 +388,6 @@ namespace HeritageStore.Data.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Story")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")

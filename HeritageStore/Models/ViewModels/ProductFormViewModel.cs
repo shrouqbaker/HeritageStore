@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace HeritageStore.Models.ViewModels
 {
@@ -28,9 +28,8 @@ namespace HeritageStore.Models.ViewModels
 
         public string? AdditionalInfo { get; set; }
 
-        [Required(ErrorMessage = "عنوان الاستلام مطلوب")]
         [MaxLength(250)]
-        public string PickupAddress { get; set; }
+        public string? PickupAddress { get; set; }
 
         [Required]
         public string ListingType { get; set; } = "archive_only"; // for_sale / archive_only

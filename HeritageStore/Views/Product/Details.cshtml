@@ -130,19 +130,7 @@
 
                         </div>
                     }
-                    else
-                    {
-                        <div class="exhibition-area">
-
-                            <i class="bi bi-award"></i>
-
-                            <div>
-                                <strong>قطعة للعرض التراثي</strong>
-                                <span>متاحة للتعرف على قصتها وتفاصيلها</span>
-                            </div>
-
-                        </div>
-                    }
+                    
 
 
                     <!-- Description -->
@@ -172,7 +160,7 @@
                                 <i class="bi bi-flower1"></i>
 
                                 <div>
-                                    <small>نوع التطريز</small>
+                                    <small>المدينة</small>
                                     <strong>@Model.EmbroideryType.Name</strong>
                                 </div>
 
@@ -197,16 +185,23 @@
 
                         @if (Model.User != null)
                         {
-                            <div class="detail">
+                            <a asp-controller="Profile" asp-action="UserProfile" asp-route-id="@Model.UserId" class="text-decoration-none" style="color: inherit;" title="عرض كافة قطع @Model.User.UserName">
+                                <div class="detail">
+                                    @if (!string.IsNullOrWhiteSpace(Model.User.ProfileImage))
+                                    {
+                                        <img src="@Model.User.ProfileImage" alt="@Model.User.UserName" class="detail-avatar" />
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-person"></i>
+                                    }
 
-                                <i class="bi bi-person"></i>
-
-                                <div>
-                                    <small>المالك / الحرفي</small>
-                                    <strong>@Model.User.UserName</strong>
+                                    <div>
+                                        <small>المالك / الحرفي</small>
+                                        <strong style="color: var(--maroon);">@Model.User.UserName</strong>
+                                    </div>
                                 </div>
-
-                            </div>
+                            </a>
                         }
 
                     </div>

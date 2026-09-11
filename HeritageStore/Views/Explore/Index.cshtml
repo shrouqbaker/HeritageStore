@@ -1,4 +1,4 @@
-﻿@model HeritageStore.Models.ViewModels.ExploreViewModel
+@model HeritageStore.Models.ViewModels.ExploreViewModel
 @{
     ViewData["Title"] = "استكشف التراث";
 }
@@ -54,7 +54,7 @@
                     </div>
 
                     <div class="filter-group">
-                        <h6>نوع التطريز</h6>
+                        <h6>المنطقة</h6>
                         <div class="filter-checkbox-list">
                             @foreach (var et in Model.EmbroideryTypes)
                             {
@@ -116,7 +116,7 @@
 
                 @if (Model.Products.Any())
                 {
-                    <section class="container section-block">
+                    <section class="explore-results-section">
                         <div class="row g-4">
                             @foreach (var product in Model.Products)
                             {

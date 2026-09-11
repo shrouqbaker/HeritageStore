@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -161,15 +161,105 @@ namespace HeritageStore.Controllers
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "تم إرسال قطعتك بنجاح! بانتظار مراجعة الإدارة قبل النشر.";
-            return RedirectToAction("MyProducts");
+            return RedirectToAction("Index", "Home");
         }
 
-        // Placeholder لحد ما نبنيها بخطوة تانية
-        public IActionResult MyProducts()
+        [HttpGet]
+        public async Task<IActionResult> MyProducts(string status = "all")
         {
-            return View();
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Challenge();
+            }
+
+            var allUserProducts = await _context.Products
+                .Include(p => p.ProductImages)
+                .Include(p => p.Category)
+                .Include(p => p.EmbroideryType)
+                .Where(p => p.UserId == userId)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+
+            var query = allUserProducts.AsEnumerable();
+
+            switch (status?.ToLower())
+            {
+                case "approved":
+                    query = query.Where(p => p.Status == "approved");
+                    break;
+                case "pending":
+                    query = query.Where(p => p.Status == "pending");
+                    break;
+                case "sold":
+                    query = query.Where(p => p.Status == "sold");
+                    break;
+                case "rejected":
+                    query = query.Where(p => p.Status == "rejected");
+                    break;
+                case "archive_only":
+                    query = query.Where(p => p.ListingType == "archive_only");
+                    break;
+                default:
+                    status = "all";
+                    break;
+            }
+
+            var vm = new MyProductsViewModel
+            {
+                Products = query.ToList(),
+                CurrentStatus = status ?? "all",
+                TotalCount = allUserProducts.Count,
+                ApprovedCount = allUserProducts.Count(p => p.Status == "approved"),
+                PendingCount = allUserProducts.Count(p => p.Status == "pending"),
+                SoldCount = allUserProducts.Count(p => p.Status == "sold"),
+                RejectedCount = allUserProducts.Count(p => p.Status == "rejected"),
+                ArchivedCount = allUserProducts.Count(p => p.ListingType == "archive_only")
+            };
+
+            return View(vm);
         }
 
+        // POST: /Product/Delete (حذف ناعم للقطعة التراثية: IsDeleted = true)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Challenge();
+            }
+
+            bool isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
+                          Request.Headers.Accept.ToString().Contains("application/json");
+
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == id && p.UserId == user.Id);
+            if (product == null)
+            {
+                if (isAjax)
+                {
+                    return Json(new { success = false, message = "القطعة غير موجودة أو تم حذفها مسبقاً." });
+                }
+                TempData["ErrorMessage"] = "القطعة غير موجودة أو ليس لديك صلاحية لحذفها.";
+                return RedirectToAction("Index", "Profile");
+            }
+
+            product.IsDeleted = true;
+            product.DeletedAt = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+            if (isAjax)
+            {
+                var remainingCount = await _context.Products.CountAsync(p => p.UserId == user.Id && !p.IsDeleted);
+                return Json(new { success = true, message = "تم حذف القطعة بنجاح.", remainingCount });
+            }
+
+            TempData["SuccessMessage"] = "تم حذف القطعة بنجاح.";
+            return RedirectToAction("Index", "Profile");
+        }
+
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
             var product = await _context.Products

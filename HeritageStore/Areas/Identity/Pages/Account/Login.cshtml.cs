@@ -21,67 +21,41 @@ namespace HeritageStore.Areas.Identity.Pages.Account;
 public class LoginModel : PageModel
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly UserManager<ApplicationUser> _userManager;
     private readonly ILogger<LoginModel> _logger;
 
-    public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger)
+    public LoginModel(
+        SignInManager<ApplicationUser> signInManager,
+        UserManager<ApplicationUser> userManager,
+        ILogger<LoginModel> logger)
     {
         _signInManager = signInManager;
+        _userManager = userManager;
         _logger = logger;
     }
 
-    /// <summary>
-    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
     [BindProperty]
     public InputModel Input { get; set; } = default!;
 
-    /// <summary>
-    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
     public IList<AuthenticationScheme>? ExternalLogins { get; set; }
 
-    /// <summary>
-    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
     public string? ReturnUrl { get; set; }
 
-    /// <summary>
-    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
     [TempData]
     public string? ErrorMessage { get; set; }
 
-    /// <summary>
-    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
     public class InputModel
     {
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "يرجى إدخال اسم المستخدم أو البريد الإلكتروني")]
+        [Display(Name = "اسم المستخدم أو البريد الإلكتروني")]
         public string Email { get; set; } = default!;
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        [Required]
+        [Required(ErrorMessage = "يرجى إدخال كلمة المرور")]
         [DataType(DataType.Password)]
+        [Display(Name = "كلمة المرور")]
         public string Password { get; set; } = default!;
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        [Display(Name = "Remember me?")]
+        [Display(Name = "تذكرني")]
         public bool RememberMe { get; set; }
     }
 
@@ -110,12 +84,51 @@ public class LoginModel : PageModel
 
         if (ModelState.IsValid)
         {
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-            var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+            var loginIdentifier = Input.Email?.Trim();
+            if (string.IsNullOrEmpty(loginIdentifier))
+            {
+                ModelState.AddModelError(string.Empty, "يرجى إدخال اسم المستخدم أو البريد الإلكتروني.");
+                return Page();
+            }
+
+            // البحث عن الحساب بواسطة البريد الإلكتروني أولاً ثم بواسطة اسم المستخدم
+            var user = await _userManager.FindByEmailAsync(loginIdentifier)
+                       ?? await _userManager.FindByNameAsync(loginIdentifier);
+
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "بيانات الدخول غير صحيحة. لم يتم العثور على حساب بهذا البريد أو اسم المستخدم.");
+                return Page();
+            }
+
+            // التحقق من حالة الحساب
+            if (!string.IsNullOrEmpty(user.Status) && user.Status != "active")
+            {
+                ModelState.AddModelError(string.Empty, "هذا الحساب غير نشط حالياً أو تم إيقافه.");
+                return Page();
+            }
+
+            // التأكد من تفعيل تأكيد البريد تلقائياً لضمان عدم حظر تسجيل الدخول
+            if (!user.EmailConfirmed)
+            {
+                user.EmailConfirmed = true;
+                await _userManager.UpdateAsync(user);
+            }
+
+            // محاولة تسجيل الدخول باستخدام اسم المستخدم الفعلي
+            var result = await _signInManager.PasswordSignInAsync(
+                user.UserName!,
+                Input.Password,
+                Input.RememberMe,
+                lockoutOnFailure: false);
+
             if (result.Succeeded)
             {
                 _logger.LogInformation("User logged in.");
+                if (await _userManager.IsInRoleAsync(user, "Admin"))
+                {
+                    return LocalRedirect("/Admin");
+                }
                 return LocalRedirect(returnUrl);
             }
             if (result.RequiresTwoFactor)
@@ -129,7 +142,7 @@ public class LoginModel : PageModel
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                ModelState.AddModelError(string.Empty, "كلمة المرور غير صحيحة. يرجى التأكد وإعادة المحاولة.");
                 return Page();
             }
         }

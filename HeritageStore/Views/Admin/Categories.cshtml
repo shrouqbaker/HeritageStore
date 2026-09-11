@@ -1,0 +1,343 @@
+@model HeritageStore.Models.ViewModels.AdminCategoriesViewModel
+@{
+    ViewData["Title"] = "إدارة التصنيفات والتطريز";
+    Layout = "_AdminLayout";
+}
+
+<!-- ==================== رأس الصفحة وأزرار الإضافة (Popups) ==================== -->
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h1 class="h4 fw-bold mb-1" style="color: var(--maroon);">
+            <i class="bi bi-tags me-2"></i> إدارة التصنيفات وأنواع التطريز
+        </h1>
+    </div>
+
+    <!-- أزرار فتح النوافذ المنبثقة (Popups) -->
+    <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-heritage" data-bs-toggle="modal" data-bs-target="#addCategoryModal" style="border-radius: 10px;">
+            <i class="bi bi-plus-circle me-1"></i> إضافة تصنيف جديد
+        </button>
+        <button type="button" class="btn btn-outline-heritage" data-bs-toggle="modal" data-bs-target="#addEmbroideryModal" style="border-radius: 10px;">
+            <i class="bi bi-flower1 me-1"></i> إضافة نوع تطريز
+        </button>
+    </div>
+</div>
+
+<!-- ==================== بطاقات ملخص سريعة ==================== -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6">
+        <div class="admin-stat-card py-3">
+            <div class="admin-stat-icon-box stat-icon-products">
+                <i class="bi bi-folder-fill"></i>
+            </div>
+            <div class="admin-stat-info">
+                <div class="admin-stat-value">@Model.TotalCategories</div>
+                <div class="admin-stat-label">تصنيفات نشطة بالمتجر</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="admin-stat-card py-3">
+            <div class="admin-stat-icon-box stat-icon-orders">
+                <i class="bi bi-flower1"></i>
+            </div>
+            <div class="admin-stat-info">
+                <div class="admin-stat-value">@Model.TotalEmbroideryTypes</div>
+                <div class="admin-stat-label">أنواع وغرز تطريز معتمدة</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== جدول التصنيفات ==================== -->
+<div class="admin-section-title">
+    <i class="bi bi-folder-check" style="color: var(--maroon);"></i>
+    <span>قائمة التصنيفات النشطة بالمتجر (@Model.TotalCategories)</span>
+</div>
+
+<div class="admin-table-card mb-5">
+    <div class="admin-table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>الصورة</th>
+                    <th>اسم التصنيف</th>
+                    <th>القطع المعروضة</th>
+                    <th>تاريخ الإضافة</th>
+                    <th class="text-center" style="width: 140px;">الإجراء</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Categories.Any())
+                {
+                    foreach (var item in Model.Categories)
+                    {
+                        var cat = item.Category;
+                        <tr>
+                            <td style="width: 70px;">
+                                <img src="@(string.IsNullOrEmpty(cat.ImageUrl) ? "/images/placeholder.jpg" : cat.ImageUrl)"
+                                     alt="@cat.Name"
+                                     style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border);" />
+                            </td>
+                            <td>
+                                <strong class="fs-6 text-dark d-block">@cat.Name</strong>
+                                <small class="text-muted">رقم: #@cat.CategoryId</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border px-3 py-2" style="border-radius: 50px; font-weight: 700;">
+                                    <i class="bi bi-box-seam me-1" style="color: var(--maroon);"></i>
+                                    @item.ProductsCount قطعة
+                                </span>
+                            </td>
+                            <td>
+                                <small class="text-muted">@cat.CreatedAt.ToString("dd/MM/yyyy")</small>
+                            </td>
+                            <td class="text-center">
+                                <form asp-controller="Admin" asp-action="DeleteCategory" method="post" class="d-inline m-0" onsubmit="return confirm('هل أنت متأكد من حذف هذا التصنيف بحذف ناعم؟ سيتم استثناؤه من الظهور بالمتجر دون حذفه نهائياً.');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@cat.CategoryId" />
+                                    <button type="submit" class="btn btn-outline-heritage btn-sm px-3 py-1" style="border-radius: 8px;" title="حذف ناعم للتصنيف">
+                                        <i class="bi bi-trash3 me-1"></i> حذف 
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-tags fs-1 d-block mb-2 text-secondary"></i>
+                            لا توجد تصنيفات حالياً. يمكنك إضافة تصنيف جديد بالضغط على زر "إضافة تصنيف جديد" أعلاه.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ==================== قسم أنواع التطريز التراثي ==================== -->
+<div class="admin-card">
+    <div class="admin-card-header pb-2 border-bottom mb-3">
+        <h3 class="admin-card-title d-flex align-items-center gap-2">
+            <i class="bi bi-flower1" style="color: var(--gold);"></i>
+            <span>أنواع وغرز التطريز المعتمدة (@Model.TotalEmbroideryTypes)</span>
+        </h3>
+        <button type="button" class="btn btn-sm btn-outline-heritage" data-bs-toggle="modal" data-bs-target="#addEmbroideryModal">
+            <i class="bi bi-plus me-1"></i> إضافة غرزة جديدة
+        </button>
+    </div>
+
+    <div class="admin-table-responsive pt-2">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>اسم نوع التطريز / الغرزة</th>
+                    <th>المنطقة / البلد</th>
+                    <th>القطع المرتبطة</th>
+                    <th class="text-center" style="width: 160px;">الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.EmbroideryTypes.Any())
+                {
+                    foreach (var emb in Model.EmbroideryTypes)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-flower1" style="color: var(--gold); font-size: 1.15rem;"></i>
+                                    <strong class="fs-6 text-dark">@emb.EmbroideryType.Name</strong>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border px-3 py-1">@emb.EmbroideryType.Country</span>
+                            </td>
+                            <td>
+                                <span class="badge px-3 py-1" style="background: var(--maroon); color: #FFFFFF;">
+                                    @emb.ProductsCount قطعة
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-inline-flex align-items-center gap-1">
+                                    <button type="button" class="btn btn-outline-heritage btn-sm py-1 px-2 btn-edit-embroidery"
+                                            data-id="@emb.EmbroideryType.EmbroideryTypeId"
+                                            data-name="@emb.EmbroideryType.Name"
+                                            data-country="@emb.EmbroideryType.Country"
+                                            title="تعديل نوع التطريز">
+                                        <i class="bi bi-pencil-square"></i> تعديل
+                                    </button>
+                                    <form asp-controller="Admin" asp-action="DeleteEmbroideryType" method="post" class="d-inline m-0" onsubmit="return confirm('هل أنت متأكد من حذف نوع التطريز هذا؟ سيتم فك ارتباطه بالقطع دون حذفها.');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@emb.EmbroideryType.EmbroideryTypeId" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm py-1 px-2" title="حذف نوع التطريز">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">لا توجد أنواع تطريز مسجلة بعد.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ==================== نافذة منبثقة: إضافة تصنيف جديد (Modal Popup) ==================== -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true" dir="rtl">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: 1px solid var(--border);">
+            <form asp-controller="Admin" asp-action="CreateCategory" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="addCategoryModalLabel" style="color: var(--maroon);">
+                        <i class="bi bi-folder-plus"></i>
+                        <span>إضافة تصنيف تراثي جديد</span>
+                    </h5>
+                    <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                </div>
+
+                <div class="modal-body py-3">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">اسم التصنيف <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" placeholder="مثال: الأثواب الفلسطينية، الحلي والفضيات..." required style="border-radius: 10px;" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">صورة التصنيف (رفع ملف من الجهاز)</label>
+                        <input type="file" name="imageFile" class="form-control" accept="image/*" style="border-radius: 10px;" />
+                        <small class="text-muted">الامتدادات المدعومة: صور JPG, PNG, WEBP</small>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light px-3" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-heritage px-4" style="border-radius: 10px;">
+                        <i class="bi bi-check-lg me-1"></i> إضافة
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== نافذة منبثقة: إضافة نوع تطريز (Modal Popup) ==================== -->
+<div class="modal fade" id="addEmbroideryModal" tabindex="-1" aria-labelledby="addEmbroideryModalLabel" aria-hidden="true" dir="rtl">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: 1px solid var(--border);">
+            <form asp-controller="Admin" asp-action="CreateEmbroideryType" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="addEmbroideryModalLabel" style="color: var(--maroon);">
+                        <i class="bi bi-flower1" style="color: var(--gold);"></i>
+                        <span>إضافة نوع / غرزة تطريز</span>
+                    </h5>
+                    <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                </div>
+
+                <div class="modal-body py-3">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">اسم الغرزة / نوع التطريز <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" placeholder="مثال: قطبة التحريري، عرق الورد، غزاوي..." required style="border-radius: 10px;" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold">البلد / المنطقة التراثية</label>
+                        <select name="country" class="form-select" style="border-radius: 10px;">
+                            <option value="فلسطين">فلسطين</option>
+                            <option value="الأردن">الأردن</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light px-3" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-heritage px-4" style="border-radius: 10px;">
+                        <i class="bi bi-check-lg me-1"></i> حفظ نوع التطريز
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== نافذة منبثقة: تعديل نوع تطريز (Modal Popup) ==================== -->
+<div class="modal fade" id="editEmbroideryModal" tabindex="-1" aria-labelledby="editEmbroideryModalLabel" aria-hidden="true" dir="rtl">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: 1px solid var(--border);">
+            <form asp-controller="Admin" asp-action="UpdateEmbroideryType" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="editEmbroideryId" value="" />
+
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="editEmbroideryModalLabel" style="color: var(--maroon);">
+                        <i class="bi bi-pencil-square"></i>
+                        <span>تعديل نوع / غرزة التطريز</span>
+                    </h5>
+                    <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                </div>
+
+                <div class="modal-body py-3">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">اسم الغرزة / نوع التطريز <span class="text-danger">*</span></label>
+                        <input type="text" name="name" id="editEmbroideryName" class="form-control" required style="border-radius: 10px;" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold">البلد / المنطقة التراثية</label>
+                        <select name="country" id="editEmbroideryCountry" class="form-select" style="border-radius: 10px;">
+                            <option value="فلسطين">فلسطين</option>
+                            <option value="الأردن">الأردن</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light px-3" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-heritage px-4" style="border-radius: 10px;">
+                        <i class="bi bi-check-lg me-1"></i> حفظ التعديل
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const editModalEl = document.getElementById('editEmbroideryModal');
+            const editIdInput = document.getElementById('editEmbroideryId');
+            const editNameInput = document.getElementById('editEmbroideryName');
+            const editCountrySelect = document.getElementById('editEmbroideryCountry');
+
+            document.querySelectorAll('.btn-edit-embroidery').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id = this.dataset.id;
+                    const name = this.dataset.name;
+                    const country = this.dataset.country;
+
+                    if (editIdInput) editIdInput.value = id;
+                    if (editNameInput) editNameInput.value = name;
+                    if (editCountrySelect) editCountrySelect.value = country;
+
+                    if (editModalEl && typeof bootstrap !== 'undefined') {
+                        const modal = bootstrap.Modal.getOrCreateInstance(editModalEl);
+                        modal.show();
+                    }
+                });
+            });
+        });
+    </script>
+}

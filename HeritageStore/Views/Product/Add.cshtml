@@ -1,4 +1,4 @@
-﻿@model HeritageStore.Models.ViewModels.ProductFormViewModel
+@model HeritageStore.Models.ViewModels.ProductFormViewModel
 @{
     ViewData["Title"] = "أضف قطعتك";
 }
@@ -290,15 +290,14 @@
                     <div class="col-12">
 
                         <label class="form-label">
-                            قصة الثوب
-                            <span class="required-star">*</span>
+                            قصة القطعة
+                            <span class="form-hint">(اختياري)</span>
                         </label>
 
                         <textarea asp-for="Story"
                                   class="form-control"
                                   rows="4"
-                                  placeholder="احكِ لنا قصة هذه القطعة، كيف وصلت إليك، وكيف كانت تُستخدم..."
-                                  required></textarea>
+                                  placeholder="احكِ لنا قصة هذه القطعة، كيف وصلت إليك، وكيف كانت تُستخدم..."></textarea>
 
                         <span asp-validation-for="Story"
                               class="text-danger"></span>
@@ -310,14 +309,13 @@
 
                         <label class="form-label">
                             الخلفية التاريخية
-                            <span class="required-star">*</span>
+                            <span class="form-hint">(اختياري)</span>
                         </label>
 
                         <textarea asp-for="HistoricalBackground"
                                   class="form-control"
                                   rows="4"
-                                  placeholder="اذكر ما تعرفه عن أصل القطعة، المنطقة التي تنتمي إليها، أو أي معلومات تاريخية وثقافية مرتبطة بها..."
-                                  required></textarea>
+                                  placeholder="اذكر ما تعرفه عن أصل القطعة، المنطقة التي تنتمي إليها، أو أي معلومات تاريخية وثقافية مرتبطة بها..."></textarea>
 
                         <span asp-validation-for="HistoricalBackground"
                               class="text-danger"></span>
@@ -453,8 +451,7 @@
                                     <textarea name="Embroideries[@i].Description"
                                               class="form-control"
                                               rows="3"
-                                              placeholder="ما معنى هذا الرمز أو التطريز؟">
-                            </textarea>
+                                              placeholder="ما معنى هذا الرمز أو التطريز؟"></textarea>
 
                                 </div>
 
@@ -594,6 +591,8 @@
 
                 <h3>
                     عنوان استلام القطعة
+                    <span class="required-star" id="pickupAddressStar" style="display:none;">*</span>
+                    <span class="form-hint" id="pickupAddressHint">(اختياري للعرض فقط)</span>
                 </h3>
 
                 <p class="form-hint">
@@ -606,7 +605,6 @@
                        class="form-control"
                        style="max-width:500px;"
                        placeholder="المدينة، الحي، أقرب معلم..."
-                       required
                        id="pickupAddressInput" />
 
 
@@ -1133,6 +1131,23 @@
                                 priceInput.reportValidity();
 
                                 priceInput.setCustomValidity('');
+
+                                valid = false;
+
+                            }
+
+                            const pickupInput =
+                                document.getElementById('pickupAddressInput');
+
+                            if (valid && pickupInput && !pickupInput.value.trim()) {
+
+                                pickupInput.setCustomValidity(
+                                    'عنوان الاستلام مطلوب عند عرض القطعة للبيع'
+                                );
+
+                                pickupInput.reportValidity();
+
+                                pickupInput.setCustomValidity('');
 
                                 valid = false;
 
@@ -1918,6 +1933,27 @@
             );
 
 
+        const pickupAddressInput =
+            document.getElementById(
+                'pickupAddressInput'
+            );
+
+        const pickupAddressStar =
+            document.getElementById(
+                'pickupAddressStar'
+            );
+
+        const pickupAddressHint =
+            document.getElementById(
+                'pickupAddressHint'
+            );
+
+        if (pickupAddressInput) {
+            pickupAddressInput.addEventListener('input', () => {
+                pickupAddressInput.setCustomValidity('');
+            });
+        }
+
         function togglePriceField() {
 
             const selected =
@@ -1941,6 +1977,27 @@
 
                 priceInput.value = '';
 
+            }
+
+            if (pickupAddressInput) {
+                if (isForSale) {
+                    pickupAddressInput.setAttribute('required', 'required');
+                    if (pickupAddressStar) pickupAddressStar.style.display = 'inline';
+                    if (pickupAddressHint) {
+                        pickupAddressHint.textContent = '(إلزامي للبيع)';
+                        pickupAddressHint.style.color = 'var(--maroon)';
+                        pickupAddressHint.style.fontWeight = '600';
+                    }
+                } else {
+                    pickupAddressInput.removeAttribute('required');
+                    pickupAddressInput.setCustomValidity('');
+                    if (pickupAddressStar) pickupAddressStar.style.display = 'none';
+                    if (pickupAddressHint) {
+                        pickupAddressHint.textContent = '(اختياري للعرض فقط)';
+                        pickupAddressHint.style.color = '';
+                        pickupAddressHint.style.fontWeight = 'normal';
+                    }
+                }
             }
 
         }

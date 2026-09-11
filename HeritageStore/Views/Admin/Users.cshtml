@@ -1,0 +1,243 @@
+@model HeritageStore.Models.ViewModels.AdminUsersViewModel
+@{
+    ViewData["Title"] = "دليل المستخدمين";
+    Layout = "_AdminLayout";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h1 class="h4 fw-bold mb-1" style="color: var(--maroon);">
+            <i class="bi bi-people me-2"></i> دليل المستخدمين
+        </h1>
+    </div>
+    <span class="badge bg-light text-dark border p-2 px-3 fs-6" style="border-radius: 50px;">
+        <i class="bi bi-person-check me-1" style="color: var(--green);"></i> إجمالي المسجلين: @Model.TotalUsers مستخدم
+    </span>
+</div>
+
+<!-- ==================== شريط البحث ==================== -->
+<div class="admin-card mb-4 p-3">
+    <form asp-controller="Admin" asp-action="Users" method="get" class="row g-2 align-items-center">
+        <div class="col-md-9 col-sm-8">
+            <div class="position-relative">
+                <input type="text" name="search" class="form-control" placeholder="ابحث باسم المستخدم، البريد الإلكتروني، أو رقم الهاتف..." value="@Model.SearchTerm" style="border-radius: 10px; padding-inline-start: 2.4rem;" />
+                <i class="bi bi-search position-absolute top-50 translate-middle-y ms-2 text-muted" style="inset-inline-start: 0.5rem;"></i>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-4 d-flex gap-2">
+            <button type="submit" class="btn btn-heritage flex-grow-1" style="border-radius: 10px;">
+                <i class="bi bi-search me-1"></i> بحث
+            </button>
+            @if (!string.IsNullOrEmpty(Model.SearchTerm))
+            {
+                <a asp-controller="Admin" asp-action="Users" class="btn btn-outline-secondary" title="إلغاء البحث" style="border-radius: 10px;">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            }
+        </div>
+    </form>
+</div>
+
+<!-- ==================== جدول المستخدمين (للعرض فقط) ==================== -->
+<div class="admin-table-card">
+    <div class="admin-table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>المستخدم</th>
+                    <th>البريد الإلكتروني</th>
+                    <th>رقم الهاتف</th>
+                    <th>نوع الحساب</th>
+                    <th>تاريخ التسجيل</th>
+                    <th>القطع المعروضة</th>
+                    <th>الطلبات</th>
+                    <th class="text-center" style="width: 170px;">المعاينة والتفاصيل</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Users.Any())
+                {
+                    foreach (var user in Model.Users)
+                    {
+                        <tr>
+                            <!-- المستخدم -->
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    @if (!string.IsNullOrEmpty(user.ProfileImage))
+                                    {
+                                        <img src="@user.ProfileImage" alt="@user.UserName" class="admin-user-avatar" />
+                                    }
+                                    else
+                                    {
+                                        <div class="admin-user-avatar-placeholder">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                    }
+                                    <div>
+                                        <strong class="d-block text-dark text-truncate" style="max-width: 150px;">@user.UserName</strong>
+                                        <small class="text-muted">رقم: @user.Id.Substring(0, Math.Min(8, user.Id.Length))...</small>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- البريد -->
+                            <td>
+                                <span class="text-muted" style="direction: ltr; display: inline-block;">@user.Email</span>
+                            </td>
+
+                            <!-- الهاتف -->
+                            <td>
+                                @if (!string.IsNullOrEmpty(user.PhoneNumber))
+                                {
+                                    <span style="direction: ltr; display: inline-block;">@user.PhoneNumber</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">غير محدد</span>
+                                }
+                            </td>
+
+                            <!-- الدور -->
+                            <td>
+                                @if (user.Role.Contains("Admin"))
+                                {
+                                    <span class="badge" style="background: var(--maroon); color: #FFFFFF; border-radius: 50px; padding: 0.35rem 0.75rem;">
+                                        <i class="bi bi-shield-lock-fill me-1"></i> مدير النظام
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-dark border" style="border-radius: 50px; padding: 0.35rem 0.75rem;">
+                                        <i class="bi bi-person me-1"></i> مستخدم / بائع
+                                    </span>
+                                }
+                            </td>
+
+
+                            <!-- تاريخ التسجيل -->
+                            <td>
+                                <small class="text-muted">@user.CreatedAt.ToString("dd/MM/yyyy")</small>
+                            </td>
+
+                            <!-- عدد القطع -->
+                            <td>
+                                <span class="text-dark text-center px-2 py-1" style="border-radius: 6px;">
+                                     @user.ProductsCount
+                                </span>
+                            </td>
+
+                            <!-- عدد الطلبات -->
+                            <td>
+                                <span class="text-dark text-center px-2 py-1">
+                                     @user.OrdersCount
+                                </span>
+                            </td>
+
+                            <!-- أزرار المعاينة -->
+                            <td class="text-center">
+                                <div class="d-inline-flex gap-1">
+                                    <a asp-controller="Profile" asp-action="UserProfile" asp-route-id="@user.Id" target="_blank" class="btn  btn-sm py-1 px-2" title="معاينة الملف العام والمتجر">
+                                        <i class="bi bi-box-arrow-up-right btn-outline-heritage"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9" class="text-center py-5 text-muted">
+                            <i class="bi bi-person-x fs-1 d-block mb-2 text-secondary"></i>
+                            لم يتم العثور على أي مستخدم يطابق معايير البحث.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ==================== نافذة منبثقة لبيانات المستخدم التفصيلية ==================== -->
+<div class="modal fade" id="userInfoModal" tabindex="-1" aria-labelledby="userInfoModalLabel" aria-hidden="true" dir="rtl">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: 1px solid var(--border);">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="userInfoModalLabel" style="color: var(--maroon);">
+                    <i class="bi bi-person-badge-fill"></i>
+                    <span>بيانات المستخدم التفصيلية</span>
+                </h5>
+                <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+            </div>
+            <div class="modal-body py-3">
+                <div class="text-center mb-3">
+                    <img id="modalUserAvatar" src="/images/placeholder.jpg" alt="صورة المستخدم" class="admin-user-avatar mb-2" style="width: 70px; height: 70px;" />
+                    <h5 class="fw-bold mb-1 text-dark" id="modalUserName">اسم المستخدم</h5>
+                    <span class="badge bg-light text-dark border px-3 py-1" id="modalUserRole">نوع الحساب</span>
+                </div>
+
+                <div class="list-group list-group-flush rounded-3 border">
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">البريد الإلكتروني:</span>
+                        <strong id="modalUserEmail" style="direction: ltr;">-</strong>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">رقم الهاتف:</span>
+                        <strong id="modalUserPhone" style="direction: ltr;">-</strong>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">تاريخ الانضمام:</span>
+                        <strong id="modalUserJoined">-</strong>
+                    </div>
+                    <div class="list-group-item">
+                        <span class="text-muted d-block mb-1">النبذة التعريفية:</span>
+                        <p class="small text-dark mb-0 p-2 bg-light rounded" id="modalUserBio">-</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" style="border-radius: 10px;">إغلاق</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const userInfoModalEl = document.getElementById('userInfoModal');
+            const modalUserAvatar = document.getElementById('modalUserAvatar');
+            const modalUserName = document.getElementById('modalUserName');
+            const modalUserRole = document.getElementById('modalUserRole');
+            const modalUserEmail = document.getElementById('modalUserEmail');
+            const modalUserPhone = document.getElementById('modalUserPhone');
+            const modalUserJoined = document.getElementById('modalUserJoined');
+            const modalUserBio = document.getElementById('modalUserBio');
+
+            document.querySelectorAll('.btn-view-user-info').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const name = this.dataset.userName;
+                    const email = this.dataset.userEmail;
+                    const phone = this.dataset.userPhone;
+                    const bio = this.dataset.userBio;
+                    const joined = this.dataset.userJoined;
+                    const role = this.dataset.userRole;
+                    const avatar = this.dataset.userAvatar || '/images/placeholder.jpg';
+
+                    if (modalUserName) modalUserName.textContent = name;
+                    if (modalUserEmail) modalUserEmail.textContent = email;
+                    if (modalUserPhone) modalUserPhone.textContent = phone;
+                    if (modalUserJoined) modalUserJoined.textContent = joined;
+                    if (modalUserRole) modalUserRole.textContent = role;
+                    if (modalUserBio) modalUserBio.textContent = bio;
+                    if (modalUserAvatar) modalUserAvatar.src = avatar;
+
+                    if (userInfoModalEl && typeof bootstrap !== 'undefined') {
+                        const modal = bootstrap.Modal.getOrCreateInstance(userInfoModalEl);
+                        modal.show();
+                    }
+                });
+            });
+        });
+    </script>
+}

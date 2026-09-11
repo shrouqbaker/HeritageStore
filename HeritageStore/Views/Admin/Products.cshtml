@@ -1,0 +1,322 @@
+@model HeritageStore.Models.ViewModels.AdminProductsViewModel
+@{
+    ViewData["Title"] = "إدارة القطع والمنتجات";
+    Layout = "_AdminLayout";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div>
+        <h1 class="h4 fw-bold mb-1" style="color: var(--maroon);">
+            <i class="bi bi-box-seam me-2"></i> إدارة والتحكم بالقطع التراثية
+        </h1>
+    </div>
+</div>
+
+<!-- ==================== تبويبات تصفية الحالات ==================== -->
+<div class="admin-filter-tabs">
+    <a asp-controller="Admin" asp-action="Products" asp-route-status="all" asp-route-search="@Model.SearchTerm"
+       class="admin-filter-tab @(Model.CurrentStatus == "all" ? "active" : "")">
+        <span>الكل</span>
+        <span class="badge-count">@Model.TotalCount</span>
+    </a>
+    <a asp-controller="Admin" asp-action="Products" asp-route-status="approved" asp-route-search="@Model.SearchTerm"
+       class="admin-filter-tab @(Model.CurrentStatus == "approved" ? "active" : "")">
+        <i class="bi bi-check2-circle" style="color: var(--green);"></i>
+        <span>معتمدة ومنشورة</span>
+        <span class="badge-count">@Model.ApprovedCount</span>
+    </a>
+    <a asp-controller="Admin" asp-action="Products" asp-route-status="pending" asp-route-search="@Model.SearchTerm"
+       class="admin-filter-tab @(Model.CurrentStatus == "pending" ? "active" : "")">
+        <i class="bi bi-hourglass-split" style="color: var(--gold);"></i>
+        <span>بانتظار الاعتماد</span>
+        <span class="badge-count">@Model.PendingCount</span>
+    </a>
+    <a asp-controller="Admin" asp-action="Products" asp-route-status="sold" asp-route-search="@Model.SearchTerm"
+       class="admin-filter-tab @(Model.CurrentStatus == "sold" ? "active" : "")">
+        <i class="bi bi-bag-check" style="color: var(--gold);"></i>
+        <span>قطع مباعة</span>
+        <span class="badge-count">@Model.SoldCount</span>
+    </a>
+    <a asp-controller="Admin" asp-action="Products" asp-route-status="rejected" asp-route-search="@Model.SearchTerm"
+       class="admin-filter-tab @(Model.CurrentStatus == "rejected" ? "active" : "")">
+        <i class="bi bi-x-circle" style="color: var(--maroon);"></i>
+        <span>قطع مرفوضة</span>
+        <span class="badge-count">@Model.RejectedCount</span>
+    </a>
+</div>
+
+<!-- ==================== شريط البحث السريع ==================== -->
+<div class="admin-card mb-4 p-3">
+    <form asp-controller="Admin" asp-action="Products" method="get" class="row g-2 align-items-center">
+        <input type="hidden" name="status" value="@Model.CurrentStatus" />
+        <div class="col-md-9 col-sm-8">
+            <div class="position-relative">
+                <input type="text" name="search" class="form-control" placeholder="ابحث باسم القطعة، اسم الحرفي، أو اسم التصنيف..." value="@Model.SearchTerm" style="border-radius: 10px; padding-inline-start: 2.4rem;" />
+                <i class="bi bi-search position-absolute top-50 translate-middle-y ms-2 text-muted" style="inset-inline-start: 0.5rem;"></i>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-4 d-flex gap-2">
+            <button type="submit" class="btn btn-heritage flex-grow-1" style="border-radius: 10px;">
+                <i class="bi bi-funnel me-1"></i> تصفية
+            </button>
+            @if (!string.IsNullOrEmpty(Model.SearchTerm))
+            {
+                <a asp-controller="Admin" asp-action="Products" asp-route-status="@Model.CurrentStatus" class="btn btn-outline-secondary" title="إلغاء البحث" style="border-radius: 10px;">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            }
+        </div>
+    </form>
+</div>
+
+<!-- ==================== جدول المنتجات ==================== -->
+<div class="admin-table-card">
+    <div class="admin-table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>القطعة</th>
+                    <th>التصنيف والتطريز</th>
+                    <th>المالك / الحرفي</th>
+                    <th>السعر / النوع</th>
+                    <th>الحالة الحالية</th>
+                    <th>تاريخ الإضافة</th>
+                    <th class="text-center" style="width: 140px;">الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Products.Any())
+                {
+                    foreach (var product in Model.Products)
+                    {
+                        var mainImg = product.ProductImages.FirstOrDefault(i => i.IsMain)?.ImageUrl
+                                      ?? product.ProductImages.FirstOrDefault()?.ImageUrl
+                                      ?? "/images/placeholder.jpg";
+
+                        string statusPillClass = product.Status switch
+                        {
+                            "approved" => "status-approved",
+                            "sold" => "status-sold",
+                            "rejected" => "status-rejected",
+                            _ => "status-pending"
+                        };
+                        string statusLabel = product.Status switch
+                        {
+                            "approved" => "معتمد ومنشور",
+                            "sold" => "تم البيع",
+                            "rejected" => "مرفوض",
+                            _ => "قيد التدقيق"
+                        };
+
+                        <tr>
+                            <!-- القطعة -->
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="@mainImg" alt="@product.Name" class="admin-prod-thumb" />
+                                    <div>
+                                        <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId" target="_blank" class="fw-bold text-dark text-decoration-none d-block text-truncate" style="max-width: 170px;" title="@product.Name">
+                                            @product.Name
+                                        </a>
+                                        <small class="text-muted">رقم: #@product.ProductId</small>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- التصنيف والتطريز -->
+                            <td>
+                                <span class="d-block fw-semibold">@(product.Category?.Name ?? "غير مصنف")</span>
+                                <small class="text-muted">
+                                    @(product.EmbroideryType != null ? "تطريز " + product.EmbroideryType.Name : product.Country)
+                                </small>
+                            </td>
+
+                            <!-- المالك -->
+                            <td>
+                                @if (product.User != null)
+                                {
+                                    <a asp-controller="Profile" asp-action="UserProfile" asp-route-id="@product.UserId" target="_blank" class="text-decoration-none" style="color: var(--maroon); font-weight: 600;">
+                                        <i class="bi bi-person me-1"></i>@(product.User.UserName ?? "مستخدم")
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">غير محدد</span>
+                                }
+                            </td>
+
+                            <!-- السعر -->
+                            <td>
+                                @if (product.ListingType == "for_sale" && product.Price.HasValue)
+                                {
+                                    <strong style="color: var(--maroon);">@product.Price.Value.ToString("N0") د.أ</strong>
+                                    <small class="d-block text-muted">للبيع</small>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-dark border">للعرض التراثي</span>
+                                }
+                            </td>
+
+                            <!-- الحالة -->
+                            <td>
+                                <span class="status-pill @statusPillClass">@statusLabel</span>
+                                @if (product.Status == "rejected" && !string.IsNullOrWhiteSpace(product.RejectionReason))
+                                {
+                                    <small class="d-block mt-1 text-truncate" style="max-width: 140px; color: var(--maroon);" title="@product.RejectionReason">
+                                        <i class="bi bi-info-circle me-1"></i>@product.RejectionReason
+                                    </small>
+                                }
+                            </td>
+
+                            <!-- تاريخ الإضافة -->
+                            <td>
+                                <small class="text-muted">@product.CreatedAt.ToString("dd/MM/yyyy")</small>
+                            </td>
+
+                            <!-- قائمة الإجراءات المنسدلة (Dropdown List) -->
+                            <td class="text-center">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-heritage btn-sm dropdown-toggle py-1 px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px;">
+                                        الإجراءات
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 12px; border: 1px solid var(--border);">
+                                        @if (product.Status != "approved")
+                                        {
+                                            <li>
+                                                <form asp-controller="Admin" asp-action="UpdateProductStatus" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@product.ProductId" />
+                                                    <input type="hidden" name="status" value="approved" />
+                                                    <button type="submit" class="dropdown-item py-2" style="color: var(--green);">
+                                                        <i class="bi bi-check-circle me-2"></i> اعتماد ونشر بالمتجر
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        }
+
+                                        @if (product.Status != "sold")
+                                        {
+                                            <li>
+                                                <form asp-controller="Admin" asp-action="UpdateProductStatus" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@product.ProductId" />
+                                                    <input type="hidden" name="status" value="sold" />
+                                                    <button type="submit" class="dropdown-item py-2" style="color: var(--gold);">
+                                                        <i class="bi bi-tag me-2"></i> تمييز كقطعة مباعة
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        }
+
+                                        @if (product.Status != "rejected")
+                                        {
+                                            <li>
+                                                <button type="button" class="dropdown-item py-2 btn-open-reject-modal" style="color: var(--maroon);"
+                                                        data-product-id="@product.ProductId"
+                                                        data-product-name="@product.Name">
+                                                    <i class="bi bi-x-circle me-2"></i> رفض القطعة مع ذكر السبب
+                                                </button>
+                                            </li>
+                                        }
+
+                                        <li>
+                                            <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId" target="_blank" class="dropdown-item py-2">
+                                                <i class="bi bi-eye me-2"></i> معاينة القطعة بالمتجر
+                                            </a>
+                                        </li>
+
+                                        <li><hr class="dropdown-divider"></li>
+
+                                        <li>
+                                            <form asp-controller="Admin" asp-action="DeleteProduct" method="post" onsubmit="return confirm('هل أنت متأكد من حذف هذه القطعة التراثية؟');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@product.ProductId" />
+                                                <button type="submit" class="dropdown-item py-2" style="color:#5E1620">
+                                                    <i class="bi bi-trash3 me-2"></i> حذف القطعة
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                                <h5>لا توجد قطع تطابق معايير التصفية والبحث</h5>
+                                <p class="small">جرّب اختيار تبويب آخر أو مسح كلمة البحث.</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ==================== نافذة الرفض المنبثقة ==================== -->
+<div class="modal fade" id="rejectProductModal" tabindex="-1" aria-labelledby="rejectProductModalLabel" aria-hidden="true" dir="rtl">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: 1px solid var(--border);">
+            <form asp-controller="Admin" asp-action="UpdateProductStatus" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="rejectModalProductId" value="" />
+                <input type="hidden" name="status" value="rejected" />
+
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="rejectProductModalLabel" style="color: var(--maroon);">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span>رفض القطعة التراثية</span>
+                    </h5>
+                    <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                </div>
+                <div class="modal-body py-3">
+                    <p class="text-muted small mb-2">يرجى توضيح سبب الرفض ليتمكن صاحب القطعة من معرفة سبب عدم النشر:</p>
+                    <div class="p-2 mb-3 bg-light rounded border fw-bold text-truncate" id="rejectModalProductName">
+                        اسم القطعة
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">سبب الرفض:</label>
+                        <textarea name="reason" rows="3" class="form-control" placeholder="مثال: الصور غير واضحة، أو المعلومات التراثية غير مكتملة..." style="border-radius: 10px;" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light px-3" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-heritage px-4" style="border-radius: 10px;">
+                        <i class="bi bi-check-lg me-1"></i> تأكيد الرفض
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const rejectModalEl = document.getElementById('rejectProductModal');
+            const rejectModalIdInput = document.getElementById('rejectModalProductId');
+            const rejectModalNameDiv = document.getElementById('rejectModalProductName');
+
+            document.querySelectorAll('.btn-open-reject-modal').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id = this.dataset.productId;
+                    const name = this.dataset.productName;
+
+                    if (rejectModalIdInput) rejectModalIdInput.value = id;
+                    if (rejectModalNameDiv) rejectModalNameDiv.textContent = name;
+
+                    if (rejectModalEl && typeof bootstrap !== 'undefined') {
+                        const modal = bootstrap.Modal.getOrCreateInstance(rejectModalEl);
+                        modal.show();
+                    }
+                });
+            });
+        });
+    </script>
+}

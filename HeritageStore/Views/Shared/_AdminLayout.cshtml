@@ -1,0 +1,195 @@
+@inject Microsoft.AspNetCore.Identity.UserManager<HeritageStore.Models.ApplicationUser> UserManager
+@{
+    var currentAdmin = await UserManager.GetUserAsync(User);
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+
+    string IsActive(string action) => (currentAction?.Equals(action, StringComparison.OrdinalIgnoreCase) == true) ? "active" : "";
+}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - لوحة تحكم المتجر </title>
+
+    <!-- خط تجوال الرسمي -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 RTL & Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Site Base & Admin Styles -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+
+    <!-- Chart.js للرسومات البيانية التفاعلية -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+
+        <!-- ==================== القائمة الجانبية (Sidebar) ==================== -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div>
+                <!-- صندوق بيانات المدير -->
+                <div class="admin-profile-box">
+                    <div class="admin-name text-truncate">
+                        @(currentAdmin?.UserName ?? "مدير النظام")
+                    </div>
+                    <p class="admin-email text-truncate">@(currentAdmin?.Email ?? "")</p>
+                </div>
+
+                <!-- قائمة الروابط الرئيسية -->
+                <ul class="admin-nav-list">
+                    <li class="admin-nav-item">
+                        <a class="admin-nav-link @IsActive("Index")" asp-controller="Admin" asp-action="Index">
+                            <i class="bi bi-grid-1x2-fill"></i>
+                            <span>لوحة التحكم الرئيسية</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a class="admin-nav-link @IsActive("Products")" asp-controller="Admin" asp-action="Products">
+                            <i class="bi bi-box-seam-fill"></i>
+                            <span>إدارة القطع والمنتجات</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a class="admin-nav-link @IsActive("Orders")" asp-controller="Admin" asp-action="Orders">
+                            <i class="bi bi-bag-check-fill"></i>
+                            <span>معالجة وتتبع الطلبات</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a class="admin-nav-link @IsActive("Categories")" asp-controller="Admin" asp-action="Categories">
+                            <i class="bi bi-tags-fill"></i>
+                            <span>إدارة التصنيفات والتطريز</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a class="admin-nav-link @IsActive("Users")" asp-controller="Admin" asp-action="Users">
+                            <i class="bi bi-people-fill"></i>
+                            <span>دليل  المستخدمين</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- أسفل القائمة الجانبية -->
+            <div class="admin-sidebar-footer">
+                <a asp-controller="Home" asp-action="Index" class="admin-btn-visit-store">
+                    <i class="bi bi-house-door"></i>
+                    <span>الرئيسية (زيارة المتجر)</span>
+                </a>
+
+                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home")" method="post" class="m-0">
+                    <button type="submit" class="admin-logout-btn">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>تسجيل الخروج</span>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- خلفية معتمة للقائمة الجانبية في الشاشات الصغيرة -->
+        <div class="admin-sidebar-backdrop" id="adminSidebarBackdrop"></div>
+
+        <!-- ==================== المساحة الرئيسية (Main Content) ==================== -->
+        <main class="admin-main">
+
+            <!-- الشريط العلوي -->
+            <header class="admin-topbar">
+                <div class="d-flex align-items-center gap-3">
+                    <button type="button" class="admin-mobile-toggle" id="adminSidebarToggle" title="فتح القائمة">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div class="admin-greeting">
+                        <h2>مرحباً بك يا @(currentAdmin?.UserName?.Split('@')[0] ?? "مدير النظام")!</h2>
+                        <p>لوحة التحكم المركزية لإدارة القطع التراثية والطلبات والمستخدمين</p>
+                    </div>
+                </div>
+
+                <div class="admin-topbar-actions">
+            
+
+                    <!-- زر الصفحة الرئيسية للمتجر -->
+                    <a asp-controller="Home" asp-action="Index" class="btn-view-store" title="الذهاب إلى الصفحة الرئيسية">
+                        <i class="bi bi-house-door"></i>
+                        <span>عرض المتجر</span>
+                    </a>
+                </div>
+            </header>
+
+            <!-- تنبيهات النجاح والخطأ -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-radius: 12px; background: rgba(47, 74, 60, 0.12); color: var(--green); font-weight: 600;">
+                    <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-radius: 12px; background: rgba(122, 31, 43, 0.12); color: var(--maroon); font-weight: 600;">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- محتوى الصفحة المعروضة -->
+            @RenderBody()
+
+        </main>
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // إظهار وإخفاء القائمة الجانبية في الشاشات الصغيرة
+        const sidebarToggle = document.getElementById('adminSidebarToggle');
+        const adminSidebar = document.getElementById('adminSidebar');
+        const adminBackdrop = document.getElementById('adminSidebarBackdrop');
+
+        function openSidebar() {
+            adminSidebar?.classList.add('show');
+            adminBackdrop?.classList.add('show');
+        }
+
+        function closeSidebar() {
+            adminSidebar?.classList.remove('show');
+            adminBackdrop?.classList.remove('show');
+        }
+
+        if (sidebarToggle && adminSidebar) {
+            sidebarToggle.addEventListener('click', () => {
+                if (adminSidebar.classList.contains('show')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+        }
+
+        adminBackdrop?.addEventListener('click', closeSidebar);
+
+        // إغلاق القائمة عند الضغط على أي رابط في الشاشات الصغيرة
+        adminSidebar?.querySelectorAll('.admin-nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 991) {
+                    closeSidebar();
+                }
+            });
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

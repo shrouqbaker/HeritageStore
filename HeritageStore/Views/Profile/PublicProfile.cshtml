@@ -1,0 +1,149 @@
+@model HeritageStore.Models.ViewModels.PublicProfileViewModel
+@{
+    ViewData["Title"] = "الملف الشخصي لـ " + Model.User.UserName;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/explore.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+}
+
+<div class="container profile-page py-4 py-lg-5" dir="rtl">
+
+    @* Breadcrumb *@
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb profile-breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-controller="Home" asp-action="Index"><i class="bi bi-house-door-fill me-1"></i> الرئيسية</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-controller="Explore" asp-action="Index">استكشف التراث</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.User.UserName</li>
+        </ol>
+    </nav>
+
+    @* هيدر معلومات المستخدم العامة *@
+    <div class="public-profile-header">
+        <div class="row align-items-center g-4 text-center text-md-start">
+            <div class="col-12 col-md-auto d-flex justify-content-center">
+                @if (!string.IsNullOrEmpty(Model.User.ProfileImage))
+                {
+                    <img src="@Model.User.ProfileImage" alt="@Model.User.UserName" class="public-profile-avatar" />
+                }
+                else
+                {
+                    <div class="public-profile-avatar d-flex align-items-center justify-content-center">
+                        <i class="bi bi-person fs-1" style="color: var(--gold);"></i>
+                    </div>
+                }
+            </div>
+            <div class="col-12 col-md">
+                <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3 flex-wrap mb-2">
+                    <h1 class="public-profile-name mb-0">@Model.User.UserName</h1>
+                    
+                    <span class="member-badge">
+                        <i class="bi bi-calendar3"></i>
+                        انضم في @Model.User.CreatedAt.ToString("dd/MM/yyyy")
+                    </span>
+                </div>
+
+                <p class="public-profile-bio mb-3">
+                    @(string.IsNullOrWhiteSpace(Model.User.Bio) ? "مستخدم ومشارك في توثيق وحفظ التراث الأردني والفلسطيني على منصة حِكاية." : Model.User.Bio)
+                </p>
+
+                <div class="d-flex gap-3 flex-wrap">
+                    <span class="badge bg-light text-dark border p-2">
+                        <i class="bi bi-box-seam me-1 text-primary"></i> @Model.TotalProducts قطعة معروضة
+                    </span>
+                    <span class="badge bg-light text-dark border p-2">
+                        <i class="bi bi-bag-check me-1 text-success"></i> @Model.TotalForSale متاح للبيع
+                    </span>
+                    <span class="badge bg-light text-dark border p-2">
+                        <i class="bi bi-archive me-1 text-secondary"></i> @Model.TotalArchived للعرض والمعرفة
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* شبكة المنتجات التراثية *@
+    <div class="products-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">قطع @Model.User.UserName التراثية (@Model.TotalProducts)</h2>
+        </div>
+
+        @if (Model.Products.Any())
+        {
+            <div class="row g-4">
+                @foreach (var product in Model.Products)
+                {
+                    var mainImage = product.ProductImages.FirstOrDefault(i => i.IsMain) ?? product.ProductImages.FirstOrDefault();
+                    bool isFav = ViewBag.FavoriteIds != null && ((HashSet<int>)ViewBag.FavoriteIds).Contains(product.ProductId);
+
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <div class="product-card">
+                            <div class="product-card-media">
+                                <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId">
+                                    <img src="@(mainImage != null ? mainImage.ImageUrl : "/images/placeholder.jpg")" alt="@product.Name" loading="lazy" />
+                                </a>
+                                <button type="button"
+                                        class="favorite-btn @(isFav ? "is-favorited" : "")"
+                                        data-product-id="@product.ProductId"
+                                        title="أضف إلى المفضلة">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                            </div>
+                            <div class="product-card-body">
+                                @if (product.EmbroideryType != null)
+                                {
+                                    <span class="embroidery-type-label">تطريز @product.EmbroideryType.Name</span>
+                                }
+                                <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId" class="product-title-link">
+                                    <h5 class="product-title">@product.Name</h5>
+                                </a>
+                                <div class="product-card-footer">
+                                    @if (product.ListingType == "for_sale" && product.Price.HasValue)
+                                    {
+                                        <div class="price-tag">
+                                            @product.Price.Value.ToString("N0") <small class="currency">د.أ</small>
+                                        </div>
+                                        @if (product.Status == "approved")
+                                        {
+                                            <button type="button" class="cart-btn" data-product-id="@product.ProductId" title="أضف إلى السلة">
+                                                <i class="bi bi-bag-plus"></i>
+                                                <span>إضافة إلى السلة</span>
+                                            </button>
+                                        }
+                                        else if (product.Status == "sold")
+                                        {
+                                            <button type="button" class="cart-btn sold" disabled>
+                                                تم بيع القطعة
+                                            </button>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-archive">قطعة للعرض</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="heritage-empty-card py-5">
+                <div class="heritage-empty-icon">
+                    <i class="bi bi-inbox"></i>
+                </div>
+                <h3>لا توجد قطع منشورة حالياً</h3>
+                <p class="text-muted">لم يقم هذا المستخدم بعرض أي قطع تراثية معتمدة حتى الآن.</p>
+                <a asp-controller="Explore" asp-action="Index" class="btn btn-heritage">استكشف قطع أخرى</a>
+            </div>
+        }
+    </div>
+
+</div>

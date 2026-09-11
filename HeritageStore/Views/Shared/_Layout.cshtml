@@ -1,3 +1,5 @@
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -9,7 +11,6 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
-
 
 <body>
  
@@ -26,6 +27,12 @@
             && currentAction.Equals(action, StringComparison.OrdinalIgnoreCase)
                 ? "active"
                 : "";
+
+        ApplicationUser? currentUser = null;
+        if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            currentUser = await UserManager.GetUserAsync(User);
+        }
     }
 
     <header>
@@ -66,7 +73,7 @@
                     </ul>
 
                     <div class="d-flex align-items-center gap-3 nav-icons">
-                        <!-- شاشات كبيرة فقط -->
+                        <!-- أيقونات شاشات كبيرة فقط -->
                         <a class="nav-icon d-none d-lg-inline-flex" asp-controller="Favorite" asp-action="Index" title="المفضلة">
                             <i class="bi bi-heart"></i>
                         </a>
@@ -75,54 +82,173 @@
                             @await Component.InvokeAsync("CartCount")
                         </a>
 
+                        <!-- البروفايل والقائمة المنسدلة (Desktop) -->
                         <div class="dropdown d-none d-lg-block">
-                            <a class="nav-icon dropdown-toggle-no-arrow" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                @if (User.Identity != null && User.Identity.IsAuthenticated)
-                                {
-                                    <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">صفحتي الشخصية</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Product" asp-action="MyProducts">منتجاتي</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Order" asp-action="Index">طلباتي</a></li>
-                                    <li><a class="dropdown-item btn-heritage btn btn-sm text-white" asp-controller="Product" asp-action="Add">أضف قطعتك</a></li>
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li>
-                                        <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home")" method="post">
-                                            <button type="submit" class="dropdown-item">تسجيل الخروج</button>
-                                        </form>
-                                    </li>
-                                }
-                                else
-                                {
-                                    <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Context.Request.Path">تسجيل الدخول</a></li>
-                                    <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="@Context.Request.Path">إنشاء حساب</a></li>
-                                }
-                            </ul>
-                        </div>
-
-                        <!-- الموبايل فقط -->
-                        <ul class="navbar-nav w-100 d-lg-none user-links-mobile">
                             @if (User.Identity != null && User.Identity.IsAuthenticated)
                             {
-                                <li class="nav-item"><a class="nav-link" asp-controller="Profile" asp-action="Index">صفحتي الشخصية</a></li>
-                                <li class="nav-item"><a class="nav-link" asp-controller="Product" asp-action="MyProducts">منتجاتي</a></li>
-                                <li class="nav-item"><a class="nav-link" asp-controller="Order" asp-action="Index">طلباتي</a></li>
-                                <li class="nav-item mt-2">
-                                    <a class="btn-heritage btn btn-sm d-inline-block" asp-controller="Product" asp-action="Add">أضف قطعتك</a>
-                                </li>
-                                <li class="nav-item mt-2">
-                                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home")" method="post" class="m-0">
-                                        <button type="submit" class="nav-link btn btn-link p-0 text-start w-100 border-0">تسجيل الخروج</button>
+                                <button class="nav-user-pill dropdown-toggle-no-arrow" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="حسابي">
+                                    <span class="nav-user-avatar-wrap">
+                                        @if (!string.IsNullOrEmpty(currentUser?.ProfileImage))
+                                        {
+                                            <img src="@currentUser.ProfileImage" alt="@(currentUser.UserName)" class="nav-user-avatar" />
+                                        }
+                                        else
+                                        {
+                                            <span class="nav-user-avatar-default">
+                                                <i class="bi bi-person-fill"></i>
+                                            </span>
+                                        }
+                                    </span>
+                                    <span class="nav-user-name text-truncate">@(currentUser?.UserName ?? User.Identity.Name)</span>
+                                    <i class="bi bi-chevron-down nav-user-chevron"></i>
+                                </button>
+
+                                <div class="dropdown-menu dropdown-menu-end modern-user-dropdown animate-dropdown">
+                                    <div class="dropdown-user-header">
+                                        <div class="d-flex align-items-center gap-3">
+                                            @if (!string.IsNullOrEmpty(currentUser?.ProfileImage))
+                                            {
+                                                <img src="@currentUser.ProfileImage" alt="@(currentUser.UserName)" class="dropdown-header-avatar" />
+                                            }
+                                            else
+                                            {
+                                                <div class="dropdown-header-placeholder">
+                                                    <i class="bi bi-person-fill"></i>
+                                                </div>
+                                            }
+                                            <div class="dropdown-header-info min-w-0">
+                                                <div class="dropdown-header-name text-truncate">@(currentUser?.UserName ?? User.Identity.Name)</div>
+                                                <div class="dropdown-header-email text-truncate">@(currentUser?.Email ?? "")</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="dropdown-items-group">
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <a class="dropdown-item user-dropdown-link mb-1" asp-controller="Admin" asp-action="Index" style="background: rgba(122, 31, 43, 0.08); border-radius: 8px;">
+                                                <span class="dropdown-link-icon" style="background: var(--maroon); color: #FFFFFF;"><i class="bi bi-speedometer2"></i></span>
+                                                <span class="dropdown-link-text">
+                                                    <strong style="color: var(--maroon);">لوحة التحكم (الإدارة)</strong>
+                                                    <small>إدارة المنتجات والطلبات</small>
+                                                </span>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a class="dropdown-item user-dropdown-link" asp-controller="Profile" asp-action="Index">
+                                                <span class="dropdown-link-icon"><i class="bi bi-person-gear"></i></span>
+                                                <span class="dropdown-link-text">
+                                                    <strong>صفحتي الشخصية</strong>
+                                                    <small>إدارة بياناتك وحسابك</small>
+                                                </span>
+                                            </a>
+                                        }
+                                    </div>
+
+                                    <div class="dropdown-divider my-2"></div>
+
+                                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home")" method="post" class="m-0 p-0">
+                                        <button type="submit" class="dropdown-item user-dropdown-link logout-link w-100 border-0 bg-transparent text-start">
+                                            <span class="dropdown-link-icon"><i class="bi bi-box-arrow-right"></i></span>
+                                            <span class="dropdown-link-text">
+                                                <strong>تسجيل الخروج</strong>
+                                            </span>
+                                        </button>
                                     </form>
-                                </li>
+                                </div>
                             }
                             else
                             {
-                                <li class="nav-item"><a class="nav-link" asp-area="Identity" asp-page="/Account/Login">تسجيل الدخول</a></li>
-                                <li class="nav-item"><a class="nav-link" asp-area="Identity" asp-page="/Account/Register">إنشاء حساب</a></li>
+                                <button class="nav-user-pill dropdown-toggle-no-arrow" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="حسابك">
+                                   
+                                    <span class="nav-user-name">تسجيل الدخول</span>
+                                    <i class="bi bi-chevron-down nav-user-chevron"></i>
+                                </button>
+
+                                <div class="dropdown-menu dropdown-menu-end modern-user-dropdown animate-dropdown p-3">
+                                    <div class="text-center py-2 mb-2">
+                                        <small class="text-muted">أهلاً بك في حِكاية</small>
+                                    </div>
+                                    <a class="btn btn-heritage w-100 mb-2 py-2 text-center" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Context.Request.Path">
+                                        <i class="bi bi-box-arrow-in-right me-1"></i> تسجيل الدخول
+                                    </a>
+                                    <a class="btn btn-outline-heritage w-100 py-2 text-center" asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="@Context.Request.Path">
+                                        <i class="bi bi-person-plus me-1"></i> إنشاء حساب جديد
+                                    </a>
+                                </div>
                             }
-                        </ul>
+                        </div>
+
+                        <!-- البروفايل والقائمة المتجاوبة (Mobile View) -->
+                        <div class="w-100 d-lg-none user-links-mobile">
+                            @if (User.Identity != null && User.Identity.IsAuthenticated)
+                            {
+                                <div class="mobile-user-card mb-3 p-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="mobile-avatar-wrap">
+                                            @if (!string.IsNullOrEmpty(currentUser?.ProfileImage))
+                                            {
+                                                <img src="@currentUser.ProfileImage" alt="@(currentUser.UserName)" class="mobile-avatar" />
+                                            }
+                                            else
+                                            {
+                                                <div class="mobile-avatar-default">
+                                                    <i class="bi bi-person-fill"></i>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="mobile-user-info min-w-0">
+                                            <h6 class="mb-0 text-truncate fw-bold">@(currentUser?.UserName ?? User.Identity.Name)</h6>
+                                            <small class="text-muted text-truncate d-block">@(currentUser?.Email ?? "")</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <ul class="navbar-nav w-100">
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li class="nav-item mb-2">
+                                            <a class="nav-link mobile-nav-item d-flex align-items-center gap-3" asp-controller="Admin" asp-action="Index" style="background: rgba(122, 31, 43, 0.08); border-radius: 10px;">
+                                                <span class="mobile-icon-box" style="background: var(--maroon); color: #FFFFFF;"><i class="bi bi-speedometer2"></i></span>
+                                                <span style="color: var(--maroon); font-weight: 700;">لوحة تحكم الإدارة</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="nav-item">
+                                            <a class="nav-link mobile-nav-item d-flex align-items-center gap-3" asp-controller="Profile" asp-action="Index">
+                                                <span class="mobile-icon-box"><i class="bi bi-person-gear"></i></span>
+                                                <span>صفحتي الشخصية</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    <li class="nav-item mt-2">
+                                        <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home")" method="post" class="m-0">
+                                            <button type="submit" class="nav-link mobile-nav-item mobile-logout-btn w-100 border-0 bg-transparent d-flex align-items-center gap-3 text-start">
+                                                <span class="mobile-icon-box logout-icon"><i class="bi bi-box-arrow-right"></i></span>
+                                                <span>تسجيل الخروج</span>
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            }
+                            else
+                            {
+                                <div class="mobile-guest-card p-3 mb-2 text-center">
+                                    <p class="mb-2 text-muted fs-7">قم بتسجيل الدخول للاستمتاع بجميع تجارب حكاية</p>
+                                    <div class="d-grid gap-2">
+                                        <a class="btn btn-heritage py-2" asp-area="Identity" asp-page="/Account/Login">
+                                            <i class="bi bi-box-arrow-in-right me-1"></i> تسجيل الدخول
+                                        </a>
+                                        <a class="btn btn-outline-heritage py-2" asp-area="Identity" asp-page="/Account/Register">
+                                            <i class="bi bi-person-plus me-1"></i> إنشاء حساب جديد
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
@@ -130,6 +256,24 @@
     </header>
 
     <main role="main">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="container mt-3" dir="rtl">
+                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-radius: 12px; background: rgba(47, 74, 60, 0.12); color: var(--green); font-weight: 600;">
+                    <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="container mt-3" dir="rtl">
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-radius: 12px; background: rgba(122, 31, 43, 0.12); color: var(--maroon); font-weight: 600;">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        }
         @RenderBody()
     </main>
 
@@ -159,7 +303,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/guest-storage.js" asp-append-version="true"></script>
     <script src="~/js/product-card-actions.js" asp-append-version="true"></script>
-
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     @if (User.Identity != null && User.Identity.IsAuthenticated)
     {
         <script>

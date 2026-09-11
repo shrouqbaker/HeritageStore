@@ -1,0 +1,417 @@
+@model HeritageStore.Models.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "لوحة التحكم الرئيسية";
+    Layout = "_AdminLayout";
+}
+
+<!-- ==================== بطاقات الإحصائيات الأربعة (نظرة عامة) ==================== -->
+<div class="mb-4">
+    <div class="admin-section-title">
+        <i class="bi bi-speedometer2" style="color: var(--maroon);"></i>
+        <span>نظرة عامة ومؤشرات سريعة</span>
+    </div>
+
+    <div class="admin-overview-grid">
+        <!-- البطاقة 1: إجمالي القطع التراثية -->
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon-box stat-icon-products">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <div class="admin-stat-info">
+                <div class="admin-stat-value">@Model.TotalProducts</div>
+                <div class="admin-stat-label">إجمالي القطع التراثية</div>
+            </div>
+        </div>
+
+        <!-- البطاقة 2: إجمالي الطلبات -->
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon-box stat-icon-orders">
+                <i class="bi bi-bag-check"></i>
+            </div>
+            <div class="admin-stat-info">
+                <div class="admin-stat-value">@Model.TotalOrders</div>
+                <div class="admin-stat-label">إجمالي الطلبات المستلمة</div>
+            </div>
+        </div>
+
+        <!-- البطاقة 3: إجمالي المبيعات -->
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon-box stat-icon-sales">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="admin-stat-info">
+                <div class="admin-stat-value">@Model.TotalSales.ToString("N0") <small style="font-size: 0.95rem;">د.أ</small></div>
+                <div class="admin-stat-label">إجمالي حجم المبيعات</div>
+            </div>
+        </div>
+
+        <!-- البطاقة 4: قطع بانتظار المراجعة (تنبيه) -->
+        <div class="admin-stat-card stat-card-alert">
+            <div class="admin-stat-icon-box stat-icon-pending">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <div class="admin-stat-info">
+                <div class="admin-stat-value" style="color: var(--maroon);">@Model.PendingProductsCount</div>
+                <div class="admin-stat-label">قطع بانتظار الاعتماد</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== الرسوم البيانية والودجات ==================== -->
+<div class="admin-widgets-grid">
+    <!-- الودجت 2: الرسم البياني الدائري لحالات القطع التراثية -->
+    <div class="admin-card widget-donut-box">
+        <div class="admin-card-header">
+            <h3 class="admin-card-title">حالات القطع التراثية</h3>
+            <span class="admin-card-subtitle">توزيع القطع حسب حالتها</span>
+        </div>
+        <div class="donut-chart-container">
+            <canvas id="inventoryStatusChart"></canvas>
+        </div>
+        <div class="donut-legends">
+            <div class="donut-legend-item">
+                <span><span class="legend-color-dot" style="background: var(--green);"></span> معتمدة ومنشورة</span>
+                <strong style="color: var(--green);">@Model.ApprovedProductsCount</strong>
+            </div>
+            <div class="donut-legend-item">
+                <span><span class="legend-color-dot" style="background: var(--gold);"></span> قطع تم بيعها</span>
+                <strong style="color: var(--gold);">@Model.SoldCount</strong>
+            </div>
+            <div class="donut-legend-item">
+                <span><span class="legend-color-dot" style="background: var(--maroon-dark);"></span> بانتظار الاعتماد</span>
+                <strong style="color: var(--maroon-dark);">@Model.PendingProductsCount</strong>
+            </div>
+            <div class="donut-legend-item">
+                <span><span class="legend-color-dot" style="background: var(--maroon);"></span> قطع مرفوضة</span>
+                <strong style="color: var(--maroon);">@Model.RejectedProductsCount</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- الودجت 3: أكثر التصنيفات نشاطاً ومبيعاً -->
+    <div class="admin-card widget-top-categories">
+        <div class="admin-card-header">
+            <h3 class="admin-card-title">أعلى التصنيفات مبيعاً وعرضاً</h3>
+            <a asp-controller="Admin" asp-action="Categories" class="admin-card-subtitle text-decoration-none" style="color: var(--maroon); font-weight: 600;">
+                التصنيفات <i class="bi bi-arrow-left"></i>
+            </a>
+        </div>
+        <div class="category-bar-list mt-3">
+            @if (Model.TopCategories.Any())
+            {
+                foreach (var cat in Model.TopCategories)
+                {
+                    <div class="category-bar-item">
+                        <span class="category-bar-name" title="@cat.CategoryName">@cat.CategoryName</span>
+                        <div class="category-bar-track">
+                            <div class="category-bar-fill" style="width: @(Math.Max(cat.Percentage, 10))%;"></div>
+                        </div>
+                        <span class="category-bar-val">@cat.Count قطعة</span>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-muted small text-center py-4">لا توجد تصنيفات حالياً.</p>
+            }
+        </div>
+    </div>
+
+    <!-- الودجت 4: حركة المبيعات والطلبات الشهرية -->
+    <div class="admin-card widget-trend-box">
+        <div class="admin-card-header">
+            <div>
+                <h3 class="admin-card-title">حركة المبيعات والطلبات</h3>
+                <span class="admin-card-subtitle">مؤشرات الأداء خلال آخر 6 أشهر</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="small d-flex align-items-center gap-1">
+                    <span style="display:inline-block; width:12px; height:12px; background:var(--maroon); border-radius:3px;"></span> المبيعات (د.أ)
+                </span>
+                <span class="small d-flex align-items-center gap-1">
+                    <span style="display:inline-block; width:12px; height:12px; background:var(--gold); border-radius:3px;"></span> عدد الطلبات
+                </span>
+            </div>
+        </div>
+        <div class="chart-trend-canvas">
+            <canvas id="monthlyTrendChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- ==================== جداول سريعة ==================== -->
+<div class="row g-4">
+    <!-- جدول القطع المعلقة -->
+    <div class="col-lg-6">
+        <div class="admin-table-card">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="background: #F8F3EA;">
+                <h4 class="m-0 fs-6 fw-bold d-flex align-items-center gap-2" style="color: var(--maroon);">
+                    <i class="bi bi-clock-history"></i>
+                    <span>قطع تنتظر الاعتماد السريع (@Model.PendingProducts.Count)</span>
+                </h4>
+                <a asp-controller="Admin" asp-action="Products" asp-route-status="pending" class="btn btn-sm btn-outline-heritage">
+                    عرض الكل
+                </a>
+            </div>
+            <div class="admin-table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>القطعة</th>
+                            <th>المالك</th>
+                            <th>السعر</th>
+                            <th class="text-center">الإجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.PendingProducts.Any())
+                        {
+                            foreach (var p in Model.PendingProducts)
+                            {
+                                var img = p.ProductImages.FirstOrDefault()?.ImageUrl ?? "/images/placeholder.jpg";
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <img src="@img" alt="@p.Name" class="admin-prod-thumb" />
+                                            <div>
+                                                <div class="fw-bold text-truncate" style="max-width: 140px;">@p.Name</div>
+                                                <small class="text-muted">@(p.Category?.Name ?? "تراث")</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@(p.User?.UserName ?? "مستخدم")</td>
+                                    <td>
+                                        @if (p.Price.HasValue)
+                                        {
+                                            <strong style="color: var(--maroon);">@p.Price.Value.ToString("N0") د.أ</strong>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">للعرض</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-outline-heritage btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px; font-size: 0.8rem; padding: 0.3rem 0.65rem;">
+                                                إجراء
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 12px; border: 1px solid var(--border);">
+                                                <li>
+                                                    <form asp-controller="Admin" asp-action="UpdateProductStatus" method="post">
+                                                        <input type="hidden" name="id" value="@p.ProductId" />
+                                                        <input type="hidden" name="status" value="approved" />
+                                                        <button type="submit" class="dropdown-item py-2" style="color: var(--green);">
+                                                            <i class="bi bi-check-circle me-2"></i> اعتماد ونشر
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@p.ProductId" target="_blank" class="dropdown-item py-2">
+                                                        <i class="bi bi-eye me-2"></i> معاينة التفاصيل
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">
+                                    <i class="bi bi-check2-circle fs-4 d-block mb-1" style="color: var(--green);"></i>
+                                    لا توجد قطع معلقة حالياً، جميع القطع تم تدقيقها!
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- جدول أحدث الطلبات -->
+    <div class="col-lg-6">
+        <div class="admin-table-card">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="background: #F8F3EA;">
+                <h4 class="m-0 fs-6 fw-bold d-flex align-items-center gap-2" style="color: var(--maroon);">
+                    <i class="bi bi-bag-check"></i>
+                    <span>أحدث الطلبات المستلمة (@Model.RecentOrders.Count)</span>
+                </h4>
+                <a asp-controller="Admin" asp-action="Orders" class="btn btn-sm btn-outline-heritage">
+                    سجل الطلبات
+                </a>
+            </div>
+            <div class="admin-table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>رقم الطلب</th>
+                            <th>المشتري</th>
+                            <th>الإجمالي</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.RecentOrders.Any())
+                        {
+                            foreach (var ord in Model.RecentOrders)
+                            {
+                                string pillClass = ord.Status switch
+                                {
+                                    "delivered" or "completed" => "status-delivered",
+                                    "shipped" => "status-shipped",
+                                    "processing" => "status-pending",
+                                    "cancelled" => "status-cancelled",
+                                    _ => "status-pending"
+                                };
+                                string statusText = ord.Status switch
+                                {
+                                    "delivered" or "completed" => "تم التوصيل",
+                                    "shipped" => "تم الشحن",
+                                    "processing" => "قيد التجهيز",
+                                    "cancelled" => "طلب ملغي",
+                                    _ => "قيد الانتظار"
+                                };
+                                <tr>
+                                    <td><strong style="color: var(--maroon);">#@ord.OrderId</strong></td>
+                                    <td>@(ord.User?.UserName ?? "مشتري")</td>
+                                    <td><strong style="color: var(--maroon);">@ord.TotalPrice.ToString("N0") د.أ</strong></td>
+                                    <td>
+                                        <span class="status-pill @pillClass">@statusText</span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">
+                                    لا توجد طلبات مسجلة بعد.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // ===== 1. الرسم البياني الدائري لحالات القطع (ألوان site.css حصراً) =====
+            const donutCtx = document.getElementById('inventoryStatusChart');
+            if (donutCtx) {
+                new Chart(donutCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['معتمدة ومنشورة', 'تم بيعها', 'بانتظار الاعتماد', 'مرفوضة'],
+                        datasets: [{
+                            data: [
+                                @Model.ApprovedProductsCount,
+                                @Model.SoldCount,
+                                @Model.PendingProductsCount,
+                                @Model.RejectedProductsCount
+                            ],
+                            backgroundColor: ['#2F4A3C', '#B8863B', '#5E1620', '#7A1F2B'],
+                            borderWidth: 2,
+                            borderColor: '#FFFFFF',
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                rtl: true,
+                                bodyFont: { family: 'Tajawal' }
+                            }
+                        },
+                        cutout: '72%'
+                    }
+                });
+            }
+
+            // ===== 2. رسم حركة المبيعات والطلبات الشهرية =====
+            const trendCtx = document.getElementById('monthlyTrendChart');
+            if (trendCtx) {
+                const months = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyTrend.Select(m => m.MonthName)));
+                const sales = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyTrend.Select(m => m.Sales)));
+                const orders = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyTrend.Select(m => m.OrdersCount)));
+
+                new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [
+                            {
+                                label: 'المبيعات (د.أ)',
+                                data: sales,
+                                borderColor: '#7A1F2B',
+                                backgroundColor: 'rgba(122, 31, 43, 0.08)',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                fill: true,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'عدد الطلبات',
+                                data: orders,
+                                borderColor: '#B8863B',
+                                backgroundColor: 'transparent',
+                                borderWidth: 2.5,
+                                borderDash: [5, 5],
+                                tension: 0.4,
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                rtl: true,
+                                bodyFont: { family: 'Tajawal' }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { font: { family: 'Tajawal' } }
+                            },
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                grid: { color: 'rgba(228, 218, 205, 0.4)' },
+                                ticks: { font: { family: 'Tajawal' } }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                grid: { display: false },
+                                ticks: { font: { family: 'Tajawal' } }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

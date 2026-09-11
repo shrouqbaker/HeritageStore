@@ -39,17 +39,18 @@
 
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
 
-                <!-- Email -->
+                <!-- Email or Username -->
                 <div class="form-group-wrapper">
                     <div class="input-group">
                         <span class="input-group-text">
-                            <i class="bi bi-envelope"></i>
+                            <i class="bi bi-person"></i>
                         </span>
                         <input asp-for="Input.Email"
+                               type="text"
                                class="form-control"
                                autocomplete="username"
                                aria-required="true"
-                               placeholder="البريد الإلكتروني" />
+                               placeholder="اسم المستخدم أو البريد الإلكتروني" />
                     </div>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>

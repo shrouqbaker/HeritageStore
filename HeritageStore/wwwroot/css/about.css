@@ -1,4 +1,4 @@
-﻿/* ===== About Hero ===== */
+/* ===== About Hero ===== */
 .about-hero {
     background-color: var(--maroon);
     color: #fff;
@@ -97,3 +97,30 @@
         margin-bottom: 0;
         font-size: 0.95rem;
     }
+
+/* =========================================================
+   RESPONSIVE ENHANCEMENTS FOR ABOUT PAGE
+   ========================================================= */
+@media (max-width: 767.98px) {
+    .about-hero {
+        padding: 3rem 1rem 2.5rem;
+    }
+
+    .about-hero h1 {
+        font-size: 1.85rem;
+    }
+
+    .about-hero p {
+        font-size: 0.96rem;
+        line-height: 1.75;
+    }
+
+    .about-block {
+        padding: 2.5rem 0;
+    }
+
+    .about-block h2 {
+        font-size: 1.4rem;
+    }
+}
+

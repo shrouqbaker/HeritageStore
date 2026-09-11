@@ -1,0 +1,693 @@
+/* =========================================================
+   PROFILE & USER ORDERS & MY PRODUCTS STYLES
+   Heritage Store (حِكاية)
+========================================================= */
+
+/* ===== Profile Page Container ===== */
+.profile-page, .orders-page, .my-products-page {
+    min-height: 70vh;
+}
+
+/* ===== Breadcrumb ===== */
+.profile-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    content: "‹";
+    color: var(--gold);
+    font-weight: bold;
+}
+
+.profile-breadcrumb a {
+    color: var(--maroon);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* ===== Card Wrapper ===== */
+.heritage-card {
+    background: #FFFFFF;
+    border: 1px solid var(--maroon);
+    border-radius: 16px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 16px rgba(43, 36, 32, 0.04);
+}
+
+.heritage-card-title {
+    font-size: 1.3rem;
+    font-family: var(--font-heading);
+    color: var(--maroon);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+/* ===== Avatar & Image Upload ===== */
+.avatar-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1.25rem;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--gold);
+    background-color: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-wrapper .avatar-placeholder {
+    font-size: 3.5rem;
+    color: var(--gold);
+}
+
+/* ===== Stats Badges & Tiles ===== */
+.stat-box {
+    background: #FFF;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(122, 31, 43, 0.08);
+}
+
+.stat-box .stat-num {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--maroon);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.stat-box .stat-label {
+    font-size: 0.88rem;
+    color: #7A6F68;
+}
+
+/* ===== Public Profile Header ===== */
+.public-profile-header {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 2.25rem 2rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 4px 20px rgba(43, 36, 32, 0.05);
+}
+
+.public-profile-avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    object-fit: cover;
+    background: var(--bg);
+}
+
+.public-profile-name {
+    font-family: var(--font-heading);
+    color: var(--maroon);
+    font-size: 1.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.public-profile-bio {
+    color: #554D47;
+    line-height: 1.7;
+    margin-top: 0.75rem;
+    font-size: 0.98rem;
+    max-width: 650px;
+}
+
+.member-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--bg);
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #7A6F68;
+    border: 1px solid var(--border);
+}
+
+/* ===== Orders List ===== */
+.order-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+}
+
+.order-card:hover {
+    box-shadow: 0 6px 20px rgba(43, 36, 32, 0.08);
+}
+
+.order-card-header {
+    background: #FDFBF7;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.order-id-badge {
+    font-weight: 700;
+    color: var(--maroon);
+    font-size: 1.05rem;
+}
+
+.order-date {
+    font-size: 0.88rem;
+    color: var(--maroon-dark);
+    font-weight: 500;
+}
+
+.order-card-body {
+    padding: 1.5rem;
+}
+
+.order-item-mini {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+}
+
+.order-item-mini:not(:last-child) {
+    border-bottom: 1px dashed var(--border);
+}
+
+.order-item-img {
+    width: 65px;
+    height: 65px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    background: var(--bg);
+}
+
+.order-item-name {
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: none;
+    display: block;
+}
+
+.order-item-name:hover {
+    color: var(--maroon);
+}
+
+.order-summary-footer {
+    background: #FAFAFA;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* ===== Status Badges ===== */
+.status-pill {
+    display: inline-block;
+    padding: 0.35rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.status-pill {
+    background: #FFF3CD;
+    color: #856404;
+}
+.status-waiting {
+    background: #FFF3CD;
+    color: #856404;
+}
+.status-pending {
+    background-color: #E8D8BE;
+    color: #6B2737;
+}
+.status-pill.status-approved {
+    background: #D4EDDA;
+    color: #155724;
+}
+
+.status-pill.status-sold {
+    background: #F8D7DA;
+    color: #721C24;
+}
+
+.status-pill.status-rejected {
+    background: #F5C6CB;
+    color: #721C24;
+}
+
+.status-pill.status-archived {
+    background: #E2E3E5;
+    color: #383D41;
+}
+
+/* ===== Filter Tabs for MyProducts ===== */
+.status-filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border);
+}
+
+.status-filter-tab {
+    padding: 0.55rem 1.15rem;
+    border-radius: 24px;
+    text-decoration: none;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 0.92rem;
+    background: #FFF;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.status-filter-tab:hover {
+    background: var(--bg);
+    color: var(--maroon);
+}
+
+.status-filter-tab.active {
+    background: var(--maroon);
+    color: #FFF;
+    border-color: var(--maroon);
+}
+
+.status-filter-tab .badge-count {
+    background: rgba(0,0,0,0.08);
+    padding: 0.15rem 0.45rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+}
+
+.status-filter-tab.active .badge-count {
+    background: rgba(255,255,255,0.25);
+    color: #FFF;
+}
+
+/* ===== Rejection Notice ===== */
+.rejection-notice {
+    background: rgba(176, 71, 63, 0.08);
+    border-right: 4px solid var(--maroon);
+    padding: 0.6rem 0.85rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #721C24;
+    margin-top: 0.5rem;
+}
+
+/* ===== Empty State Card ===== */
+.heritage-empty-card {
+    background: #FFFFFF;
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    padding: 3.5rem 1.5rem;
+    text-align: center;
+}
+
+.heritage-empty-icon {
+    width: 70px;
+    height: 70px;
+    background: var(--bg);
+    color: var(--gold);
+    font-size: 2rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    margin-bottom: 1rem;
+}
+
+/* =========================================================
+   MODERN PROFILE LAYOUT (USING SITE.CSS VARIABLES)
+========================================================= */
+
+.modern-profile-sidebar {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem 1.25rem;
+    box-shadow: 0 4px 16px rgba(43, 36, 32, 0.04);
+    text-align: center;
+}
+
+.profile-avatar-box {
+    position: relative;
+    width: 115px;
+    height: 115px;
+    margin: 0 auto;
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--bg);
+    border: 3px solid var(--gold);
+}
+
+.profile-avatar-badge {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 34px;
+    height: 34px;
+    background: var(--gold);
+    color: #FFFFFF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2.5px solid #FFFFFF;
+    box-shadow: 0 2px 8px rgba(184, 134, 59, 0.35);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.profile-avatar-badge:hover {
+    transform: scale(1.1);
+    background: var(--maroon);
+}
+
+.profile-user-name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--ink);
+    margin-top: 1rem;
+    margin-bottom: 0.15rem;
+}
+
+.profile-user-role {
+    font-size: 0.85rem;
+    color: #7A6F68;
+}
+
+.profile-nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1.8rem;
+}
+
+.profile-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.8rem 1.15rem;
+    border-radius: 14px;
+    color: var(--ink);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: right;
+    font-size: 0.94rem;
+    cursor: pointer;
+}
+
+.profile-nav-btn i {
+    font-size: 1.15rem;
+    color: #8A7D6D;
+    transition: color 0.2s;
+}
+
+.profile-nav-btn:hover {
+    background: var(--bg);
+    color: var(--maroon);
+}
+
+.profile-nav-btn:hover i {
+    color: var(--maroon);
+}
+
+.profile-nav-btn.active {
+    background: var(--bg);
+    color: var(--maroon);
+    font-weight: 700;
+    border-right: 4px solid var(--maroon);
+}
+
+.profile-nav-btn.active i {
+    color: var(--maroon);
+}
+
+.profile-nav-btn .nav-badge {
+    margin-inline-start: auto;
+    background: rgba(43, 36, 32, 0.06);
+    color: #7A6F68;
+    padding: 0.15rem 0.55rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.profile-nav-btn.active .nav-badge {
+    background: rgba(122, 31, 43, 0.12);
+    color: var(--maroon);
+}
+
+.modern-profile-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem 2.25rem;
+    box-shadow: 0 4px 16px rgba(43, 36, 32, 0.04);
+}
+
+.profile-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+}
+
+.profile-card-header h2 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0;
+    font-size: 1.55rem;
+}
+
+.btn-edit-profile-pill {
+    background: var(--maroon);
+    color: var(--bg);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1.25rem;
+    border-radius: 24px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-edit-profile-pill:hover {
+    background: var(--maroon-dark);
+    color: #FFFFFF;
+    border-color: var(--maroon);
+}
+
+.profile-field-label {
+    font-size: 0.88rem;
+    color: #7A6F68;
+    font-weight: 600;
+    margin-bottom: 0.45rem;
+    display: block;
+    direction:rtl;
+}
+
+.profile-input-wrapper {
+    position: relative;
+}
+
+.profile-form-control {
+    background: var(--bg);
+    border: 1.5px solid transparent;
+    border-radius: 12px;
+    padding: 0.85rem 1.15rem;
+    font-size: 0.96rem;
+    color: var(--ink);
+    width: 100%;
+    transition: all 0.25s ease;
+    font-family: var(--font-body);
+}
+
+.profile-form-control.is-readonly {
+    pointer-events: none;
+    background: var(--bg);
+    border-color: transparent;
+    color: var(--ink);
+}
+
+.profile-form-control.is-editing {
+    background: #FFFFFF;
+    border-color: var(--border);
+    pointer-events: auto;
+}
+
+.profile-form-control.is-editing:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(184, 134, 59, 0.15);
+    outline: none;
+}
+
+.verified-badge-pill {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--green);
+    background: rgba(47, 74, 60, 0.08);
+    border: 1px solid rgba(47, 74, 60, 0.2);
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+.input-icon-pill {
+    position: absolute;
+    left: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8A7D6D;
+    font-size: 1.05rem;
+    pointer-events: none;
+}
+
+/* Tab Panes */
+.profile-tab-pane {
+    display: none;
+    animation: fadeInPane 0.22s ease-in-out;
+}
+
+.profile-tab-pane.active {
+    display: block;
+}
+
+@keyframes fadeInPane {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .modern-profile-card {
+        padding: 1.5rem 1.15rem;
+    }
+}
+
+
+.profile-tab-pane {
+    direction: rtl;
+}
+
+.profile-card-header {
+    direction: rtl;
+}
+
+    .profile-card-header h2 {
+        text-align: right;
+    }
+
+.profile-field-label {
+    text-align: right;
+}
+
+.profile-form-control {
+    text-align: right;
+    direction: rtl;
+}
+
+    .profile-form-control[dir="ltr"] {
+        text-align: left;
+        direction: ltr;
+    }
+
+.view{
+    color:white;
+    background-color:var(--maroon);
+}
+.view:hover{
+    background-color:var(--maroon-dark);
+    scale:1.1;
+}
+
+/* =========================================================
+   RESPONSIVE ENHANCEMENTS FOR PROFILE
+   ========================================================= */
+@media (max-width: 767.98px) {
+    .public-profile-header {
+        padding: 1.5rem 1rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .public-profile-avatar {
+        width: 90px;
+        height: 90px;
+    }
+
+    .public-profile-name {
+        font-size: 1.45rem;
+    }
+
+    .profile-card-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .stat-box {
+        padding: 0.9rem;
+    }
+
+    .stat-box .stat-num {
+        font-size: 1.45rem;
+    }
+}

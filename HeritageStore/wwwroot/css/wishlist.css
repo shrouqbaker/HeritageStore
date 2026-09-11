@@ -5,6 +5,9 @@ body {
     color: var(--ink);
     font-family: var(--font-body);
 }
+.s{
+        min-height:70vh;
+}
 
 /* BREADCRUMB */
 .heritage-breadcrumb {
@@ -265,3 +268,291 @@ body {
         background-color: var(--maroon-dark);
         color: #FFFFFF;
     }
+
+/* =========================================================
+   RESPONSIVE WISHLIST
+   ========================================================= */
+
+/* TABLET */
+@media (max-width: 991.98px) {
+
+    .wishlist-table-wrapper {
+        border-radius: 10px;
+    }
+
+    .wishlist-table thead th {
+        font-size: 0.95rem;
+        padding: 1rem;
+    }
+
+    .wishlist-table tbody td {
+        padding: 1rem;
+    }
+
+    .product-info-cell {
+        gap: 0.9rem;
+    }
+
+    .product-img-box {
+        width: 65px;
+        height: 65px;
+    }
+
+    .product-title {
+        font-size: 1rem;
+    }
+
+    .btn-add-to-cart {
+        padding: 0.6rem 1.2rem;
+    }
+}
+
+
+/* MOBILE */
+@media (max-width: 767.98px) {
+
+    .s {
+        min-height: 70vh;
+    }
+
+    /* Breadcrumb */
+    .heritage-breadcrumb {
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Remove table appearance */
+    .wishlist-table-wrapper {
+        background: transparent;
+        border: none;
+        overflow: visible;
+    }
+
+    .wishlist-table,
+    .wishlist-table tbody {
+        display: block;
+        width: 100%;
+    }
+
+        /* Hide desktop table header */
+        .wishlist-table thead {
+            display: none;
+        }
+
+        /* Each product becomes a card */
+        .wishlist-table tbody tr.wishlist-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 0.9rem;
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1rem;
+            margin-bottom: 0.9rem;
+            position: relative;
+            transition: all 0.25s ease;
+        }
+
+            .wishlist-table tbody tr.wishlist-row:hover {
+                background: #FFFFFF;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
+            }
+
+        /* Reset table cells */
+        .wishlist-table tbody td {
+            display: block;
+            padding: 0;
+            border: none;
+        }
+
+            /* Product information */
+            .wishlist-table tbody td.product-info-cell,
+            .wishlist-table tbody td:first-child {
+                grid-column: 1 / -1;
+            }
+
+    .product-info-cell {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    /* Bigger image on mobile */
+    .product-img-box {
+        width: 95px;
+        height: 95px;
+        min-width: 95px;
+        border-radius: 10px;
+    }
+
+    .product-title {
+        font-size: 1.05rem;
+        line-height: 1.4;
+    }
+
+    .product-subtext {
+        font-size: 0.78rem;
+        margin-top: 0.2rem;
+    }
+
+    /* Price */
+    .wishlist-table tbody td:has(.price-amount) {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .price-amount {
+        font-size: 1.05rem;
+    }
+
+    /* Embroidery */
+    .wishlist-table tbody td:has(.embroidery-badge) {
+        display: flex;
+        align-items: center;
+    }
+
+    .embroidery-badge {
+        font-size: 0.8rem;
+    }
+
+    /* Stock */
+    .wishlist-table tbody td:has(.status-badge) {
+        display: flex;
+        align-items: center;
+    }
+
+    .status-badge {
+        font-size: 0.8rem;
+    }
+
+    /* Cart button */
+    .wishlist-table tbody td:has(.btn-add-to-cart) {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .btn-add-to-cart {
+        padding: 0.55rem 1rem;
+        font-size: 0.8rem;
+        min-height: 38px;
+    }
+
+    /* Remove button */
+    .wishlist-table tbody td.col-remove {
+        position: absolute;
+        top: 0.7rem;
+        left: 0.7rem;
+        width: auto;
+        z-index: 2;
+    }
+
+    .favorite-remove-btn {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        font-size: 0.85rem;
+    }
+
+        .favorite-remove-btn:hover {
+            transform: scale(1.08);
+        }
+
+    /* Empty state */
+    .wishlist-empty-card {
+        padding: 2.5rem 1.2rem;
+        border-radius: 14px;
+    }
+
+    .empty-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        font-size: 1.7rem;
+    }
+
+    .empty-title {
+        font-size: 1.25rem;
+    }
+
+    .empty-text {
+        font-size: 0.88rem;
+    }
+
+    .btn-heritage-primary {
+        padding: 0.7rem 1.5rem;
+        font-size: 0.88rem;
+    }
+}
+
+
+/* SMALL MOBILE */
+@media (max-width: 480px) {
+
+    .wishlist-table tbody tr.wishlist-row {
+        padding: 0.85rem;
+        gap: 0.75rem;
+    }
+
+    .product-info-cell {
+        gap: 0.8rem;
+    }
+
+    .product-img-box {
+        width: 82px;
+        height: 82px;
+        min-width: 82px;
+    }
+
+    .product-title {
+        font-size: 0.95rem;
+    }
+
+    .product-subtext {
+        font-size: 0.73rem;
+    }
+
+    .price-amount {
+        font-size: 1rem;
+    }
+
+    .btn-add-to-cart {
+        padding: 0.5rem 0.85rem;
+        font-size: 0.76rem;
+    }
+
+    .favorite-remove-btn {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+
+/* VERY SMALL SCREENS */
+@media (max-width: 360px) {
+
+    .product-img-box {
+        width: 72px;
+        height: 72px;
+        min-width: 72px;
+    }
+
+    .product-title {
+        font-size: 0.88rem;
+    }
+
+    .product-subtext {
+        font-size: 0.7rem;
+    }
+
+    .btn-add-to-cart {
+        padding: 0.45rem 0.7rem;
+        font-size: 0.72rem;
+    }
+}

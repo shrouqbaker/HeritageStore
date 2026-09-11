@@ -1,16 +1,19 @@
-﻿.site-footer {
+.site-footer {
     margin: 0 !important;
 }
 
 .auth-page {
-    min-height: 100vh;
+    min-height: 90vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem 1rem;
-    position: relative;
-    /* خلفية الصفحة كاملة بلون عاجي فاتح جداً */
-    background-color: #faf8f5;
+    position: relative;        
+    background-image: url('/images/bgl.jpg');
+        background-size: cover; 
+        background-position: center;
+        background-repeat: no-repeat;
+
     overflow: hidden;
 }
 
@@ -20,12 +23,11 @@
         position: absolute;
         top: 0;
         left: 0;
-        width: 50%;
+        width: 52.5%;
         height: 100%;
-        background-color: #f2ede4; /* درجة فاتحة أغمق قليلاً للتباين */
+
         z-index: 1;
     }
-
 .auth-dots-decor {
     position: absolute;
     top: 40px;
@@ -309,3 +311,22 @@
         margin-right: -1.5em !important;
         margin-left: 0.5rem !important;
     }
+
+@media (max-width: 575.98px) {
+    .auth-page {
+        padding: 1rem 0.75rem;
+    }
+
+    .auth-side-form {
+        padding: 1.75rem 1.25rem !important;
+    }
+
+    .auth-side-image {
+        padding: 1.5rem 1rem;
+    }
+
+    .auth-options {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+}

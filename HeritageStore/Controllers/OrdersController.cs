@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +22,30 @@ namespace HeritageStore.Controllers
             _userManager = userManager;
         }
 
+        // GET: /Orders أو /Order
+        [HttpGet]
+        [Route("Orders")]
+        [Route("Orders/Index")]
+        [Route("Order")]
+        [Route("Order/Index")]
+        public async Task<IActionResult> Index()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            var orders = await _context.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                        .ThenInclude(p => p.ProductImages)
+                .Where(o => o.UserId == userId)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
+
+            return View(orders);
+        }
+
         // GET: /Orders/Checkout
+        [Route("Orders/Checkout")]
+        [Route("Order/Checkout")]
         public async Task<IActionResult> Checkout()
         {
             var userId = _userManager.GetUserId(User);
@@ -39,7 +62,7 @@ namespace HeritageStore.Controllers
 
             if (!availableItems.Any())
             {
-                TempData["Error"] = "السلة ما فيها قطع متاحة للشراء حاليًا.";
+                TempData["Error"] = "لا توجد قطع متاحة للشراء حاليًا.";
                 return RedirectToAction("Index", "Cart");
             }
 
@@ -58,6 +81,8 @@ namespace HeritageStore.Controllers
 
         // POST: /Orders/Checkout
         [HttpPost]
+        [Route("Orders/Checkout")]
+        [Route("Order/Checkout")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Checkout(CheckoutViewModel form)
         {
@@ -108,7 +133,7 @@ namespace HeritageStore.Controllers
 
                 if (string.IsNullOrWhiteSpace(form.CardCvv) || form.CardCvv.Length < 3 || !form.CardCvv.All(char.IsDigit))
                 {
-                    ModelState.AddModelError(nameof(form.CardCvv), "CVV لازم يكون 3 أو 4 أرقام");
+                    ModelState.AddModelError(nameof(form.CardCvv), "رمز الأمان يجب أن يتكون من 3 أو 4 أرقام.");
                 }
             }
 
@@ -125,7 +150,7 @@ namespace HeritageStore.Controllers
 
             if (!availableItems.Any())
             {
-                TempData["Error"] = "كل القطع اللي بسلتك انباعت. رجعي استكشفي قطع تانية.";
+                TempData["Error"] = "القطع الموجودة في سلتك لم تعد متاحة. اكتشفي قطعًا أخرى مميزة من حِكاية.";
                 return RedirectToAction("Index", "Cart");
             }
 
@@ -135,7 +160,7 @@ namespace HeritageStore.Controllers
                 _context.CartItems.RemoveRange(unavailableItems);
                 await _context.SaveChangesAsync();
 
-                TempData["Error"] = $"{unavailableItems.Count} قطعة انباعت من حدا تاني وتم حذفها من سلتك. راجعي السلة وأكملي الطلب.";
+                TempData["Error"] = $"{unavailableItems.Count} قطعة لم تعد متاحة وتم حذفها من سلتك. راجعي السلة وأكملي طلبك.\r\n";
                 return RedirectToAction("Index", "Cart");
             }
 
@@ -171,7 +196,8 @@ namespace HeritageStore.Controllers
                     _context.OrderItems.Add(new OrderItem
                     {
                         OrderId = order.OrderId,
-                        ProductId = item.ProductId
+                        ProductId = item.ProductId,
+                        PriceAtPurchase = (decimal)item.Product!.Price!
                     });
 
                     // القطعة تصير مباعة فورًا، أي حدا تاني عندها بسلته رح تظهر عنده "مباعة"
@@ -188,12 +214,15 @@ namespace HeritageStore.Controllers
             catch
             {
                 await transaction.RollbackAsync();
-                TempData["Error"] = "صار في خطأ أثناء إتمام الطلب. جربي مرة ثانية.";
+                TempData["Error"] = "حدث خطأ أثناء إتمام الطلب. يرجى المحاولة مرة أخرى.";
                 return RedirectToAction("Index", "Cart");
             }
         }
 
         // GET: /Orders/Confirmation/5
+        [HttpGet]
+        [Route("Orders/Confirmation/{id:int}")]
+        [Route("Order/Confirmation/{id:int}")]
         public async Task<IActionResult> Confirmation(int id)
         {
             var userId = _userManager.GetUserId(User);

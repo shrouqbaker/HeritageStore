@@ -1,0 +1,245 @@
+@model HeritageStore.Models.ViewModels.AdminOrdersViewModel
+@{
+    ViewData["Title"] = "معالجة وتتبع الطلبات";
+    Layout = "_AdminLayout";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div>
+        <h1 class="h4 fw-bold mb-1" style="color: var(--maroon);">
+            <i class="bi bi-bag-check me-2"></i> معالجة وتتبع طلبات الشراء
+        </h1>
+    </div>
+</div>
+
+<!-- ==================== تبويبات تصفية حالات الطلب ==================== -->
+<div class="admin-filter-tabs">
+    <a asp-controller="Admin" asp-action="Orders" asp-route-status="all" asp-route-search="@Model.SearchTerm"
+       class="admin-filter-tab @(Model.CurrentStatus == "all" ? "active" : "")">
+        <span>الكل</span>
+        <span class="badge-count">@Model.TotalOrders</span>
+    </a>
+    <a asp-controller="Admin" asp-action="Orders" asp-route-status="pending" asp-route-search="@Model.SearchTerm"
+       class="admin-filter-tab @(Model.CurrentStatus == "pending" ? "active" : "")">
+        <i class="bi bi-clock-history" style="color: var(--gold);"></i>
+        <span>بانتظار التأكيد</span>
+        <span class="badge-count">@Model.PendingOrders</span>
+    </a>
+    <a asp-controller="Admin" asp-action="Orders" asp-route-status="processing" asp-route-search="@Model.SearchTerm"
+       class="admin-filter-tab @(Model.CurrentStatus == "processing" ? "active" : "")">
+        <i class="bi bi-gear" style="color: var(--gold);"></i>
+        <span>قيد التجهيز</span>
+        <span class="badge-count">@Model.ProcessingOrders</span>
+    </a>
+    <a asp-controller="Admin" asp-action="Orders" asp-route-status="shipped" asp-route-search="@Model.SearchTerm"
+       class="admin-filter-tab @(Model.CurrentStatus == "shipped" ? "active" : "")">
+        <i class="bi bi-truck" style="color: var(--green);"></i>
+        <span>تم الشحن</span>
+        <span class="badge-count">@Model.ShippedOrders</span>
+    </a>
+    <a asp-controller="Admin" asp-action="Orders" asp-route-status="delivered" asp-route-search="@Model.SearchTerm"
+       class="admin-filter-tab @(Model.CurrentStatus == "delivered" ? "active" : "")">
+        <i class="bi bi-check2-all" style="color: var(--green);"></i>
+        <span>تم التسليم</span>
+        <span class="badge-count">@Model.DeliveredOrders</span>
+    </a>
+    <a asp-controller="Admin" asp-action="Orders" asp-route-status="cancelled" asp-route-search="@Model.SearchTerm"
+       class="admin-filter-tab @(Model.CurrentStatus == "cancelled" ? "active" : "")">
+        <i class="bi bi-x-circle" style="color: var(--maroon);"></i>
+        <span>ملغي</span>
+        <span class="badge-count">@Model.CancelledOrders</span>
+    </a>
+</div>
+
+<!-- ==================== شريط البحث ==================== -->
+<div class="admin-card mb-4 p-3">
+    <form asp-controller="Admin" asp-action="Orders" method="get" class="row g-2 align-items-center">
+        <input type="hidden" name="status" value="@Model.CurrentStatus" />
+        <div class="col-md-9 col-sm-8">
+            <div class="position-relative">
+                <input type="text" name="search" class="form-control" placeholder="ابحث برقم الطلب، اسم المشتري، أو عنوان الشحن..." value="@Model.SearchTerm" style="border-radius: 10px; padding-inline-start: 2.4rem;" />
+                <i class="bi bi-search position-absolute top-50 translate-middle-y ms-2 text-muted" style="inset-inline-start: 0.5rem;"></i>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-4 d-flex gap-2">
+            <button type="submit" class="btn btn-heritage flex-grow-1" style="border-radius: 10px;">
+                <i class="bi bi-funnel me-1"></i> تصفية
+            </button>
+            @if (!string.IsNullOrEmpty(Model.SearchTerm))
+            {
+                <a asp-controller="Admin" asp-action="Orders" asp-route-status="@Model.CurrentStatus" class="btn btn-outline-secondary" title="إلغاء البحث" style="border-radius: 10px;">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            }
+        </div>
+    </form>
+</div>
+
+<!-- ==================== جدول الطلبات ==================== -->
+<div class="admin-table-card">
+    <div class="admin-table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>رقم الطلب</th>
+                    <th>المشتري وعنوان التوصيل</th>
+                    <th>القطع المطلوبة</th>
+                    <th>المبلغ الإجمالي</th>
+                    <th>طريقة الدفع</th>
+                    <th>الحالة الحالية</th>
+                    <th>تاريخ الطلب</th>
+                    <th class="text-center" style="width: 170px;">تحديث الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Orders.Any())
+                {
+                    foreach (var order in Model.Orders)
+                    {
+                        string pillClass = order.Status switch
+                        {
+                            "delivered" or "completed" => "status-delivered",
+                            "shipped" => "status-shipped",
+                            "processing" => "status-pending",
+                            "cancelled" => "status-cancelled",
+                            _ => "status-pending"
+                        };
+                        string statusText = order.Status switch
+                        {
+                            "delivered" or "completed" => "تم التسليم",
+                            "shipped" => "تم الشحن",
+                            "processing" => "قيد التجهيز",
+                            "cancelled" => "طلب ملغي",
+                            _ => "بانتظار التأكيد"
+                        };
+
+                        <tr>
+                            <!-- رقم الطلب -->
+                            <td>
+                                <strong class="fs-6" style="color: var(--maroon);">#@order.OrderId</strong>
+                            </td>
+
+                            <!-- المشتري -->
+                            <td>
+                                <div class="fw-bold text-dark">@(order.User?.UserName ?? "عميل")</div>
+                                <small class="text-muted text-truncate d-block" style="max-width: 160px;" title="@order.ShippingAddress">
+                                    <i class="bi bi-geo-alt me-1"></i>@order.ShippingAddress
+                                </small>
+                            </td>
+
+                            <!-- القطع -->
+                            <td>
+                                <div class="d-flex align-items-center gap-1">
+                                    @foreach (var item in order.OrderItems.Take(3))
+                                    {
+                                        var pImg = item.Product?.ProductImages?.FirstOrDefault()?.ImageUrl ?? "/images/placeholder.jpg";
+                                        <img src="@pImg" alt="صورة القطعة" class="admin-prod-thumb" style="width: 36px; height: 36px;" title="@(item.Product?.Name ?? "")" />
+                                    }
+                                    @if (order.OrderItems.Count > 3)
+                                    {
+                                        <span class="badge bg-light text-dark border">+@(order.OrderItems.Count - 3)</span>
+                                    }
+                                    <span class="small text-muted ms-1">(@order.OrderItems.Count قطعة)</span>
+                                </div>
+                            </td>
+
+                            <!-- المبلغ -->
+                            <td>
+                                <strong class="fs-6" style="color: var(--maroon);">@order.TotalPrice.ToString("N0") د.أ</strong>
+                                <small class="d-block text-muted">التوصيل: @order.DeliveryCost.ToString("N0") د.أ</small>
+                            </td>
+
+                            <!-- الدفع -->
+                            <td>
+                                <span class="badge bg-light text-dark border px-2 py-1">
+                                    <i class="bi bi-cash-coin me-1" style="color: var(--green);"></i> @order.PaymentMethod
+                                </span>
+                            </td>
+
+                            <!-- الحالة -->
+                            <td>
+                                <span class="status-pill @pillClass">@statusText</span>
+                            </td>
+
+                            <!-- التاريخ -->
+                            <td>
+                                <small class="text-muted">@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                            </td>
+
+                            <!-- المعالجة وتحديث الحالة -->
+                            <td class="text-center">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-heritage btn-sm dropdown-toggle py-1 px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px;">
+                                        تحديث الحالة
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 12px; border: 1px solid var(--border);">
+                                        <li>
+                                            <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@order.OrderId" />
+                                                <input type="hidden" name="newStatus" value="pending" />
+                                                <button type="submit" class="dropdown-item py-2 @(order.Status == "pending" ? "fw-bold text-dark" : "")">
+                                                    <i class="bi bi-clock-history me-2" style="color: var(--gold);"></i> بانتظار التأكيد
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@order.OrderId" />
+                                                <input type="hidden" name="newStatus" value="processing" />
+                                                <button type="submit" class="dropdown-item py-2 @(order.Status == "processing" ? "fw-bold text-dark" : "")">
+                                                    <i class="bi bi-gear me-2" style="color: var(--gold);"></i> قيد التجهيز والمعالجة
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@order.OrderId" />
+                                                <input type="hidden" name="newStatus" value="shipped" />
+                                                <button type="submit" class="dropdown-item py-2 @(order.Status == "shipped" ? "fw-bold text-dark" : "")">
+                                                    <i class="bi bi-truck me-2" style="color: var(--green);"></i> تم الشحن وهو في الطريق
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@order.OrderId" />
+                                                <input type="hidden" name="newStatus" value="delivered" />
+                                                <button type="submit" class="dropdown-item py-2 @(order.Status == "delivered" || order.Status == "completed" ? "fw-bold text-dark" : "")">
+                                                    <i class="bi bi-check2-all me-2" style="color: var(--green);"></i> تم التسليم بنجاح
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post" onsubmit="return confirm('هل أنت متأكد من رغبتك بإلغاء هذا الطلب؟');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@order.OrderId" />
+                                                <input type="hidden" name="newStatus" value="cancelled" />
+                                                <button type="submit" class="dropdown-item py-2 text-danger">
+                                                    <i class="bi bi-x-circle me-2"></i> إلغاء الطلب
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-bag-x fs-1 d-block mb-2 text-secondary"></i>
+                            لا توجد طلبات تطابق الفلتر أو كلمة البحث المحددة.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

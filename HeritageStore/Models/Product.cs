@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HeritageStore.Models
@@ -34,18 +34,17 @@ namespace HeritageStore.Models
         [MaxLength(1000)]
         public string Description { get; set; }
 
-        public string Story { get; set; }
+        public string? Story { get; set; }
 
-        public string HistoricalBackground { get; set; }
+        public string? HistoricalBackground { get; set; }
 
         [MaxLength(150)]
         public string? Occasion { get; set; }
 
         public string? AdditionalInfo { get; set; }
 
-        [Required]
         [MaxLength(250)]
-        public string PickupAddress { get; set; }
+        public string? PickupAddress { get; set; }
 
         [Required]
         [MaxLength(20)]

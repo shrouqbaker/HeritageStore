@@ -1,4 +1,4 @@
-﻿/* ===== Search Bar ===== */
+/* ===== Search Bar ===== */
 
 .search-bar {
     position: relative;
@@ -315,3 +315,39 @@
             .favorite-btn.is-favorited i::before {
                 content: "\f415";
             }
+
+/* =========================================================
+   RESPONSIVE ENHANCEMENTS FOR EXPLORE PAGE
+   ========================================================= */
+@media (max-width: 991.98px) {
+    .filter-sidebar {
+        position: static;
+        margin-bottom: 1.5rem;
+        padding: 1.1rem;
+    }
+
+    .filter-group {
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    .filter-radio {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .explore-header h1 {
+        font-size: 1.65rem;
+    }
+
+    .explore-header .lead-text {
+        font-size: 0.9rem;
+    }
+
+    .search-bar input {
+        font-size: 0.88rem;
+    }
+}
