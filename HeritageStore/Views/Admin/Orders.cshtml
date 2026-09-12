@@ -88,7 +88,7 @@
                     <th>طريقة الدفع</th>
                     <th>الحالة الحالية</th>
                     <th>تاريخ الطلب</th>
-                    <th class="text-center" style="width: 170px;">تحديث الحالة</th>
+                    <th class="text-center" style="min-width: 170px;">الإجراءات والتفاصيل</th>
                 </tr>
             </thead>
             <tbody>
@@ -166,65 +166,70 @@
                                 <small class="text-muted">@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
                             </td>
 
-                            <!-- المعالجة وتحديث الحالة -->
+                            <!-- المعالجة وتحديث الحالة وعرض التفاصيل -->
                             <td class="text-center">
-                                <div class="dropdown">
-                                    <button class="btn btn-outline-heritage btn-sm dropdown-toggle py-1 px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px;">
-                                        تحديث الحالة
+                                <div class="d-inline-flex align-items-center gap-1">
+                                    <!-- زر فتح تفاصيل الطلب -->
+                                    <button type="button" class="btn btn-outline-heritage btn-sm py-1 px-2" data-bs-toggle="modal" data-bs-target="#orderDetailsModal-@order.OrderId" title="عرض تفاصيل الطلب">
+                                        <i class="bi bi-eye"></i>
+                                        <span class="d-none d-lg-inline ms-1">التفاصيل</span>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 12px; border: 1px solid var(--border);">
-                                        <li>
-                                            <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@order.OrderId" />
-                                                <input type="hidden" name="newStatus" value="pending" />
-                                                <button type="submit" class="dropdown-item py-2 @(order.Status == "pending" ? "fw-bold text-dark" : "")">
-                                                    <i class="bi bi-clock-history me-2" style="color: var(--gold);"></i> بانتظار التأكيد
+
+                                    <!-- قائمة الإجراءات -->
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-heritage btn-sm dropdown-toggle py-1 px-2" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="تحديث الحالة">
+                                            الحالة
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                            <li>
+                                                <button type="button" class="dropdown-item py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#orderDetailsModal-@order.OrderId" style="color: var(--maroon);">
+                                                    <i class="bi bi-receipt me-2"></i> عرض تفاصيل الطلب الكاملة
                                                 </button>
-                                            </form>
-                                        </li>
-                                        <li>
-                                            <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@order.OrderId" />
-                                                <input type="hidden" name="newStatus" value="processing" />
-                                                <button type="submit" class="dropdown-item py-2 @(order.Status == "processing" ? "fw-bold text-dark" : "")">
-                                                    <i class="bi bi-gear me-2" style="color: var(--gold);"></i> قيد التجهيز والمعالجة
-                                                </button>
-                                            </form>
-                                        </li>
-                                        <li>
-                                            <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@order.OrderId" />
-                                                <input type="hidden" name="newStatus" value="shipped" />
-                                                <button type="submit" class="dropdown-item py-2 @(order.Status == "shipped" ? "fw-bold text-dark" : "")">
-                                                    <i class="bi bi-truck me-2" style="color: var(--green);"></i> تم الشحن وهو في الطريق
-                                                </button>
-                                            </form>
-                                        </li>
-                                        <li>
-                                            <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@order.OrderId" />
-                                                <input type="hidden" name="newStatus" value="delivered" />
-                                                <button type="submit" class="dropdown-item py-2 @(order.Status == "delivered" || order.Status == "completed" ? "fw-bold text-dark" : "")">
-                                                    <i class="bi bi-check2-all me-2" style="color: var(--green);"></i> تم التسليم بنجاح
-                                                </button>
-                                            </form>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post" onsubmit="return confirm('هل أنت متأكد من رغبتك بإلغاء هذا الطلب؟');">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@order.OrderId" />
-                                                <input type="hidden" name="newStatus" value="cancelled" />
-                                                <button type="submit" class="dropdown-item py-2 text-danger">
-                                                    <i class="bi bi-x-circle me-2"></i> إلغاء الطلب
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post" class="m-0">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@order.OrderId" />
+                                                    <input type="hidden" name="newStatus" value="pending" />
+                                                    <button type="submit" class="dropdown-item py-2 @(order.Status == "pending" ? "fw-bold text-dark" : "")">
+                                                        <i class="bi bi-clock-history me-2" style="color: var(--gold);"></i> بانتظار التأكيد
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post" class="m-0">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@order.OrderId" />
+                                                    <input type="hidden" name="newStatus" value="processing" />
+                                                    <button type="submit" class="dropdown-item py-2 @(order.Status == "processing" ? "fw-bold text-dark" : "")">
+                                                        <i class="bi bi-gear me-2" style="color: var(--gold);"></i> قيد التجهيز والمعالجة
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post" class="m-0">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@order.OrderId" />
+                                                    <input type="hidden" name="newStatus" value="shipped" />
+                                                    <button type="submit" class="dropdown-item py-2 @(order.Status == "shipped" ? "fw-bold text-dark" : "")">
+                                                        <i class="bi bi-truck me-2" style="color: var(--green);"></i> تم الشحن وهو في الطريق
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post" class="m-0">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@order.OrderId" />
+                                                    <input type="hidden" name="newStatus" value="delivered" />
+                                                    <button type="submit" class="dropdown-item py-2 @(order.Status == "delivered" || order.Status == "completed" ? "fw-bold text-dark" : "")">
+                                                        <i class="bi bi-check2-all me-2" style="color: var(--green);"></i> تم التسليم بنجاح
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            
+                                        </ul>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -242,4 +247,361 @@
             </tbody>
         </table>
     </div>
+
+    @if (Model.TotalPages > 1 || Model.FilteredCount > 0)
+    {
+        <div class="admin-table-footer">
+            <div class="admin-pagination-info">
+                @{
+                    int startItem = Model.FilteredCount == 0 ? 0 : (Model.CurrentPage - 1) * Model.PageSize + 1;
+                    int endItem = Math.Min(Model.CurrentPage * Model.PageSize, Model.FilteredCount);
+                }
+                عرض <strong>@startItem</strong> إلى <strong>@endItem</strong> من إجمالي <strong>@Model.FilteredCount</strong> طلب
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <ul class="admin-pagination">
+                    <!-- السابق -->
+                    <li class="admin-page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                        <a class="admin-page-link @(!Model.HasPreviousPage ? "disabled" : "")"
+                           asp-action="Orders"
+                           asp-route-status="@Model.CurrentStatus"
+                           asp-route-search="@Model.SearchTerm"
+                           asp-route-page="@(Model.CurrentPage - 1)"
+                           title="الصفحة السابقة">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                    @for (int p = 1; p <= Model.TotalPages; p++)
+                    {
+                        if (p == 1 || p == Model.TotalPages || (p >= Model.CurrentPage - 2 && p <= Model.CurrentPage + 2))
+                        {
+                            <li class="admin-page-item @(p == Model.CurrentPage ? "active" : "")">
+                                <a class="admin-page-link"
+                                   asp-action="Orders"
+                                   asp-route-status="@Model.CurrentStatus"
+                                   asp-route-search="@Model.SearchTerm"
+                                   asp-route-page="@p">
+                                    @p
+                                </a>
+                            </li>
+                        }
+                        else if (p == Model.CurrentPage - 3 || p == Model.CurrentPage + 3)
+                        {
+                            <li class="admin-page-item disabled">
+                                <span class="admin-page-link disabled">...</span>
+                            </li>
+                        }
+                    }
+
+                    <!-- التالي -->
+                    <li class="admin-page-item @(!Model.HasNextPage ? "disabled" : "")">
+                        <a class="admin-page-link @(!Model.HasNextPage ? "disabled" : "")"
+                           asp-action="Orders"
+                           asp-route-status="@Model.CurrentStatus"
+                           asp-route-search="@Model.SearchTerm"
+                           asp-route-page="@(Model.CurrentPage + 1)"
+                           title="الصفحة التالية">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                </ul>
+            }
+        </div>
+    }
 </div>
+
+<!-- ==================== نوافذ تفاصيل الطلبات ==================== -->
+@if (Model.Orders.Any())
+{
+    foreach (var order in Model.Orders)
+    {
+        string mPillClass = order.Status switch
+        {
+            "delivered" or "completed" => "status-delivered",
+            "shipped" => "status-shipped",
+            "processing" => "status-pending",
+            "cancelled" => "status-cancelled",
+            _ => "status-pending"
+        };
+        string mStatusText = order.Status switch
+        {
+            "delivered" or "completed" => "تم التسليم",
+            "shipped" => "تم الشحن",
+            "processing" => "قيد التجهيز",
+            "cancelled" => "طلب ملغي",
+            _ => "بانتظار التأكيد"
+        };
+        bool isCancelled = order.Status == "cancelled";
+        int stepIndex = order.Status switch
+        {
+            "delivered" or "completed" => 4,
+            "shipped" => 3,
+            "processing" => 2,
+            _ => 1
+        };
+        int progressPercent = stepIndex switch
+        {
+            4 => 100,
+            3 => 66,
+            2 => 33,
+            _ => 0
+        };
+
+        <div class="modal fade" id="orderDetailsModal-@order.OrderId" tabindex="-1" aria-labelledby="orderDetailsModalLabel-@order.OrderId" aria-hidden="true" dir="rtl">
+            <div class="modal-dialog modal-dialog-centered order-modal-dialog">
+                <div class="modal-content order-modal-content">
+                    <!-- رأس النافذة الأنيق -->
+                    <div class="modal-header order-modal-header d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="order-modal-badge-id">
+                                <i class="bi bi-receipt"></i>
+                                <span>#@order.OrderId</span>
+                            </div>
+                            <div>
+                                <h5 class="modal-title fw-bold text-dark m-0" id="orderDetailsModalLabel-@order.OrderId">
+                                    تفاصيل الطلبية
+                                </h5>
+                                <div class="small text-muted d-flex align-items-center gap-2 mt-1">
+                                    <span><i class="bi bi-calendar3 me-1"></i>@order.CreatedAt.ToString("dd/MM/yyyy")</span>
+                                    <span>•</span>
+                                    <span><i class="bi bi-clock me-1"></i>@order.CreatedAt.ToString("HH:mm")</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="status-pill @mPillClass px-3 py-1">@mStatusText</span>
+                            <button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                        </div>
+                    </div>
+
+                    <!-- جسم النافذة -->
+                    <div class="modal-body p-4">
+                        <!-- متتبع مسار الطلب (Stepper) -->
+                        @if (!isCancelled)
+                        {
+                            <div class="order-stepper">
+                                <div class="order-stepper-line">
+                                    <div class="order-stepper-progress" style="width: @(progressPercent)%"></div>
+                                </div>
+                                <div class="order-step @(stepIndex > 1 ? "completed" : (stepIndex == 1 ? "active" : ""))">
+                                    <div class="order-step-icon">
+                                        <i class="bi @(stepIndex > 1 ? "bi-check-lg" : "bi-hourglass-split")"></i>
+                                    </div>
+                                    <span class="order-step-label">بانتظار التأكيد</span>
+                                </div>
+                                <div class="order-step @(stepIndex > 2 ? "completed" : (stepIndex == 2 ? "active" : ""))">
+                                    <div class="order-step-icon">
+                                        <i class="bi @(stepIndex > 2 ? "bi-check-lg" : "bi-gear-wide-connected")"></i>
+                                    </div>
+                                    <span class="order-step-label">قيد التجهيز</span>
+                                </div>
+                                <div class="order-step @(stepIndex > 3 ? "completed" : (stepIndex == 3 ? "active" : ""))">
+                                    <div class="order-step-icon">
+                                        <i class="bi @(stepIndex > 3 ? "bi-check-lg" : "bi-truck")"></i>
+                                    </div>
+                                    <span class="order-step-label">تم الشحن</span>
+                                </div>
+                                <div class="order-step @(stepIndex == 4 ? "completed" : "")">
+                                    <div class="order-step-icon">
+                                        <i class="bi bi-check2-circle"></i>
+                                    </div>
+                                    <span class="order-step-label">تم التسليم</span>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="order-cancelled-banner">
+                                <i class="bi bi-x-circle-fill fs-4"></i>
+                                <div>
+                                    <div class="fw-bold">تم إلغاء هذا الطلب</div>
+                                    <small class="text-muted">تم إيقاف معالجة وشحن هذه الطلبية بناءً على طلب العميل أو الإدارة.</small>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- شبكة بطاقات المعلومات (3 أعمدة) -->
+                        <div class="row g-3 mb-4">
+                            <!-- بطاقة العميل -->
+                            <div class="col-md-4">
+                                <div class="order-info-card">
+                                    <div class="order-info-header">
+                                        <i class="bi bi-person-fill fs-5"></i>
+                                        <span>بيانات المشتري</span>
+                                    </div>
+                                    <div class="order-info-row">
+                                        <span class="order-info-label">الاسم:</span>
+                                        <span class="order-info-value">@(order.User?.UserName ?? "عميل زائر")</span>
+                                    </div>
+                                    <div class="order-info-row">
+                                        <span class="order-info-label">البريد:</span>
+                                        <span class="order-info-value small text-truncate" style="max-width: 140px; direction: ltr;" title="@(order.User?.Email ?? "-")">
+                                            @(order.User?.Email ?? "غير متوفر")
+                                        </span>
+                                    </div>
+                                    <div class="order-info-row">
+                                        <span class="order-info-label">الهاتف:</span>
+                                        <span class="order-info-value" style="direction: ltr;">
+                                            @(string.IsNullOrEmpty(order.User?.PhoneNumber) ? "غير مسجل" : order.User.PhoneNumber)
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- بطاقة الشحن والتوصيل -->
+                            <div class="col-md-4">
+                                <div class="order-info-card">
+                                    <div class="order-info-header">
+                                        <i class="bi bi-geo-alt-fill fs-5"></i>
+                                        <span>بيانات الشحن</span>
+                                    </div>
+                                    <div class="order-info-row">
+                                        <span class="order-info-label">تكلفة التوصيل:</span>
+                                        <span class="order-info-value text-success">@order.DeliveryCost.ToString("N0") د.أ</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="order-info-label d-block mb-1">عنوان الاستلام:</span>
+                                        <div class="p-2 rounded border bg-white small text-dark fw-semibold" style="line-height: 1.4;">
+                                            <i class="bi bi-pin-map text-danger me-1"></i>
+                                            @order.ShippingAddress
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- بطاقة الدفع ومعلومات الطلب -->
+                            <div class="col-md-4">
+                                <div class="order-info-card">
+                                    <div class="order-info-header">
+                                        <i class="bi bi-credit-card-2-front-fill fs-5"></i>
+                                        <span>طريقة الدفع والحساب</span>
+                                    </div>
+                                    <div class="order-info-row">
+                                        <span class="order-info-label">طريقة الدفع:</span>
+                                        <span class="badge bg-white text-dark border px-2 py-1">
+                                            <i class="bi bi-cash-coin me-1" style="color: var(--green);"></i>
+                                            @order.PaymentMethod
+                                        </span>
+                                    </div>
+                                    <div class="order-info-row">
+                                        <span class="order-info-label">عدد القطع:</span>
+                                        <span class="order-info-value">@order.OrderItems.Count قطعة</span>
+                                    </div>
+                                    <div class="order-info-row">
+                                        <span class="order-info-label">تاريخ الإنشاء:</span>
+                                        <span class="order-info-value small">@order.CreatedAt.ToString("yyyy/MM/dd")</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- جدول القطع المطلوبة -->
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h6 class="fw-bold m-0 d-flex align-items-center gap-2" style="color: var(--ink);">
+                                <i class="bi bi-boxes" style="color: var(--gold);"></i>
+                                <span>القطع المطلوبة في الطلبية (@order.OrderItems.Count)</span>
+                            </h6>
+                        </div>
+
+                        <div class="order-items-table-box table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 70px;">القطعة</th>
+                                        <th>اسم التحفة والتفاصيل</th>
+                                        <th class="text-center">سعر الشراء</th>
+                                        <th class="text-center" style="width: 80px;">معاينة</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in order.OrderItems)
+                                    {
+                                        var mainImg = item.Product?.ProductImages?.FirstOrDefault()?.ImageUrl ?? "/images/placeholder.jpg";
+                                        <tr>
+                                            <td>
+                                                <img src="@mainImg" alt="@(item.Product?.Name ?? "")" class="order-item-img" />
+                                            </td>
+                                            <td>
+                                                <strong class="text-dark d-block">@(item.Product?.Name ?? "قطعة غير معروفة")</strong>
+                                                <small class="text-muted">رقم القطعة: #@item.ProductId</small>
+                                            </td>
+                                            <td class="text-center">
+                                                <strong style="color: var(--maroon); font-size: 0.95rem;">@item.PriceAtPurchase.ToString("N0") د.أ</strong>
+                                            </td>
+                                            <td class="text-center">
+                                                @if (item.Product != null)
+                                                {
+                                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@item.ProductId" target="_blank" class="btn btn-sm btn-outline-secondary py-1 px-2" title="فتح صفحة القطعة بالمتجر">
+                                                        <i class="bi bi-box-arrow-up-right"></i>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- ملخص الحساب المالي -->
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-2">
+                            <div class="text-muted small">
+                                <i class="bi bi-info-circle me-1" style="color: var(--gold);"></i> جميع الأسعار تشمل ضريبة المبيعات المقررة قانونياً ورسوم المعالجة.
+                            </div>
+                            <div class="order-summary-box">
+                                <div class="order-summary-line">
+                                    <span>مجموع القطع (@order.OrderItems.Count):</span>
+                                    <strong class="text-dark">@((order.TotalPrice - order.DeliveryCost).ToString("N0")) د.أ</strong>
+                                </div>
+                                <div class="order-summary-line">
+                                    <span>رسوم الشحن والتوصيل:</span>
+                                    <strong class="text-dark">@order.DeliveryCost.ToString("N0") د.أ</strong>
+                                </div>
+                                <div class="order-summary-total">
+                                    <span>المجموع الإجمالي:</span>
+                                    <span>@order.TotalPrice.ToString("N0") د.أ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- شريط الإجراءات والتحكم السفلي -->
+                    <div class="order-modal-footer-bar">
+                        <form asp-controller="Admin" asp-action="UpdateOrderStatus" method="post" class="d-flex align-items-center gap-2 flex-wrap m-0">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@order.OrderId" />
+                            <label class="small fw-bold text-dark text-nowrap d-flex align-items-center gap-1">
+                                <i class="bi bi-arrow-repeat" style="color: var(--maroon);"></i>
+                                <span>تغيير حالة الطلب:</span>
+                            </label>
+                            <select name="newStatus" class="form-select form-select-sm" style="border-radius: 8px; width: 190px; border-color: var(--border);">
+                                <option value="pending" selected="@(order.Status == "pending")">بانتظار التأكيد</option>
+                                <option value="processing" selected="@(order.Status == "processing")">قيد التجهيز والمعالجة</option>
+                                <option value="shipped" selected="@(order.Status == "shipped")">تم الشحن وهو في الطريق</option>
+                                <option value="delivered" selected="@(order.Status == "delivered" || order.Status == "completed")">تم التسليم بنجاح</option>
+                                <option value="cancelled" selected="@(order.Status == "cancelled")">إلغاء الطلب</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-heritage" style="border-radius: 8px;">
+                                <i class="bi bi-check2 me-1"></i> حفظ الحالة
+                            </button>
+                        </form>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-heritage" onclick="window.print()" title="طباعة الفاتورة">
+                                <i class="bi bi-printer me-1"></i> طباعة الفاتورة
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px; padding: 0.35rem 1.25rem;">
+                                إغلاق
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

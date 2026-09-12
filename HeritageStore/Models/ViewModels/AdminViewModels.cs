@@ -47,6 +47,14 @@ namespace HeritageStore.Models.ViewModels
         public int RejectedCount { get; set; }
         public int SoldCount { get; set; }
         public int PendingCount { get; set; }
+
+        // Pagination
+        public int CurrentPage { get; set; } = 1;
+        public int TotalPages { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+        public int FilteredCount { get; set; }
+        public bool HasPreviousPage => CurrentPage > 1;
+        public bool HasNextPage => CurrentPage < TotalPages;
     }
 
     public class AdminCategoriesViewModel
@@ -74,6 +82,14 @@ namespace HeritageStore.Models.ViewModels
         public List<AdminUserDetailsViewModel> Users { get; set; } = new();
         public string? SearchTerm { get; set; }
         public int TotalUsers { get; set; }
+
+        // Pagination
+        public int CurrentPage { get; set; } = 1;
+        public int TotalPages { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+        public int FilteredCount { get; set; }
+        public bool HasPreviousPage => CurrentPage > 1;
+        public bool HasNextPage => CurrentPage < TotalPages;
     }
 
     public class AdminUserDetailsViewModel
@@ -102,5 +118,13 @@ namespace HeritageStore.Models.ViewModels
         public int ShippedOrders { get; set; }
         public int DeliveredOrders { get; set; }
         public int CancelledOrders { get; set; }
+
+        // Pagination
+        public int CurrentPage { get; set; } = 1;
+        public int TotalPages { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+        public int FilteredCount { get; set; }
+        public bool HasPreviousPage => CurrentPage > 1;
+        public bool HasNextPage => CurrentPage < TotalPages;
     }
 }

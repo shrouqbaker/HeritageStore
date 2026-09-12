@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 using HeritageStore.Data;
 using HeritageStore.Models;
 
@@ -28,6 +29,7 @@ public class RegisterModel : PageModel
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IUserStore<ApplicationUser> _userStore;
     private readonly IUserEmailStore<ApplicationUser> _emailStore;
+    private readonly ApplicationDbContext _context;
     private readonly ILogger<RegisterModel> _logger;
     private readonly IEmailSender _emailSender;
 
@@ -35,6 +37,7 @@ public class RegisterModel : PageModel
         UserManager<ApplicationUser> userManager,
         IUserStore<ApplicationUser> userStore,
         SignInManager<ApplicationUser> signInManager,
+        ApplicationDbContext context,
         ILogger<RegisterModel> logger,
         IEmailSender emailSender)
     {
@@ -42,9 +45,16 @@ public class RegisterModel : PageModel
         _userStore = userStore;
         _emailStore = GetEmailStore();
         _signInManager = signInManager;
+        _context = context;
         _logger = logger;
         _emailSender = emailSender;
     }
+
+    [BindProperty]
+    public string? GuestCartJson { get; set; }
+
+    [BindProperty]
+    public string? GuestFavsJson { get; set; }
 
     /// <summary>
     ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -112,13 +122,16 @@ public class RegisterModel : PageModel
 
     public async Task OnGetAsync(string? returnUrl = null)
     {
+        returnUrl = returnUrl ?? Request.Query["ReturnUrl"].FirstOrDefault() ?? Request.Query["returnUrl"].FirstOrDefault() ?? Url.Content("~/");
         ReturnUrl = returnUrl;
         ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
     }
 
     public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
     {
-        returnUrl ??= Url.Content("~/");
+        returnUrl = returnUrl ?? Request.Form["returnUrl"].FirstOrDefault() ?? Request.Query["ReturnUrl"].FirstOrDefault() ?? Request.Query["returnUrl"].FirstOrDefault() ?? Url.Content("~/");
+        ReturnUrl = returnUrl;
+
         ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         if (ModelState.IsValid)
         {
@@ -147,7 +160,15 @@ public class RegisterModel : PageModel
                 await _userManager.AddToRoleAsync(user, "User");
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                return LocalRedirect(returnUrl);
+
+                // دمج عناصر السلة والمفضلة المخزنة في جهاز الزائر مباشرة
+                await MergeGuestDataAsync(user.Id);
+
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                {
+                    return LocalRedirect(returnUrl);
+                }
+                return LocalRedirect("~/");
             }
             foreach (var error in result.Errors)
             {
@@ -157,6 +178,89 @@ public class RegisterModel : PageModel
 
         // If we got this far, something failed, redisplay form
         return Page();
+    }
+
+    private async Task MergeGuestDataAsync(string userId)
+    {
+        // دمج عناصر السلة
+        if (!string.IsNullOrWhiteSpace(GuestCartJson))
+        {
+            try
+            {
+                var productIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(GuestCartJson);
+                if (productIds != null && productIds.Any())
+                {
+                    var existingIds = await _context.CartItems
+                        .Where(c => c.UserId == userId)
+                        .Select(c => c.ProductId)
+                        .ToListAsync();
+
+                    var newIds = productIds.Distinct().Where(id => !existingIds.Contains(id)).ToList();
+                    if (newIds.Any())
+                    {
+                        var validProducts = await _context.Products
+                            .Where(p => newIds.Contains(p.ProductId) && p.ListingType == "for_sale" && p.Status == "approved")
+                            .Select(p => p.ProductId)
+                            .ToListAsync();
+
+                        foreach (var pid in validProducts)
+                        {
+                            _context.CartItems.Add(new CartItem
+                            {
+                                UserId = userId,
+                                ProductId = pid,
+                                AddedAt = DateTime.Now
+                            });
+                        }
+                        await _context.SaveChangesAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error merging guest cart on register");
+            }
+        }
+
+        // دمج عناصر المفضلة
+        if (!string.IsNullOrWhiteSpace(GuestFavsJson))
+        {
+            try
+            {
+                var favIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(GuestFavsJson);
+                if (favIds != null && favIds.Any())
+                {
+                    var existingFavs = await _context.Favorites
+                        .Where(f => f.UserId == userId)
+                        .Select(f => f.ProductId)
+                        .ToListAsync();
+
+                    var newFavIds = favIds.Distinct().Where(id => !existingFavs.Contains(id)).ToList();
+                    if (newFavIds.Any())
+                    {
+                        var validFavProducts = await _context.Products
+                            .Where(p => newFavIds.Contains(p.ProductId))
+                            .Select(p => p.ProductId)
+                            .ToListAsync();
+
+                        foreach (var pid in validFavProducts)
+                        {
+                            _context.Favorites.Add(new Favorite
+                            {
+                                UserId = userId,
+                                ProductId = pid,
+                                CreatedAt = DateTime.Now
+                            });
+                        }
+                        await _context.SaveChangesAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error merging guest favorites on register");
+            }
+        }
     }
 
     private ApplicationUser CreateUser()

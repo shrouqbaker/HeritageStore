@@ -122,22 +122,25 @@ namespace HeritageStore.Controllers
         }
 
         // GET: /Admin/Products (Product Control)
-        public async Task<IActionResult> Products(string status = "all", string? search = null)
+        public async Task<IActionResult> Products(string status = "all", string? search = null, int page = 1)
         {
+            const int pageSize = 10;
+            if (page < 1) page = 1;
+
+            var baseQuery = _context.Products.AsNoTracking();
+
+            int totalCount = await baseQuery.CountAsync();
+            int approvedCount = await baseQuery.CountAsync(p => p.Status == "approved");
+            int rejectedCount = await baseQuery.CountAsync(p => p.Status == "rejected");
+            int soldCount = await baseQuery.CountAsync(p => p.Status == "sold");
+            int pendingCount = await baseQuery.CountAsync(p => p.Status == "pending");
+
             var query = _context.Products
                 .Include(p => p.User)
                 .Include(p => p.Category)
                 .Include(p => p.EmbroideryType)
                 .Include(p => p.ProductImages)
                 .AsQueryable();
-
-            var allProducts = await query.ToListAsync();
-
-            int totalCount = allProducts.Count;
-            int approvedCount = allProducts.Count(p => p.Status == "approved");
-            int rejectedCount = allProducts.Count(p => p.Status == "rejected");
-            int soldCount = allProducts.Count(p => p.Status == "sold");
-            int pendingCount = allProducts.Count(p => p.Status == "pending");
 
             if (!string.IsNullOrEmpty(status) && status != "all")
             {
@@ -152,18 +155,30 @@ namespace HeritageStore.Controllers
                                          (p.Category != null && p.Category.Name.Contains(search)));
             }
 
-            var filteredProducts = await query.OrderByDescending(p => p.CreatedAt).ToListAsync();
+            int filteredCount = await query.CountAsync();
+            int totalPages = Math.Max(1, (int)Math.Ceiling(filteredCount / (double)pageSize));
+            if (page > totalPages) page = totalPages;
+
+            var pagedProducts = await query
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
             var vm = new AdminProductsViewModel
             {
-                Products = filteredProducts,
+                Products = pagedProducts,
                 CurrentStatus = status,
                 SearchTerm = search,
                 TotalCount = totalCount,
                 ApprovedCount = approvedCount,
                 RejectedCount = rejectedCount,
                 SoldCount = soldCount,
-                PendingCount = pendingCount
+                PendingCount = pendingCount,
+                CurrentPage = page,
+                TotalPages = totalPages,
+                PageSize = pageSize,
+                FilteredCount = filteredCount
             };
 
             return View(vm);
@@ -439,8 +454,13 @@ namespace HeritageStore.Controllers
         }
 
         // GET: /Admin/Users (View Users - Read Only)
-        public async Task<IActionResult> Users(string? search = null)
+        public async Task<IActionResult> Users(string? search = null, int page = 1)
         {
+            const int pageSize = 10;
+            if (page < 1) page = 1;
+
+            int totalUsers = await _userManager.Users.CountAsync();
+
             var usersQuery = _userManager.Users.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
@@ -452,11 +472,19 @@ namespace HeritageStore.Controllers
                     (u.PhoneNumber != null && u.PhoneNumber.Contains(search)));
             }
 
-            var usersList = await usersQuery.OrderByDescending(u => u.CreatedAt).ToListAsync();
+            int filteredCount = await usersQuery.CountAsync();
+            int totalPages = Math.Max(1, (int)Math.Ceiling(filteredCount / (double)pageSize));
+            if (page > totalPages) page = totalPages;
 
-            var userIds = usersList.Select(u => u.Id).ToList();
+            var pagedUsers = await usersQuery
+                .OrderByDescending(u => u.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
-            // حساب عدد المنتجات والطلبات لكل مستخدم بكفاءة
+            var userIds = pagedUsers.Select(u => u.Id).ToList();
+
+            // حساب عدد المنتجات والطلبات بكفاءة لمستخدمي الصفحة الحالية فقط
             var productsCountMap = await _context.Products
                 .Where(p => userIds.Contains(p.UserId))
                 .GroupBy(p => p.UserId)
@@ -471,7 +499,7 @@ namespace HeritageStore.Controllers
 
             var detailedUsers = new List<AdminUserDetailsViewModel>();
 
-            foreach (var u in usersList)
+            foreach (var u in pagedUsers)
             {
                 var isUserAdmin = await _userManager.IsInRoleAsync(u, "Admin");
                 detailedUsers.Add(new AdminUserDetailsViewModel
@@ -494,30 +522,37 @@ namespace HeritageStore.Controllers
             {
                 Users = detailedUsers,
                 SearchTerm = search,
-                TotalUsers = detailedUsers.Count
+                TotalUsers = totalUsers,
+                CurrentPage = page,
+                TotalPages = totalPages,
+                PageSize = pageSize,
+                FilteredCount = filteredCount
             };
 
             return View(vm);
         }
 
         // GET: /Admin/Orders (Processing Orders)
-        public async Task<IActionResult> Orders(string status = "all", string? search = null)
+        public async Task<IActionResult> Orders(string status = "all", string? search = null, int page = 1)
         {
+            const int pageSize = 10;
+            if (page < 1) page = 1;
+
+            var baseOrders = _context.Orders.AsNoTracking();
+
+            int totalOrders = await baseOrders.CountAsync();
+            int pendingOrders = await baseOrders.CountAsync(o => o.Status == "pending");
+            int processingOrders = await baseOrders.CountAsync(o => o.Status == "processing");
+            int shippedOrders = await baseOrders.CountAsync(o => o.Status == "shipped");
+            int deliveredOrders = await baseOrders.CountAsync(o => o.Status == "delivered" || o.Status == "completed");
+            int cancelledOrders = await baseOrders.CountAsync(o => o.Status == "cancelled");
+
             var query = _context.Orders
                 .Include(o => o.User)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
                         .ThenInclude(p => p.ProductImages)
                 .AsQueryable();
-
-            var allOrders = await query.ToListAsync();
-
-            int totalOrders = allOrders.Count;
-            int pendingOrders = allOrders.Count(o => o.Status == "pending");
-            int processingOrders = allOrders.Count(o => o.Status == "processing");
-            int shippedOrders = allOrders.Count(o => o.Status == "shipped");
-            int deliveredOrders = allOrders.Count(o => o.Status == "delivered" || o.Status == "completed");
-            int cancelledOrders = allOrders.Count(o => o.Status == "cancelled");
 
             if (!string.IsNullOrEmpty(status) && status != "all")
             {
@@ -540,11 +575,19 @@ namespace HeritageStore.Controllers
                     (o.User != null && (o.User.UserName!.Contains(search) || o.User.Email!.Contains(search))));
             }
 
-            var filteredOrders = await query.OrderByDescending(o => o.CreatedAt).ToListAsync();
+            int filteredCount = await query.CountAsync();
+            int totalPages = Math.Max(1, (int)Math.Ceiling(filteredCount / (double)pageSize));
+            if (page > totalPages) page = totalPages;
+
+            var pagedOrders = await query
+                .OrderByDescending(o => o.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
             var vm = new AdminOrdersViewModel
             {
-                Orders = filteredOrders,
+                Orders = pagedOrders,
                 CurrentStatus = status,
                 SearchTerm = search,
                 TotalOrders = totalOrders,
@@ -552,7 +595,11 @@ namespace HeritageStore.Controllers
                 ProcessingOrders = processingOrders,
                 ShippedOrders = shippedOrders,
                 DeliveredOrders = deliveredOrders,
-                CancelledOrders = cancelledOrders
+                CancelledOrders = cancelledOrders,
+                CurrentPage = page,
+                TotalPages = totalPages,
+                PageSize = pageSize,
+                FilteredCount = filteredCount
             };
 
             return View(vm);

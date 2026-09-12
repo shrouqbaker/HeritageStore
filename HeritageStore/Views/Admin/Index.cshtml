@@ -194,12 +194,13 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="dropdown">
-                                            <button class="btn btn-outline-heritage btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px; font-size: 0.8rem; padding: 0.3rem 0.65rem;">
-                                                إجراء
+                                            <button class="btn btn-outline-heritage btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" style="border-radius: 8px; font-size: 0.8rem; padding: 0.3rem 0.65rem;">
+                                                الإجراءات
                                             </button>
-                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 12px; border: 1px solid var(--border);">
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                                                 <li>
-                                                    <form asp-controller="Admin" asp-action="UpdateProductStatus" method="post">
+                                                    <form asp-controller="Admin" asp-action="UpdateProductStatus" method="post" class="m-0">
+                                                        @Html.AntiForgeryToken()
                                                         <input type="hidden" name="id" value="@p.ProductId" />
                                                         <input type="hidden" name="status" value="approved" />
                                                         <button type="submit" class="dropdown-item py-2" style="color: var(--green);">
@@ -209,7 +210,7 @@
                                                 </li>
                                                 <li>
                                                     <a asp-controller="Product" asp-action="Details" asp-route-id="@p.ProductId" target="_blank" class="dropdown-item py-2">
-                                                        <i class="bi bi-eye me-2"></i> معاينة التفاصيل
+                                                        <i class="bi bi-eye me-2" style="color: var(--ink);"></i> معاينة التفاصيل
                                                     </a>
                                                 </li>
                                             </ul>

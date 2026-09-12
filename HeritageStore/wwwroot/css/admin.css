@@ -624,13 +624,21 @@ body.admin-body {
     background: #FFFFFF;
     border: 1px solid var(--border);
     border-radius: 16px;
-    overflow: hidden;
     box-shadow: var(--admin-card-shadow);
     margin-bottom: 1.75rem;
+    position: relative;
+    /* Allow dropdown menus to overflow without clipping */
+    overflow: visible;
 }
 
 .admin-table-responsive {
     overflow-x: auto;
+    border-radius: 16px 16px 0 0;
+}
+
+.admin-table-card:has(.admin-table-footer) .admin-table-responsive {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .admin-table {
@@ -638,6 +646,14 @@ body.admin-body {
     margin-bottom: 0;
     border-collapse: separate;
     border-spacing: 0;
+}
+
+.admin-table thead tr:first-child th:first-child {
+    border-top-right-radius: 15px;
+}
+
+.admin-table thead tr:first-child th:last-child {
+    border-top-left-radius: 15px;
 }
 
 .admin-table th {
@@ -664,6 +680,184 @@ body.admin-body {
 
 .admin-table tbody tr:last-child td {
     border-bottom: none;
+}
+
+/* ==================== Admin Table Action Dropdown ==================== */
+.admin-table .dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.admin-table .dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.38rem 0.85rem;
+    background-color: #FFFFFF;
+    border: 1px solid var(--border);
+    color: var(--ink);
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(43, 36, 32, 0.04);
+    white-space: nowrap;
+}
+
+.admin-table .dropdown-toggle:hover,
+.admin-table .dropdown-toggle:focus,
+.admin-table .dropdown-toggle[aria-expanded="true"] {
+    background-color: var(--maroon);
+    border-color: var(--maroon);
+    color: #FFFFFF !important;
+    box-shadow: 0 3px 8px rgba(122, 31, 43, 0.2);
+}
+
+.admin-table .dropdown-toggle::after {
+    margin-right: 0.35rem;
+    margin-left: 0;
+    vertical-align: 0.15em;
+    transition: transform 0.2s ease;
+}
+
+.admin-table .dropdown-toggle[aria-expanded="true"]::after {
+    transform: rotate(180deg);
+}
+
+/* High-contrast, clean elevated dropdown menu */
+.admin-table .dropdown-menu,
+.admin-actions-menu {
+    border-radius: 12px !important;
+    border: 1px solid rgba(122, 31, 43, 0.18) !important;
+    background-color: #FFFFFF !important;
+    box-shadow: 0 12px 32px rgba(43, 36, 32, 0.2), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    padding: 0.5rem !important;
+    min-width: 220px !important;
+    z-index: 1080 !important;
+}
+
+.admin-table .dropdown-item,
+.admin-actions-menu .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.86rem;
+    font-weight: 500;
+    color: var(--ink);
+    padding: 0.55rem 0.85rem;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: right;
+    cursor: pointer;
+}
+
+.admin-table .dropdown-item:hover,
+.admin-table .dropdown-item:focus,
+.admin-actions-menu .dropdown-item:hover,
+.admin-actions-menu .dropdown-item:focus {
+    background-color: #F8F3EA !important;
+    color: var(--maroon) !important;
+}
+
+.admin-table .dropdown-item i,
+.admin-actions-menu .dropdown-item i {
+    font-size: 1rem;
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+}
+
+.admin-table .dropdown-divider,
+.admin-actions-menu .dropdown-divider {
+    margin: 0.35rem 0;
+    border-top: 1px solid var(--border);
+    opacity: 0.8;
+}
+
+/* ==================== Admin Pagination Styles ==================== */
+.admin-table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.25rem;
+    background-color: #FAF7F2;
+    border-top: 1px solid var(--border);
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.admin-pagination-info {
+    font-size: 0.85rem;
+    color: #6C5F57;
+    font-weight: 500;
+    margin: 0;
+}
+
+.admin-pagination-info strong {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.admin-pagination {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.admin-page-item {
+    margin: 0;
+}
+
+.admin-page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 0.65rem;
+    border-radius: 8px;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    color: var(--ink);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.admin-page-link:hover:not(.disabled) {
+    background-color: #F4ECE1;
+    border-color: var(--maroon);
+    color: var(--maroon);
+}
+
+.admin-page-item.active .admin-page-link {
+    background-color: var(--maroon);
+    border-color: var(--maroon);
+    color: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(122, 31, 43, 0.25);
+}
+
+.admin-page-link.disabled,
+.admin-page-item.disabled .admin-page-link {
+    background-color: #F8F5F0;
+    color: #BDB3A7;
+    border-color: #EAE3D8;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.admin-page-link i {
+    font-size: 0.95rem;
 }
 
 /* Status Pills (Strictly site.css palette) */
@@ -798,7 +992,293 @@ body.admin-body {
     border: 1.5px solid var(--gold);
 }
 
-/* Responsive */
+/* ==================== Order Details Modal (Luxury Heritage Theme) ==================== */
+.order-modal-dialog {
+    max-width: 860px;
+}
+
+.order-modal-content {
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(43, 36, 32, 0.22);
+    overflow: hidden;
+    background: #FFFFFF;
+}
+
+.order-modal-header {
+    background: linear-gradient(135deg, #FAF6EF 0%, #F5EFEB 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 1.75rem;
+}
+
+.order-modal-badge-id {
+    background: var(--maroon);
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 0.92rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* Order Stepper / Status Tracker */
+.order-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    padding: 1.25rem 1rem;
+    background: #FAF7F2;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+}
+
+.order-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    text-align: center;
+}
+
+.order-step-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border: 2px solid #D8CFC4;
+    color: #9C8F84;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.order-step-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #7A6F67;
+    white-space: nowrap;
+}
+
+.order-step.completed .order-step-icon {
+    background: var(--green);
+    border-color: var(--green);
+    color: #FFFFFF;
+}
+
+.order-step.completed .order-step-label {
+    color: var(--green);
+    font-weight: 700;
+}
+
+.order-step.active .order-step-icon {
+    background: var(--maroon);
+    border-color: var(--maroon);
+    color: #FFFFFF;
+    box-shadow: 0 0 0 4px rgba(122, 31, 43, 0.15);
+}
+
+.order-step.active .order-step-label {
+    color: var(--maroon);
+    font-weight: 700;
+}
+
+.order-stepper-line {
+    position: absolute;
+    top: 31px;
+    right: 12%;
+    left: 12%;
+    height: 3px;
+    background: #E5DDD3;
+    z-index: 1;
+}
+
+.order-stepper-progress {
+    height: 100%;
+    background: linear-gradient(90deg, var(--maroon) 0%, var(--green) 100%);
+    transition: width 0.4s ease;
+}
+
+/* Cancelled Alert Banner */
+.order-cancelled-banner {
+    background: rgba(122, 31, 43, 0.08);
+    border: 1px solid rgba(122, 31, 43, 0.25);
+    border-radius: 12px;
+    padding: 0.9rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--maroon);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+/* Info Cards */
+.order-info-card {
+    background: #FAF7F2;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.15rem;
+    height: 100%;
+    box-shadow: 0 2px 8px rgba(43, 36, 32, 0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.order-info-card:hover {
+    box-shadow: 0 4px 14px rgba(43, 36, 32, 0.06);
+}
+
+.order-info-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--maroon);
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid #EAE1D6;
+    margin-bottom: 0.85rem;
+}
+
+.order-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.84rem;
+    margin-bottom: 0.5rem;
+}
+
+.order-info-row:last-child {
+    margin-bottom: 0;
+}
+
+.order-info-label {
+    color: #6C5F57;
+    font-weight: 500;
+}
+
+.order-info-value {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+/* Items List in Modal */
+.order-items-table-box {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.order-items-table-box table {
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 0.88rem;
+}
+
+.order-items-table-box th {
+    background: #FAF6EF;
+    color: var(--ink);
+    font-weight: 700;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+}
+
+.order-items-table-box td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #F2ECE4;
+    vertical-align: middle;
+}
+
+.order-items-table-box tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.order-item-img {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1.5px solid var(--border);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Invoice Summary Card */
+.order-summary-box {
+    background: #FAF7F2;
+    border: 1.5px dashed #D8CFC4;
+    border-radius: 14px;
+    padding: 1.25rem;
+    min-width: 290px;
+}
+
+.order-summary-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 0.45rem;
+    color: #6C5F57;
+}
+
+.order-summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--maroon);
+    border-top: 1px solid #E0D6CB;
+    padding-top: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+/* Modal Footer Form */
+.order-modal-footer-bar {
+    background: #FAF6EF;
+    border-top: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    border-radius: 0 0 20px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* ==================== Responsive Rules ==================== */
+
+/* Custom smooth horizontal scrollbar for responsive tables */
+.admin-table-responsive {
+    -webkit-overflow-scrolling: touch;
+}
+
+.admin-table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+
+.admin-table-responsive::-webkit-scrollbar-track {
+    background: #F4EFEA;
+    border-radius: 10px;
+}
+
+.admin-table-responsive::-webkit-scrollbar-thumb {
+    background: #D8CFC4;
+    border-radius: 10px;
+}
+
+.admin-table-responsive::-webkit-scrollbar-thumb:hover {
+    background: var(--maroon);
+}
+
 @media (max-width: 1200px) {
     .admin-overview-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -829,7 +1309,7 @@ body.admin-body {
     display: block;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
     .admin-sidebar {
         position: fixed;
         right: 0;
@@ -856,32 +1336,188 @@ body.admin-body {
     .widget-trend-box {
         grid-column: span 12;
     }
+
+    /* Filter Tabs Scrollable horizontally on small screens */
+    .admin-filter-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 0.4rem;
+        -webkit-overflow-scrolling: touch;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+    }
+
+    .admin-filter-tab {
+        white-space: nowrap;
+        flex-shrink: 0;
+        padding: 0.45rem 0.9rem;
+        font-size: 0.82rem;
+    }
+
+    /* Table adjustments */
+    .admin-table th {
+        padding: 0.75rem 0.85rem;
+        font-size: 0.82rem;
+        white-space: nowrap;
+    }
+
+    .admin-table td {
+        padding: 0.75rem 0.85rem;
+        font-size: 0.84rem;
+    }
+
+    .admin-table .dropdown-toggle {
+        padding: 0.32rem 0.65rem;
+        font-size: 0.78rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .admin-table-card {
+        border-radius: 12px;
+        margin-bottom: 1.25rem;
+    }
+
+    .admin-table th {
+        padding: 0.65rem 0.75rem;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    .admin-table td {
+        padding: 0.65rem 0.75rem;
+        font-size: 0.82rem;
+    }
+
+    .admin-prod-thumb {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+    }
+
+    .admin-user-avatar,
+    .admin-user-avatar-placeholder {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    /* Stack pagination footer on mobile */
+    .admin-table-footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 0.85rem 1rem;
+        gap: 0.75rem;
+    }
+
+    .admin-pagination-info {
+        font-size: 0.82rem;
+        text-align: center;
+        width: 100%;
+    }
+
+    .admin-pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.25rem;
+    }
+
+    .admin-page-link {
+        min-width: 32px;
+        height: 32px;
+        padding: 0 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .status-pill {
+        padding: 0.22rem 0.55rem;
+        font-size: 0.74rem;
+        white-space: nowrap;
+    }
+
+    .admin-section-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.85rem;
+    }
 }
 
 @media (max-width: 575.98px) {
     .admin-main {
-        padding: 0.9rem 0.75rem !important;
+        padding: 0.85rem 0.6rem !important;
     }
+
     .admin-overview-grid {
         grid-template-columns: 1fr;
     }
+
     .admin-topbar {
-        gap: 0.85rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
         padding-bottom: 1rem;
         margin-bottom: 1.25rem;
     }
+
     .admin-greeting h2 {
         font-size: 1.25rem;
     }
+
+    .admin-topbar-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .admin-search-wrapper {
+        width: 100%;
+        min-width: 100%;
+    }
+
     .btn-view-store {
         font-size: 0.8rem;
         padding: 0.4rem 0.85rem;
     }
+
     .admin-stat-card {
         padding: 0.85rem 1rem;
     }
+
     .admin-stat-value {
         font-size: 1.25rem;
+    }
+
+    .admin-table th {
+        padding: 0.55rem 0.6rem;
+        font-size: 0.78rem;
+    }
+
+    .admin-table td {
+        padding: 0.55rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .admin-table .dropdown-menu {
+        min-width: 190px !important;
+        font-size: 0.82rem;
+    }
+
+    .admin-table .dropdown-item {
+        padding: 0.45rem 0.7rem;
+        font-size: 0.82rem;
+    }
+
+    .admin-filter-tab {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.78rem;
+    }
+
+    /* Modals on extra small screens */
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .modal-body {
+        padding: 1rem !important;
     }
 }
 

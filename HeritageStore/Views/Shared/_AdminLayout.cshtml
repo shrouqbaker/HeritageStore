@@ -188,6 +188,20 @@
                 }
             });
         });
+
+        // ضمان ظهور قوائم الإجراءات بوضوح تام وبدون قص داخل جداول الإدارة
+        document.addEventListener('DOMContentLoaded', function () {
+            const tableDropdowns = document.querySelectorAll('.admin-table [data-bs-toggle="dropdown"]');
+            tableDropdowns.forEach(function (toggleEl) {
+                bootstrap.Dropdown.getOrCreateInstance(toggleEl, {
+                    popperConfig: function (defaultBsPopperConfig) {
+                        return Object.assign({}, defaultBsPopperConfig, {
+                            strategy: 'fixed'
+                        });
+                    }
+                });
+            });
+        });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

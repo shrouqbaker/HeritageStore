@@ -38,6 +38,9 @@
             <form id="registerForm"
                   asp-route-returnUrl="@Model.ReturnUrl"
                   method="post">
+                <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+                <input type="hidden" id="registerGuestCartInput" asp-for="GuestCartJson" />
+                <input type="hidden" id="registerGuestFavsInput" asp-for="GuestFavsJson" />
 
                 <div asp-validation-summary="ModelOnly"
                      class="text-danger mb-3"
@@ -156,4 +159,28 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            try {
+                const cart = localStorage.getItem('guestCart');
+                const favs = localStorage.getItem('guestFavorites');
+                const cartInput = document.getElementById('registerGuestCartInput');
+                const favsInput = document.getElementById('registerGuestFavsInput');
+                if (cartInput && cart) cartInput.value = cart;
+                if (favsInput && favs) favsInput.value = favs;
+
+                const form = document.getElementById('registerForm');
+                if (form) {
+                    form.addEventListener('submit', function () {
+                        const currentCart = localStorage.getItem('guestCart');
+                        const currentFavs = localStorage.getItem('guestFavorites');
+                        if (cartInput && currentCart) cartInput.value = currentCart;
+                        if (favsInput && currentFavs) favsInput.value = currentFavs;
+                    });
+                }
+            } catch (e) {
+                console.error('Error attaching guest data to register form:', e);
+            }
+        });
+    </script>
 }

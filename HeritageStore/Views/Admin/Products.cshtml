@@ -176,14 +176,14 @@
                             <!-- قائمة الإجراءات المنسدلة (Dropdown List) -->
                             <td class="text-center">
                                 <div class="dropdown">
-                                    <button class="btn btn-outline-heritage btn-sm dropdown-toggle py-1 px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px;">
+                                    <button class="btn btn-outline-heritage btn-sm dropdown-toggle py-1 px-3" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false">
                                         الإجراءات
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 12px; border: 1px solid var(--border);">
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                                         @if (product.Status != "approved")
                                         {
                                             <li>
-                                                <form asp-controller="Admin" asp-action="UpdateProductStatus" method="post">
+                                                <form asp-controller="Admin" asp-action="UpdateProductStatus" method="post" class="m-0">
                                                     @Html.AntiForgeryToken()
                                                     <input type="hidden" name="id" value="@product.ProductId" />
                                                     <input type="hidden" name="status" value="approved" />
@@ -197,7 +197,7 @@
                                         @if (product.Status != "sold")
                                         {
                                             <li>
-                                                <form asp-controller="Admin" asp-action="UpdateProductStatus" method="post">
+                                                <form asp-controller="Admin" asp-action="UpdateProductStatus" method="post" class="m-0">
                                                     @Html.AntiForgeryToken()
                                                     <input type="hidden" name="id" value="@product.ProductId" />
                                                     <input type="hidden" name="status" value="sold" />
@@ -221,17 +221,17 @@
 
                                         <li>
                                             <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId" target="_blank" class="dropdown-item py-2">
-                                                <i class="bi bi-eye me-2"></i> معاينة القطعة بالمتجر
+                                                <i class="bi bi-eye me-2" style="color: var(--ink);"></i> معاينة القطعة بالمتجر
                                             </a>
                                         </li>
 
                                         <li><hr class="dropdown-divider"></li>
 
                                         <li>
-                                            <form asp-controller="Admin" asp-action="DeleteProduct" method="post" onsubmit="return confirm('هل أنت متأكد من حذف هذه القطعة التراثية؟');">
+                                            <form asp-controller="Admin" asp-action="DeleteProduct" method="post" class="m-0" onsubmit="return confirm('هل أنت متأكد من حذف هذه القطعة التراثية؟');">
                                                 @Html.AntiForgeryToken()
                                                 <input type="hidden" name="id" value="@product.ProductId" />
-                                                <button type="submit" class="dropdown-item py-2" style="color:#5E1620">
+                                                <button type="submit" class="dropdown-item py-2 text-danger">
                                                     <i class="bi bi-trash3 me-2"></i> حذف القطعة
                                                 </button>
                                             </form>
@@ -257,6 +257,70 @@
             </tbody>
         </table>
     </div>
+
+    @if (Model.TotalPages > 1 || Model.FilteredCount > 0)
+    {
+        <div class="admin-table-footer">
+            <div class="admin-pagination-info">
+                @{
+                    int startItem = Model.FilteredCount == 0 ? 0 : (Model.CurrentPage - 1) * Model.PageSize + 1;
+                    int endItem = Math.Min(Model.CurrentPage * Model.PageSize, Model.FilteredCount);
+                }
+                عرض <strong>@startItem</strong> إلى <strong>@endItem</strong> من إجمالي <strong>@Model.FilteredCount</strong> قطعة
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <ul class="admin-pagination">
+                    <!-- السابق -->
+                    <li class="admin-page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                        <a class="admin-page-link @(!Model.HasPreviousPage ? "disabled" : "")"
+                           asp-action="Products"
+                           asp-route-status="@Model.CurrentStatus"
+                           asp-route-search="@Model.SearchTerm"
+                           asp-route-page="@(Model.CurrentPage - 1)"
+                           title="الصفحة السابقة">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                    @for (int p = 1; p <= Model.TotalPages; p++)
+                    {
+                        if (p == 1 || p == Model.TotalPages || (p >= Model.CurrentPage - 2 && p <= Model.CurrentPage + 2))
+                        {
+                            <li class="admin-page-item @(p == Model.CurrentPage ? "active" : "")">
+                                <a class="admin-page-link"
+                                   asp-action="Products"
+                                   asp-route-status="@Model.CurrentStatus"
+                                   asp-route-search="@Model.SearchTerm"
+                                   asp-route-page="@p">
+                                    @p
+                                </a>
+                            </li>
+                        }
+                        else if (p == Model.CurrentPage - 3 || p == Model.CurrentPage + 3)
+                        {
+                            <li class="admin-page-item disabled">
+                                <span class="admin-page-link disabled">...</span>
+                            </li>
+                        }
+                    }
+
+                    <!-- التالي -->
+                    <li class="admin-page-item @(!Model.HasNextPage ? "disabled" : "")">
+                        <a class="admin-page-link @(!Model.HasNextPage ? "disabled" : "")"
+                           asp-action="Products"
+                           asp-route-status="@Model.CurrentStatus"
+                           asp-route-search="@Model.SearchTerm"
+                           asp-route-page="@(Model.CurrentPage + 1)"
+                           title="الصفحة التالية">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                </ul>
+            }
+        </div>
+    }
 </div>
 
 <!-- ==================== نافذة الرفض المنبثقة ==================== -->

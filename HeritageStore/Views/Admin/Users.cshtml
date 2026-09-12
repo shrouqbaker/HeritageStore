@@ -51,7 +51,7 @@
                     <th>تاريخ التسجيل</th>
                     <th>القطع المعروضة</th>
                     <th>الطلبات</th>
-                    <th class="text-center" style="width: 170px;">المعاينة والتفاصيل</th>
+                    <th class="text-center" style="width: 140px;"></th>
                 </tr>
             </thead>
             <tbody>
@@ -133,12 +133,31 @@
                                 </span>
                             </td>
 
-                            <!-- أزرار المعاينة -->
+                            <!-- قائمة الإجراءات -->
                             <td class="text-center">
-                                <div class="d-inline-flex gap-1">
-                                    <a asp-controller="Profile" asp-action="UserProfile" asp-route-id="@user.Id" target="_blank" class="btn  btn-sm py-1 px-2" title="معاينة الملف العام والمتجر">
-                                        <i class="bi bi-box-arrow-up-right btn-outline-heritage"></i>
-                                    </a>
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-heritage btn-sm dropdown-toggle py-1 px-3" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false">
+                                         التفاصيل
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                        <li>
+                                            <button type="button" class="dropdown-item py-2 btn-view-user-info"
+                                                    data-user-name="@user.UserName"
+                                                    data-user-email="@user.Email"
+                                                    data-user-phone="@(string.IsNullOrEmpty(user.PhoneNumber) ? "غير محدد" : user.PhoneNumber)"
+                                                    data-user-bio="@(string.IsNullOrEmpty(user.Bio) ? "لا توجد نبذة تعريفية مسجلة لهذا الحساب." : user.Bio)"
+                                                    data-user-joined="@user.CreatedAt.ToString("dd/MM/yyyy")"
+                                                    data-user-role="@user.Role"
+                                                    data-user-avatar="@user.ProfileImage">
+                                                <i class="bi bi-person-badge me-2" style="color: var(--maroon);"></i> عرض الملف والتفاصيل
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <a asp-controller="Profile" asp-action="UserProfile" asp-route-id="@user.Id" target="_blank" class="dropdown-item py-2">
+                                                <i class="bi bi-box-arrow-up-right me-2" style="color: var(--gold);"></i> زيارة المتجر بالصفحة العامة
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </div>
                             </td>
                         </tr>
@@ -156,6 +175,67 @@
             </tbody>
         </table>
     </div>
+
+    @if (Model.TotalPages > 1 || Model.FilteredCount > 0)
+    {
+        <div class="admin-table-footer">
+            <div class="admin-pagination-info">
+                @{
+                    int startItem = Model.FilteredCount == 0 ? 0 : (Model.CurrentPage - 1) * Model.PageSize + 1;
+                    int endItem = Math.Min(Model.CurrentPage * Model.PageSize, Model.FilteredCount);
+                }
+                عرض <strong>@startItem</strong> إلى <strong>@endItem</strong> من إجمالي <strong>@Model.FilteredCount</strong> مستخدم
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <ul class="admin-pagination">
+                    <!-- السابق -->
+                    <li class="admin-page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                        <a class="admin-page-link @(!Model.HasPreviousPage ? "disabled" : "")"
+                           asp-action="Users"
+                           asp-route-search="@Model.SearchTerm"
+                           asp-route-page="@(Model.CurrentPage - 1)"
+                           title="الصفحة السابقة">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                    @for (int p = 1; p <= Model.TotalPages; p++)
+                    {
+                        if (p == 1 || p == Model.TotalPages || (p >= Model.CurrentPage - 2 && p <= Model.CurrentPage + 2))
+                        {
+                            <li class="admin-page-item @(p == Model.CurrentPage ? "active" : "")">
+                                <a class="admin-page-link"
+                                   asp-action="Users"
+                                   asp-route-search="@Model.SearchTerm"
+                                   asp-route-page="@p">
+                                    @p
+                                </a>
+                            </li>
+                        }
+                        else if (p == Model.CurrentPage - 3 || p == Model.CurrentPage + 3)
+                        {
+                            <li class="admin-page-item disabled">
+                                <span class="admin-page-link disabled">...</span>
+                            </li>
+                        }
+                    }
+
+                    <!-- التالي -->
+                    <li class="admin-page-item @(!Model.HasNextPage ? "disabled" : "")">
+                        <a class="admin-page-link @(!Model.HasNextPage ? "disabled" : "")"
+                           asp-action="Users"
+                           asp-route-search="@Model.SearchTerm"
+                           asp-route-page="@(Model.CurrentPage + 1)"
+                           title="الصفحة التالية">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                </ul>
+            }
+        </div>
+    }
 </div>
 
 <!-- ==================== نافذة منبثقة لبيانات المستخدم التفصيلية ==================== -->

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using HeritageStore.Data;
 using HeritageStore.Models;
@@ -22,20 +23,29 @@ public class LoginModel : PageModel
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ApplicationDbContext _context;
     private readonly ILogger<LoginModel> _logger;
 
     public LoginModel(
         SignInManager<ApplicationUser> signInManager,
         UserManager<ApplicationUser> userManager,
+        ApplicationDbContext context,
         ILogger<LoginModel> logger)
     {
         _signInManager = signInManager;
         _userManager = userManager;
+        _context = context;
         _logger = logger;
     }
 
     [BindProperty]
     public InputModel Input { get; set; } = default!;
+
+    [BindProperty]
+    public string? GuestCartJson { get; set; }
+
+    [BindProperty]
+    public string? GuestFavsJson { get; set; }
 
     public IList<AuthenticationScheme>? ExternalLogins { get; set; }
 
@@ -66,7 +76,7 @@ public class LoginModel : PageModel
             ModelState.AddModelError(string.Empty, ErrorMessage);
         }
 
-        returnUrl ??= Url.Content("~/");
+        returnUrl = returnUrl ?? Request.Query["ReturnUrl"].FirstOrDefault() ?? Request.Query["returnUrl"].FirstOrDefault() ?? Url.Content("~/");
 
         // Clear the existing external cookie to ensure a clean login process
         await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
@@ -78,7 +88,8 @@ public class LoginModel : PageModel
 
     public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
     {
-        returnUrl ??= Url.Content("~/");
+        returnUrl = returnUrl ?? Request.Form["returnUrl"].FirstOrDefault() ?? Request.Query["ReturnUrl"].FirstOrDefault() ?? Request.Query["returnUrl"].FirstOrDefault() ?? Url.Content("~/");
+        ReturnUrl = returnUrl;
 
         ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
@@ -125,11 +136,24 @@ public class LoginModel : PageModel
             if (result.Succeeded)
             {
                 _logger.LogInformation("User logged in.");
+
+                // دمج عناصر السلة والمفضلة المخزنة في جهاز الزائر مباشرة قبل التحويل
+                await MergeGuestDataAsync(user.Id);
+
                 if (await _userManager.IsInRoleAsync(user, "Admin"))
                 {
+                    if (!string.IsNullOrEmpty(returnUrl) && returnUrl != "/" && returnUrl != Url.Content("~/") && Url.IsLocalUrl(returnUrl))
+                    {
+                        return LocalRedirect(returnUrl);
+                    }
                     return LocalRedirect("/Admin");
                 }
-                return LocalRedirect(returnUrl);
+
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                {
+                    return LocalRedirect(returnUrl);
+                }
+                return LocalRedirect("~/");
             }
             if (result.RequiresTwoFactor)
             {
@@ -149,5 +173,88 @@ public class LoginModel : PageModel
 
         // If we got this far, something failed, redisplay form
         return Page();
+    }
+
+    private async Task MergeGuestDataAsync(string userId)
+    {
+        // دمج عناصر السلة
+        if (!string.IsNullOrWhiteSpace(GuestCartJson))
+        {
+            try
+            {
+                var productIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(GuestCartJson);
+                if (productIds != null && productIds.Any())
+                {
+                    var existingIds = await _context.CartItems
+                        .Where(c => c.UserId == userId)
+                        .Select(c => c.ProductId)
+                        .ToListAsync();
+
+                    var newIds = productIds.Distinct().Where(id => !existingIds.Contains(id)).ToList();
+                    if (newIds.Any())
+                    {
+                        var validProducts = await _context.Products
+                            .Where(p => newIds.Contains(p.ProductId) && p.ListingType == "for_sale" && p.Status == "approved")
+                            .Select(p => p.ProductId)
+                            .ToListAsync();
+
+                        foreach (var pid in validProducts)
+                        {
+                            _context.CartItems.Add(new CartItem
+                            {
+                                UserId = userId,
+                                ProductId = pid,
+                                AddedAt = DateTime.Now
+                            });
+                        }
+                        await _context.SaveChangesAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error merging guest cart on login");
+            }
+        }
+
+        // دمج عناصر المفضلة
+        if (!string.IsNullOrWhiteSpace(GuestFavsJson))
+        {
+            try
+            {
+                var favIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(GuestFavsJson);
+                if (favIds != null && favIds.Any())
+                {
+                    var existingFavs = await _context.Favorites
+                        .Where(f => f.UserId == userId)
+                        .Select(f => f.ProductId)
+                        .ToListAsync();
+
+                    var newFavIds = favIds.Distinct().Where(id => !existingFavs.Contains(id)).ToList();
+                    if (newFavIds.Any())
+                    {
+                        var validFavProducts = await _context.Products
+                            .Where(p => newFavIds.Contains(p.ProductId))
+                            .Select(p => p.ProductId)
+                            .ToListAsync();
+
+                        foreach (var pid in validFavProducts)
+                        {
+                            _context.Favorites.Add(new Favorite
+                            {
+                                UserId = userId,
+                                ProductId = pid,
+                                CreatedAt = DateTime.Now
+                            });
+                        }
+                        await _context.SaveChangesAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error merging guest favorites on login");
+            }
+        }
     }
 }

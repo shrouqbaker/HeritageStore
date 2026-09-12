@@ -170,10 +170,10 @@
                                     <div class="text-center py-2 mb-2">
                                         <small class="text-muted">أهلاً بك في حِكاية</small>
                                     </div>
-                                    <a class="btn btn-heritage w-100 mb-2 py-2 text-center" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Context.Request.Path">
+                                    <a class="btn btn-heritage w-100 mb-2 py-2 text-center" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Context.Request.Path@Context.Request.QueryString">
                                         <i class="bi bi-box-arrow-in-right me-1"></i> تسجيل الدخول
                                     </a>
-                                    <a class="btn btn-outline-heritage w-100 py-2 text-center" asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="@Context.Request.Path">
+                                    <a class="btn btn-outline-heritage w-100 py-2 text-center" asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="@Context.Request.Path@Context.Request.QueryString">
                                         <i class="bi bi-person-plus me-1"></i> إنشاء حساب جديد
                                     </a>
                                 </div>
@@ -239,10 +239,10 @@
                                 <div class="mobile-guest-card p-3 mb-2 text-center">
                                     <p class="mb-2 text-muted fs-7">قم بتسجيل الدخول للاستمتاع بجميع تجارب حكاية</p>
                                     <div class="d-grid gap-2">
-                                        <a class="btn btn-heritage py-2" asp-area="Identity" asp-page="/Account/Login">
+                                        <a class="btn btn-heritage py-2" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Context.Request.Path@Context.Request.QueryString">
                                             <i class="bi bi-box-arrow-in-right me-1"></i> تسجيل الدخول
                                         </a>
-                                        <a class="btn btn-outline-heritage py-2" asp-area="Identity" asp-page="/Account/Register">
+                                        <a class="btn btn-outline-heritage py-2" asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="@Context.Request.Path@Context.Request.QueryString">
                                             <i class="bi bi-person-plus me-1"></i> إنشاء حساب جديد
                                         </a>
                                     </div>

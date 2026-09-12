@@ -27,19 +27,34 @@
 <!-- ===== أهمية التراث + فيديو ===== -->
 <section class="container mt-5">
     <div class="row align-items-center g-5">
+
+        <!-- النص -->
         <div class="col-lg-6">
             <h2 class="mb-3">لماذا نوثّق التراث؟</h2>
+
             <p class="lead-text">
-                كل نقشة تطريز تحمل رمزًا ودلالة، وكل ثوب يعكس هوية منطقة بأكملها. مع مرور الوقت،
-                تندثر الكثير من هذه الحكايات إن لم تُحفظ وتُنقل للأجيال القادمة رقميًا.
+                كل نقشة تطريز تحمل رمزًا ودلالة، وكل ثوب يعكس هوية منطقة بأكملها.
+                مع مرور الوقت، تندثر الكثير من هذه الحكايات إن لم تُحفظ وتُنقل
+                للأجيال القادمة رقميًا.
             </p>
-            <a asp-controller="Home" asp-action="About" class="btn btn-outline-heritage mt-2">اعرف المزيد</a>
+
+            <a asp-controller="Home"
+               asp-action="About"
+               class="btn btn-outline-heritage mt-2">
+                اعرف المزيد
+            </a>
         </div>
+
+        <!-- الفيديو -->
         <div class="col-lg-6">
-            <div class="ratio ratio-16x9">
-                <iframe src="https://www.youtube.com/embed/dQw4w9WgXc" title="التراث الفلسطيني والأردني" allowfullscreen></iframe>
+            <div class="video-wrapper">
+                <video autoplay muted playsinline preload="metadata" controls>
+                    <source src="@Url.Content("~/video/0912.mp4")" type="video/mp4" />
+                    متصفحك لا يدعم تشغيل الفيديو.
+                </video>
             </div>
         </div>
+
     </div>
 </section>
 
